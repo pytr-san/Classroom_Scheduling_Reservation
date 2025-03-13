@@ -1,0 +1,51 @@
+.card{
+    border: 1px solid hsl(0, 0%, 80%);
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    max-width: 250px;
+    display: inline-block;
+
+}
+
+.card .card-image{
+    max-width: 60%;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 10px;
+
+}
+
+.card .card-title{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    color: black;
+}
+.card .card-text{
+
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(83, 84, 84);
+}
+
+.material-symbol-outlined{
+background-color: aliceblue;
+color: rgb(65, 220, 93);
+padding: 10px 20px;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+
+}
+.sidebar{
+    width: 60px;
+    height: 100%;
+    background-color: rgb(18, 46, 252);
+    padding: 20px;
+    box-sizing: border-box;
+    color: aliceblue;
+    overflow: hidden;
+    border-radius: 5px 0 0 5px;
+    transition: .75s ease;
+}
