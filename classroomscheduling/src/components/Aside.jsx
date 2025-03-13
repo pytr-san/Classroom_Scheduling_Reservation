@@ -10,6 +10,7 @@ function Aside(){
                         <li><a href="#"><span className="material-symbol-outlined">classroom</span><span>Classroom</span></a></li>
                         <li><a href="#"><span className="material-symbol-outlined">course</span><span>Course</span></a></li>
                         <li><a href="#"><span className="material-symbol-outlined">settings</span><span>Settings</span></a></li>
+                        <p>Welcome to access</p>
                     </ul>
             </div>
      </aside>
