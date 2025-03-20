@@ -1,0 +1,163 @@
+
+.container {
+    background: #004000;
+    display: flex;
+    flex-direction: row; /* Side-by-side layout */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;  /* Full viewport height */
+    width: 100vw;   /* Full viewport width */
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 20px; /* Space between the logo and form */
+}
+
+/* Left Image Section */
+.imageContainer {
+    flex: 1; /* Left side takes up half the screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('/assets/your-binary-bg.png') center/cover no-repeat;
+    border-right: 5px solid #004000; /* Border between sections */
+}
+
+/* Logo Image */
+.logoImage {
+    width: 100%;
+ 
+    max-width: 1000px; /* Adjust as necessary */
+    max-height: 100vh; /* Ensures it fits within the viewport */
+    object-fit: contain; /* Keeps aspect ratio while fitting inside */
+}
+
+/* Right Form Section */
+.div1 {
+    flex: 1; /* Right side takes up half the screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #00991fdd; /* Light green */
+    border-left: 5px solid #004000;
+}
+
+/* Form Container */
+.formContainer {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    height: auto; /* Fix the incorrect '100hv' */
+    flex-direction: column;
+    border: 1px solid #004000;
+    background-color: rgb(208, 208, 208);
+}
+
+/* RESPONSIVE DESIGN FOR MOBILE */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stack items vertically */
+        gap: 10px;
+    }
+
+    .imageContainer {
+        flex: none;
+        width: 100%; /* Make image take full width */
+        border-right: none; /* Remove border */
+        border-bottom: 5px solid #004000; /* Add separator */
+    }
+
+    .div1 {
+        flex: none;
+        width: 100%; /* Form takes full width */
+        border-left: none; /* Remove side border */
+    }
+
+    .formContainer {
+        width: 90%; /* Make form responsive */
+        max-width: 400px;
+    }
+}
+
+  
+  .title {
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .inputGroup {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    color: #004000;
+  }
+  
+  .inputGroup input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #004000;
+    border-radius: 5px;
+  }
+  
+  .inputWithIcon {
+    position: relative;
+  }
+  
+  .inputWithIcon input {
+    width: 100%;
+    padding-right: 30px;
+  }
+  
+  .checkIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: green;
+  }
+  
+  .buttonContainer {
+    text-align: center;
+  }
+  
+  .confirmBtn {
+    width: 100%;
+    background: linear-gradient(to bottom, #008000, #004000);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .confirmBtn:hover {
+    background: linear-gradient(90deg, #008000, #00A000); /* Lighter green on hover */
+    transform: scale(1.05); /* Slightly enlarges */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Adds glow effect */
+  }
+
+  .loginBtn {
+    width: 100%;
+    background: gray;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .loginBtn:hover{
+    background: linear-gradient(90deg, #008000, #00A000); /* Lighter green on hover */
+    transform: scale(1.05); /* Slightly enlarges */
+    box-shadow: 0px 4px 10px rgba(145, 145, 145, 0.667); /* Adds glow effect */
+  }
+  
