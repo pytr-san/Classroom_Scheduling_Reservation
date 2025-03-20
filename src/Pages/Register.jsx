@@ -3,19 +3,14 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { FaUser, FaEnvelope, FaLock, FaCheckCircle } from "react-icons/fa";
 import accesslogo from "../assets/bg.png";
+import axios from "axios";
 
-export default function Register({setAuth}) {
+export default function Register() {
 
     const navigate = useNavigate();
 
-    const handleRegister = (e) => {
-        // Simulate successful login
-        e.preventDefault()
-        setAuth(true);
-        navigate("/");
-
-    }
-
+    const [errorMessage, setErrorMessage] = useState("");
+    
     const [data, setData] = useState({
         name: '',
         email: '',
@@ -23,6 +18,23 @@ export default function Register({setAuth}) {
         reTypePassword:'',
     })
 
+    const handleRegister = async (e) => {
+        e.preventDefault(); // Prevent form submission reload
+    
+        try {
+            const response = await axios.post('http://localhost:8000/auth/register', data, { withCredentials: true });
+    
+            if (response.status === 201) { // Check status, not data
+                navigate('/login'); // Redirect on success
+            }
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.error) {
+                setErrorMessage(err.response.data.error); // Display backend error
+            } else {
+                setErrorMessage("Something went wrong. Please try again.");
+            }
+        }
+    };    
 
     return (
     <>
@@ -43,6 +55,7 @@ export default function Register({setAuth}) {
         <div className={styles.imageContainer}>
             <img src={accesslogo} alt="Access Logo" className={styles.logoImage} />
         </div>
+
 
         <div className="div1">
         <form onSubmit={handleRegister}  className={styles.formContainer}>
@@ -83,6 +96,7 @@ export default function Register({setAuth}) {
                 <button type="submit"className={styles.confirmBtn}>Confirm</button>
                 <p>Already have an account?</p>
                 <button className={styles.loginBtn} onClick={() => navigate("/login")}>Login</button>
+                                                
             </div>
            </form>
         </div>

@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "./Navbar.css"; // External CSS file
+import "./Header.css"
 import spistlogo from "../assets/logo1.png";
 
 function Header({ toggleSidebar }) {

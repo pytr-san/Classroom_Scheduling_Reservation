@@ -1,36 +1,25 @@
-const express = require('express');
-const mysql = require('mysql2')
-const dotenv = require("dotenv")
-const cors = require('cors')
-dotenv.config({ path: "./.env" });
-
+import express from 'express';
+import cors from 'cors';
+import authRouter from './routes/authRoute.js'
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173", // Allow requests from your frontend
+    credentials: true,  // Allow cookies, authentication headers, etc.
+}
+));
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password:'',
-    database: 'schedulingsystem',
-})
-
-
-    db.connect( (error) => {
-    if(error){
-        console.log(error)
-    }else{
-        console.log("Database Connected...")
-    }
-})
-
+app.use(express.json())
+app.use('/auth', authRouter)
 
 app.get("/", (req, res) =>{
     res.send("<h1>I was Here</h1>")
 })
 
 
-app.listen(8000, () =>{
-
-    console.log("Server Started on Port 8000");
-})
+app.listen(process.env.PORT || 8000, () => {
+    console.log(`Server Started on Port ${process.env.PORT || 8000}`);
+  });
+  

@@ -1,7 +1,6 @@
-/* SIDEBAR */
 .sidebar {
   grid-area: sidebar;
-  height: calc(100vh - 70px); /* Full height minus navbar */
+  height: calc(100vh - 70px);
   width: 80px;
   background: #f8f9fa;
   padding-top: 10px;
@@ -9,58 +8,105 @@
   position: fixed;
   top: 70px;
   left: 0;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-.sidebar.open {
-  width: 200px; /* Expanded size */
+.sidebar:hover {
+  width: 200px; /* Expand on hover */
 }
-.sidebar.open + .main-content {
-  margin-left: 200px;
+
+
+.sidebar:hover span {
+  opacity: 1; /* Show text on hover */
 }
+
 .sidebar a {
   display: flex;
   align-items: center;
   padding: 10px;
   color: #333;
   text-decoration: none;
+  transition: background 0.3s ease, width 0.3s ease;
 }
 
-.sidebar img, .sidebar i {
-  width: 24px; /* Icon size */
+.sidebar img,
+.sidebar i {
+  width: 24px;
   height: 24px;
-  margin-right: 10px; /* Space between icon and text */
+  margin-right: 10px;
 }
 
 .sidebar span {
-  opacity: 0; /* Hide text */
+  opacity: 0;
   transition: opacity 0.3s ease;
 }
+.sidebar.open {
+  width: 200px; /* Expanded width */
+}
+.sidebar:hover + .main-content {
+  margin-left: 200px; /* Shift content when expanded */
+}
 
-.sidebar.open span {
-  opacity: 1; /* Show text on hover */
+.nav-link {
+  border-radius: 10px; /* Initial border radius */
+  transition: all 0.3s ease-in-out; /* Smooth transition */
+  padding: 10px; /* Ensuring padding consistency */
+  width: 150px; /* Default width */
 }
 
 .nav-link:hover {
-  border-radius: 25px;
-  background: #d0f0d8; 
-  padding: 10px;
+  border-radius: 20px; /* Smooth rounded effect */
+  background: #d0f0d8;
+  width: 150px; /* Expanded width */
+}
+
+.img-icon {
+  width: 2rem;
+  height: 3rem;
+  object-fit: contain;
+}
+
+.navbar-brand {
+  font-family: 'Times New Roman', Times, serif;
+  color: white;
+}
+
+/* Logout Button */
+.logout-btn {
   display: flex;
   align-items: center;
-  white-space: nowrap;
-  width: 150px; /* Expanded width when hovered */
+  justify-content: flex-start;
+  background: transparent;
+  border: none;
+  color: #ff2727;
+  padding: 10px;
+  width: 80px; /* Matches sidebar width */
+  transition: background 0.3s ease, width 0.3s ease, border-radius 0.3s ease;
+  margin-top: auto; /* Pushes it to the bottom */
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
 
+.sidebar:hover .logout-btn {
+  width: 200px; /* Expand on hover */
 }
-.btn,.navbar,
-.navbar-default {
-    background-image: linear-gradient(to bottom,#3fa53f 0,#006c51,#023d0f 100%) !important; /* override background image gradient w/ flat color */
+
+.logout-btn i {
+  margin-right: 10px;
+  font-size: 1.2rem;
 }
-.img-icon {
-  width: 2rem;  /* Match icon size */
-  height: 3rem; /* Keep it square */
-  object-fit: contain; /* Ensures the image scales properly */
+
+.logout-btn span {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
-.navbar-brand{
-  font-family:'Times New Roman', Times, serif;
-  color: white;
+
+.sidebar:hover .logout-btn span {
+  opacity: 1;
+}
+
+.logout-btn:hover {
+  background: #ededed;
+  border-radius: 10px;
 }

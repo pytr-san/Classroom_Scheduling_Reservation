@@ -7,23 +7,40 @@ import Course from "./Pages/Course/Course.jsx"
 import Settings from "./Pages/Settings/Settings.jsx"
 import Register from "./Pages/Register.jsx"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Login from "./Pages/Login.jsx";
 import axios from "axios";
 
 
-axios.defaults.baseURL ='http://localhost:8000'
-axios.defaults.withCredentials = true
+// //axios.defaults.baseURL ='http://localhost:8000'
+// axios.defaults.withCredentials = true
 
 function App() {
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
+    // Load authentication state from localStorage
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        localStorage.getItem("isAuthenticated") === "true"  
+    );  
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Update localStorage when authentication state changes
+    useEffect(() => {
+        localStorage.setItem("isAuthenticated", isAuthenticated.toString());
+    }, [isAuthenticated]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);
       };
-    
+      
+      const handleLogout = () => {
+                const confirmLogout = window.confirm("Are you sure you want to log out?");
+        
+        if (confirmLogout) {
+            localStorage.removeItem("isAuthenticated"); // Remove from local storage
+            localStorage.removeItem("token"); // Remove JWT token if stored
+            setIsAuthenticated(false); // Update state
+      }
+    };
     return(
         <>
         <div className="app-container">
@@ -31,7 +48,7 @@ function App() {
             {isAuthenticated && (
             <>
                 <Header toggleSidebar= {toggleSidebar} />
-                <Navbar isSidebarOpen= {isSidebarOpen} className="navbar" />
+                <Navbar isSidebarOpen= {isSidebarOpen} handleLogout={handleLogout} className="navbar" />
             </>
             )}
 
@@ -40,15 +57,11 @@ function App() {
                 {/* Public Routes */}
                 <Route
                     path="/login"
-                    element={isAuthenticated ? <Navigate to="/" /> : <Login setAuth={() => { 
-                        setIsAuthenticated(true); 
-                        setIsSidebarOpen(true);}} />}
+                    element={isAuthenticated ? <Navigate to="/" /> : <Login setAuth={setIsAuthenticated} />}
                 />
                 <Route
                     path="/register"
-                    element={isAuthenticated ? <Navigate to="/" /> : <Register setAuth={() => {                        
-                        setIsAuthenticated(true); 
-                        setIsSidebarOpen(true);}} />}
+                    element={isAuthenticated ? <Navigate to="/" /> : <Register setAuth={setIsAuthenticated} />}
                 />
 
                 {/* Private Routes */}

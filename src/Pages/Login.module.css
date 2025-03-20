@@ -1,0 +1,84 @@
+/* Login.module.css */
+
+/* Container for centering the form */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #58b851, #042c04, #000000);
+}
+
+/* Form card */
+.formContainer {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+}
+
+/* Label styling */
+.label {
+    display: block;
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #333;
+    text-align: left;
+}
+
+/* Input field styling */
+.input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border 0.3s ease;
+}
+
+.input:focus {
+    border-color: #764ba2;
+    outline: none;
+}
+
+/* Button styling */
+.button {
+    width: 100%;
+    padding: 10px;
+    background: #008e3b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button:hover {
+    background: rgba(0, 185, 52, 0.947);
+}
+
+/* Register button */
+.registerButton {
+    background: transparent;
+    color: #131313;
+    margin-top: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.registerButton:hover {
+    color: #07e42c;
+}
+
+/* Error message */
+.errorMessage {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
