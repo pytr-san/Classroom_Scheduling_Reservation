@@ -18,6 +18,14 @@
                 return res.status(400).json({ error: "All fields are required" });
             }
 
+                // Allowed domain
+            const allowedDomain = "@spist.edu.ph";
+
+            // Check if the email ends with the allowed domain
+            if (!email.endsWith(allowedDomain)) {
+                return res.status(403).json({ error: "Unauthorized email. Please use your organization email." });
+            }
+
             const [existingUser] = await db.execute(
                 'SELECT * FROM admin WHERE email = ? OR name = ?',
                 [email, name]

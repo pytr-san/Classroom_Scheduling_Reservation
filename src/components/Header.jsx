@@ -7,7 +7,7 @@ function Header({ toggleSidebar }) {
 
   return (
   <>
-    <nav className="navbar navbar-expand-lg navbar-light bg-light px-3">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light px-3 sticky-top shadow">
       <button 
         className="btn btn-light me-3" 
         onClick={toggleSidebar} // Calls function from parent component

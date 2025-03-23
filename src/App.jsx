@@ -9,6 +9,8 @@ import Register from "./Pages/Register.jsx"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Login from "./Pages/Login.jsx";
+import ManageCourse from "./Pages/Course/ManageCourse.jsx";
+import ErrorBoundary from "./components/ErrorBoundary"  
 import axios from "axios";
 
 
@@ -48,12 +50,13 @@ function App() {
             {isAuthenticated && (
             <>
                 <Header toggleSidebar= {toggleSidebar} />
-                <Navbar isSidebarOpen= {isSidebarOpen} handleLogout={handleLogout} className="navbar" />
+                <Navbar isSidebarOpen= {isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} className="navbar" />
             </>
             )}
 
             <div className="main-content">
             <Routes>
+                
                 {/* Public Routes */}
                 <Route
                     path="/login"
@@ -70,6 +73,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/classroom" element={<Classroom />} />
                         <Route path="/course" element={<Course />} />
+                        <Route path="/course/:id/ManageCourse" element={<ManageCourse />} />
                         <Route path="/settings" element={<Settings />} />
                     </>
                 ) : (

@@ -1,42 +1,55 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Gear, Plus } from "react-bootstrap-icons";
 import copppLogo from "../../assets/coppp.png";
-
+import axios from "axios";
+import styles from "./Course.module.css"; // Import CSS module
+import { useNavigate } from "react-router-dom";
 
 const Courses = () => {
-  const [courses, setCourses] = useState(["BSCPE", "BSCS", "BSIT"]);
+  const [courses, setCourses] = useState([]);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/course")
+      .then((response) => {
+        console.log("Courses API Response:", response.data); // Debug
+        setCourses(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching courses:", error);
+      });
+  }, []);
 
   return (
-    <div className="container text-center mt-5">
+    <div className={styles.container}>
       {/* Header Section */}
-      <div className="mb-4">
-        <img
-          src={copppLogo}// Replace with your actual logo path
-          alt="ACCESS Department Logo"
-          className="img-fluid rounded-circle"
-          style={{ width: "120px", height: "120px" }}
-        />
-        <h2 className="mt-3 fw-bold">ACCESS DEPARTMENT</h2>
-        <p className="text-muted">A Combination of Computer Experts and Special Students</p>
+      <div className={styles.header}>
+        <img src={copppLogo} alt="ACCESS Department Logo" className={styles.logo} />
+        <h2 className={styles.title}>ACCESS DEPARTMENT</h2>
+        <p className={styles.subtitle}>A Combination of Computer Experts and Special Students</p>
       </div>
 
       {/* Add Course Button */}
-      <button className="btn btn-outline-dark d-flex align-items-center mx-auto mb-4">
+      <button className={styles.addCourseButton}>
         <Plus className="me-2" /> Add Course
       </button>
 
       {/* Course List */}
-      <div className="card p-3 shadow-sm">
-        {courses.map((course, index) => (
-          <div
-            key={index}
-            className="d-flex justify-content-between align-items-center border-bottom py-2"
-          >
-            <span className="fw-semibold">{course}</span>
-            <Gear size={20} className="text-secondary" />
-          </div>
-        ))}
+      <div className={styles.courseCard}>
+        {courses.length > 0 ? (
+          courses.map((course, index) => (
+            <div key={index} className={styles.courseItem}>
+              <span className={styles.courseName}>{course.course_name}</span>
+              <Gear size={20} 
+              className={styles.icon}
+              onClick={() => navigate(`/course/${course.course_id}/ManageCourse`)} // Navigate on click
+              style={{ cursor: "pointer" }} // Make it clickable
+               />
+            </div>
+          ))
+        ) : (
+          <p className={styles.subtitle}>No courses available</p>
+        )}
       </div>
     </div>
   );

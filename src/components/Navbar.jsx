@@ -5,7 +5,7 @@ import "./Navbar.css";
 import accesslogo from "../assets/coppp.png"
 import { Link } from "react-router-dom";
 
-function Navbar({ isSidebarOpen, handleLogout}) {
+function Navbar({ isSidebarOpen, setIsSidebarOpen, handleLogout}) {
 
   return (
     <>

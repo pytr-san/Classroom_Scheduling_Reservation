@@ -1,0 +1,115 @@
+/* Courses.module.css */
+
+/* Page Container */
+.container {
+    text-align: center;
+    margin-top: 3rem;
+  }
+  
+  /* Header Section */
+  .header {
+    margin-bottom: 2rem;
+  }
+  
+  .logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  
+  .subtitle {
+    color: #6c757d;
+  }
+  
+  /* Add Course Button */
+  .addCourseButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid black;
+    background-color: transparent;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .addCourseButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .container {
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  .header {
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+  }
+  
+  .title {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .subtitle {
+    color: gray;
+  }
+  
+  .addCourseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    padding: 10px 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .addCourseBtn:hover {
+    background: black;
+    color: white;
+  }
+  
+  .courseCard {
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    width: 60%;
+    margin: auto;
+  }
+  
+  .courseItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .courseName {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .settingsIcon {
+    color: gray;
+    cursor: pointer;
+  }
+  

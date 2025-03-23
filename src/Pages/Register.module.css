@@ -123,7 +123,7 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: green;
+    color: rgb(219, 219, 219);
   }
   
   .buttonContainer {
@@ -141,9 +141,11 @@
   }
 
   .confirmBtn:hover {
-    background: linear-gradient(90deg, #008000, #00A000); /* Lighter green on hover */
-    transform: scale(1.05); /* Slightly enlarges */
+    background: linear-gradient(90deg, #00c500, #1bff1b); /* Lighter green on hover */
+    transform: scale(1.0); /* Slightly enlarges */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Adds glow effect */
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
   }
 
   .loginBtn {
@@ -156,8 +158,22 @@
     cursor: pointer;
   }
   .loginBtn:hover{
-    background: linear-gradient(90deg, #008000, #00A000); /* Lighter green on hover */
+    background: linear-gradient(90deg, #171717, #9b9b9b); /* Lighter green on hover */
     transform: scale(1.05); /* Slightly enlarges */
     box-shadow: 0px 4px 10px rgba(145, 145, 145, 0.667); /* Adds glow effect */
   }
   
+  .errorMessage {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.passwordHint {
+  font-size: 0.5rem;
+  color: #4a4a4a; /* Gray color for a subtle hint */
+  margin-top: 5px;
+  margin-left: 5px;
+margin-top: 10px;
+margin-bottom: 0px;
+}
