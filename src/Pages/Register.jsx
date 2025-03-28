@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { FaUser, FaEnvelope, FaLock, FaCheckCircle } from "react-icons/fa";
@@ -8,35 +8,24 @@ import axios from "axios";
 export default function Register() {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
+    const userRef = useRef();
 
     const [data, setData] = useState({
         name: "",
         email: "",
         password: "",
         reTypePassword: "",
+        role: "", 
     });
 
-    const [passwordValid, setPasswordValid] = useState(null);
-    const [passwordMatch, setPasswordMatch] = useState(null);
-
-    // ✅ Password Validation Function
-    const validatePassword = (password) => {
-        return password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    };
-
-    // ✅ Real-time validation
+    const [passwordValid, setPasswordValid] = useState(false);
+    const [passwordMatch, setPasswordMatch] = useState(false);
+    useEffect(()=> {
+        userRef.current.focus();
+    })
     useEffect(() => {
-        if (data.password.length === 0) {
-            setPasswordValid(null);
-        } else {
-            setPasswordValid(validatePassword(data.password));
-        }
-
-        if (data.password && data.reTypePassword) {
-            setPasswordMatch(data.password === data.reTypePassword);
-        } else {
-            setPasswordMatch(null);
-        }
+        setPasswordValid(data.password.length === 0 ? false : data.password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(data.password));
+        setPasswordMatch(data.password && data.reTypePassword ? data.password === data.reTypePassword : false);
     }, [data.password, data.reTypePassword]);
 
     const handleRegister = async (e) => {
@@ -51,11 +40,15 @@ export default function Register() {
         }
         if (!data.password) {
             newErrors.password = "Password is required.";
-        } else if (!validatePassword(data.password)) {
-            newErrors.password = "Password must be at least 6 characters and include a special character.";
+        } else if (!passwordValid) {
+            newErrors.password = "Password must be at least 8 characters and include a special character.";
         }
         if (data.password !== data.reTypePassword) {
             newErrors.reTypePassword = "Passwords do not match.";
+        }
+
+        if (!data.role) {
+            newErrors.role = "Role selection is required.";
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -65,9 +58,16 @@ export default function Register() {
 
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
+
             if (response.status === 201) {
                 navigate("/login");
             }
+            
+            // if (response.status === 201 && !role==="student") {
+            //     navigate("/login");
+            // }else{
+            //     navigate("/newStudent");
+            // }
         } catch (err) {
             setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
         }
@@ -76,133 +76,75 @@ export default function Register() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setData({ ...data, [name]: value });
-    
-        // Remove the error when the user corrects the input
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
-            if (name === "name" && value.trim()) delete newErrors.name;
-            if (name === "email") {
-                if (value.trim()) delete newErrors.email;
-                if (value.endsWith("@spist.edu.ph")) delete newErrors.email;
-            }
-            if (name === "password") {
-                if (value.length >= 6 && /[!@#$%^&*(),.?":{}|<>]/.test(value)) delete newErrors.password;
-            }
-            if (name === "reTypePassword" && value === data.password) delete newErrors.reTypePassword;
+            if (name in newErrors) delete newErrors[name];
+        if (name === "role" && value) delete newErrors.role;
             return newErrors;
         });
     };
-    
+
     return (
+    
         <div className={styles.container}>
             <div className={styles.imageContainer}>
                 <img src={accesslogo} alt="Access Logo" className={styles.logoImage} />
             </div>
-
             <div className="div1">
                 <form onSubmit={handleRegister} className={styles.formContainer}>
                     <h2 className={styles.title}>REGISTRATION FORM</h2>
-
                     {errors.server && <p className={styles.errorMessage}>{errors.server}</p>}
-
-                    {/* Name Input */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label} htmlFor="role">Role</label>
+                        {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
+                        <select id="role" name="role" value={data.role} onChange={handleChange}>
+                            <option value="">Select Role</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Student">Student</option>
+                        </select>
+                    </div>
                     <div className={styles.inputGroup}>
                         <label className={styles.label} htmlFor="fullName">
                             <FaUser className={styles.icon} /> Name
                         </label>
                         {errors.name && <p className={styles.errorMessage}>{errors.name}</p>}
-                        <input
-                            id="fullName"
-                            type="text"
-                            name="name"
-                            placeholder="Enter full name"
-                            value={data.name}
-                            onChange={handleChange}
-                        />
+                        <input id="fullName" type="text" name="name" ref={userRef} placeholder="Enter full name" required value={data.name} onChange={handleChange} />
                     </div>
-
-                    {/* Email Input */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label} htmlFor="email">
                             <FaEnvelope className={styles.icon} /> Email
                         </label>
                         {errors.email && <p className={styles.errorMessage}>{errors.email}</p>}
-                        <input
-                            id="email"
-                            type="email"
-                            name="email"
-                            placeholder="Enter your email"
-                            value={data.email}
-                            onChange={handleChange}
-                        />
+                        <input id="email" type="email" name="email" placeholder="Enter your email" value={data.email} onChange={handleChange} />
                     </div>
-
-                    {/* Password Input with Check Icon */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label} htmlFor="password">
-                            <FaLock className={styles.icon} /> Password  <p className={styles.passwordHint}>
-                               Password must be 8+ characters with at least one special character (e.g., @, #, $).
-                            </p>
+                            <FaLock className={styles.icon} /> Password
                         </label>
                         {errors.password && <p className={styles.errorMessage}>{errors.password}</p>}
                         <div className={styles.inputWithIcon}>
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                placeholder="Enter password"
-                                value={data.password}
-                                onChange={handleChange}
-                            /> 
-                            {data.password && (
-                                <FaCheckCircle
-                                    className={styles.checkIcon}
-                                    style={{
-                                        color: passwordValid === null ? "gray" : passwordValid ? "green" : "red",
-                                    }}
-                                />
-                            )}
-
+                            <input id="password" type="password" name="password" placeholder="Enter password" value={data.password} onChange={handleChange} />
+                            {data.password && <FaCheckCircle className={styles.checkIcon} style={{ color: passwordValid === null ? "gray" : passwordValid ? "green" : "red" }} />}
                         </div>
                     </div>
-
-                    {/* Re-type Password Input with Check Icon */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label} htmlFor="confirmPassword">
                             <FaLock className={styles.icon} /> Re-type Password
                         </label>
                         {errors.reTypePassword && <p className={styles.errorMessage}>{errors.reTypePassword}</p>}
                         <div className={styles.inputWithIcon}>
-                            <input
-                                id="confirmPassword"
-                                type="password"
-                                name="reTypePassword"
-                                placeholder="Re-type password"
-                                value={data.reTypePassword}
-                                onChange={handleChange}
-                            />
-                            {data.reTypePassword && (
-                                <FaCheckCircle
-                                    className={styles.checkIcon}
-                                    style={{
-                                        color: passwordMatch === null ? "gray" : passwordMatch ? "green" : "red",
-                                    }}
-                                />
-                            )}
+                            <input id="confirmPassword" type="password" name="reTypePassword" placeholder="Re-type password" value={data.reTypePassword} onChange={handleChange} />
+                            {data.reTypePassword && <FaCheckCircle className={styles.checkIcon} style={{ color: passwordMatch === null ? "gray" : passwordMatch ? "green" : "red" }} />}
                         </div>
                     </div>
-
                     <div className={styles.buttonContainer}>
-                        <button type="submit" className={styles.confirmBtn}>
-                            Sign up
-                        </button>
+                        <button type="submit" className={styles.confirmBtn}>Sign up</button>
                         <p>Already have an account?</p>
-                        <button className={styles.loginBtn} onClick={() => navigate("/login")}>
-                            Login
-                        </button>
+                        <button className={styles.loginBtn} onClick={() => navigate("/login")}>Login</button>
                     </div>
                 </form>
             </div>
         </div>
+    
     );
 }

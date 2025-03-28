@@ -2,13 +2,23 @@
 
 /* Page Container */
 .container {
-    text-align: center;
-    margin-top: 3rem;
+  padding: 20px;
+  max-width: 900px;
+  text-align: center;
+  margin: auto;
+  border-radius: 12px; /* Rounded edges */
   }
   
   /* Header Section */
   .header {
-    margin-bottom: 2rem;
+    position: sticky;
+    top: 70px; /* Adjust this based on your navbar height */
+    background: white;
+    z-index: 1050; /* Higher z-index to stay above other elements */
+    padding: 10px;
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   }
   
   .logo {
@@ -40,14 +50,16 @@
     font-weight: bold;
   }
   
+  .courseCard {
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+  }
   .addCourseButton:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
   
-  .container {
-    text-align: center;
-    margin-top: 40px;
-  }
+ 
   
   .header {
     margin-bottom: 20px;
@@ -68,24 +80,9 @@
     color: gray;
   }
   
-  .addCourseBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px auto;
-    padding: 10px 20px;
-    border: 1px solid black;
-    border-radius: 5px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
+ 
   
-  .addCourseBtn:hover {
-    background: black;
-    color: white;
-  }
-  
+ 
   .courseCard {
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

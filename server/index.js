@@ -1,26 +1,33 @@
 import express from 'express';
 import cors from 'cors';
-import authRouter from './routes/authRoute.js'
+import authRouter from './routes/authRoute.js';
 import courseRouter from "./routes/courseRoute.js";
+import cookieParser from "cookie-parser";
+import homeRouter from "./routes/homeRoute.js";
+//import getUserData from "./utils/getUserData.js"
 import dotenv from 'dotenv';
 dotenv.config({ path: "./server/.env" });
 
 const app = express();
+
 app.use(cors({
     origin: "http://localhost:5173", // Allow requests from your frontend
     credentials: true,  // Allow cookies, authentication headers, etc.
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"] // Allowed headers
 }
 ));
 
 app.use(express.json())
-app.use('/auth', authRouter)
+app.use(cookieParser());
+app.use('/auth', authRouter) 
 app.use('/api', courseRouter);
-app.get("/", (req, res) =>{
-    res.send("<h1>I was Here</h1>")
-})
+app.use("/", homeRouter);
+// app.use("/user", getUserData);
 
 
-app.listen(process.env.PORT || 8000, () => {
-    console.log(`Server Started on Port ${process.env.PORT || 8000}`);
+const PORT = process.env.PORT || 8000;
+app.listen(process.env.PORT, () => {
+    console.log(`Server Started on Port ${process.env.PORT}`);
   });
   

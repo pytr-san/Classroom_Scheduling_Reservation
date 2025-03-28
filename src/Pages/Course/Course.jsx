@@ -22,36 +22,34 @@ const Courses = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header Section */}
-      <div className={styles.header}>
-        <img src={copppLogo} alt="ACCESS Department Logo" className={styles.logo} />
+    <div className={styles.header}>
+      <img src={copppLogo} alt="ACCESS Department Logo" className={styles.logo} />
+      <div className={styles.headerText}>
         <h2 className={styles.title}>ACCESS DEPARTMENT</h2>
         <p className={styles.subtitle}>A Combination of Computer Experts and Special Students</p>
       </div>
-
-      {/* Add Course Button */}
       <button className={styles.addCourseButton}>
         <Plus className="me-2" /> Add Course
       </button>
-
-      {/* Course List */}
-      <div className={styles.courseCard}>
-        {courses.length > 0 ? (
-          courses.map((course, index) => (
-            <div key={index} className={styles.courseItem}>
-              <span className={styles.courseName}>{course.course_name}</span>
-              <Gear size={20} 
-              className={styles.icon}
-              onClick={() => navigate(`/course/${course.course_id}/ManageCourse`)} // Navigate on click
-              style={{ cursor: "pointer" }} // Make it clickable
-               />
-            </div>
-          ))
-        ) : (
-          <p className={styles.subtitle}>No courses available</p>
-        )}
-      </div>
     </div>
+  
+    {/* Course List */}
+    <div className={styles.courseCard}>
+      {courses.length > 0 ? (
+        courses.map((course, index) => (
+          <div key={index} className={styles.courseItem}>
+            <span className={styles.courseName}>{course.course_name}</span>
+            <Gear size={20} 
+            className={styles.icon}
+            onClick={() => navigate(`/course/${course.course_id}/ManageCourse`)} 
+            style={{ cursor: "pointer" }} />
+          </div>
+        ))
+      ) : (
+        <p className={styles.subtitle}>No courses available</p>
+      )}
+    </div>
+  </div>
   );
 };
 

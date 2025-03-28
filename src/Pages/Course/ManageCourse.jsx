@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CreatableSelect from "react-select/creatable"; // ✅ Import react-select
 import styles from "./ManageCourse.module.css";
-import { FaArrowLeft,   FaSyncAlt } from "react-icons/fa"; // Font Awesome Icon
+import { FaArrowLeft, FaSyncAlt, FaCheck } from "react-icons/fa"; // Font Awesome Icon
+import ConfirmModal from "../../components/Modal/ConfirmInstructor";
 
 const ManageCourse = () => {
   const navigate = useNavigate();
@@ -12,6 +14,12 @@ const ManageCourse = () => {
   const [courseName, setCourseName] = useState("");
   const [faculty, setFaculty] = useState([]);
   const [updatedSubjects, setUpdatedSubjects] = useState({});
+  const [pendingInstructor, setPendingInstructor] = useState(null);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   useEffect(() => {
     axios.get(`http://localhost:8000/api/course/${id}/ManageCourse`)
@@ -24,27 +32,36 @@ const ManageCourse = () => {
   }, [id]);
 
   const handleInstructorChange = (subject_id, facultyOption) => {
-    setUpdatedSubjects((prev) => ({
-      ...prev,
-      [subject_id]: facultyOption?.value || null, // ✅ Store faculty_id
-    }));
+    if (facultyOption?.__isNew__) { // 🔥 CHANGED: Detect if a new instructor is being added
+      setPendingInstructor({ name: facultyOption.value, subject_id }); // 🔥 CHANGED: Store pending instructor
+    } else {
+      setPendingInstructor(null); // 🔥 CHANGED: Reset pendingInstructor if existing faculty is selected
+      setUpdatedSubjects((prev) => ({
+        ...prev,
+        [subject_id]: facultyOption?.value || null, 
+      }));
+    }
   };
 
   // ✅ Handle Adding New Instructor Automatically
-  const handleCreateInstructor = (inputValue, subject_id) => {
-    if (!inputValue.trim()) return;
+  const handleConfirmInstructor = () => {
+    if (!pendingInstructor) return;
+    const { name, subject_id } = pendingInstructor;
 
-    axios.post("http://localhost:8000/api/faculty/add", { name: inputValue })
-      .then((response) => {
-        const newFaculty = response.data.newFaculty;
-        setFaculty([...faculty, newFaculty]); // ✅ Update UI with new instructor
+    axios.post("http://localhost:8000/api/faculty/add", { name })
+      .then(({ data }) => {
+        const newFaculty = data.newFaculty;
+        setFaculty([...faculty, newFaculty]); // ✅ Update UI
         setUpdatedSubjects((prev) => ({
           ...prev,
-          [subject_id]: newFaculty.faculty_id, // ✅ Assign new instructor
+          [subject_id]: newFaculty.faculty_id, 
         }));
+        setPendingInstructor(null);
+        handleCloseModal();
       })
       .catch((error) => console.error("Error adding instructor:", error));
   };
+
 
   const handleSaveChanges = () => {
     const updates = Object.entries(updatedSubjects)
@@ -76,7 +93,9 @@ const ManageCourse = () => {
   const handleRefresh = () => {
     setUpdatedSubjects({}); // Clears the selected instructors
   };
-  
+
+
+
   return (
     <div className={styles.container}>
       <div className={`${styles.header} d-flex justify-content-between align-items-center `}>
@@ -104,7 +123,8 @@ const ManageCourse = () => {
                     <div key={subject.subject_id} className={styles.subjectRow}>
                       <span className="fw-semibold">{subject.subject_name}</span>
                       <div className="w-50">
-                        <CreatableSelect
+                      <CreatableSelect
+                          className="flex-grow-1"
                           isClearable
                           value={
                             faculty
@@ -113,9 +133,14 @@ const ManageCourse = () => {
                           }
                           options={faculty.map(f => ({ value: f.faculty_id, label: f.name }))}
                           onChange={(selectedOption) => handleInstructorChange(subject.subject_id, selectedOption)}
-                          onCreateOption={(inputValue) => handleCreateInstructor(inputValue, subject.subject_id)}
                           placeholder="Select or add instructor..."
-                        />
+                        />  
+                        {/* ✅ SHOW CHECK BUTTON FOR MODAL */}
+                        {pendingInstructor && pendingInstructor.subject_id === subject.subject_id && (
+                          <button className="btn btn-success btn-sm ms-2" onClick={handleShowModal}>
+                            <FaCheck />
+                          </button>
+                        )}                    
                       </div>
                     </div>
                   ))}
@@ -125,6 +150,13 @@ const ManageCourse = () => {
           ))}
         </div>
       ))}
+       {/* CONFIRM MODAL */}
+       <ConfirmModal
+        show={showModal}
+        onHide={handleCloseModal}
+        onConfirm={handleConfirmInstructor}
+        instructorName={pendingInstructor?.name}
+      />
     </div>
   );
 };

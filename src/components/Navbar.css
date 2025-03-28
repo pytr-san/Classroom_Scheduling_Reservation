@@ -11,13 +11,15 @@
   overflow-x: hidden;
 }
 
-.sidebar:hover {
-  width: 200px; /* Expand on hover */
+.sidebar:hover,
+.sidebar.open {
+  width: 200px; /* Expand on hover or when toggled */
 }
 
 
-.sidebar:hover span {
-  opacity: 1; /* Show text on hover */
+.sidebar:hover span,
+.sidebar.open span {
+  opacity: 1; /* Show text when hovered or toggled */
 }
 
 .sidebar a {
@@ -40,11 +42,16 @@
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.sidebar.open {
-  width: 200px; /* Expanded width */
+
+
+.main-content {
+  transition: margin-left 0.3s ease-in-out;
+ /* Default sidebar width */
 }
-.sidebar:hover + .main-content {
-  margin-left: 200px; /* Shift content when expanded */
+
+.sidebar:hover + .main-content,
+.sidebar.open + .main-content {
+  margin-left: 200px; /* Shift content when sidebar expands */
 }
 
 .nav-link {

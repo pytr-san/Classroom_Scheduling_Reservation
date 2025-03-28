@@ -1,6 +1,9 @@
 import express from "express";
 import {connectToDatabase} from '../db.js'
+import authMiddleware from "../middleware/authMiddleware.js";
+
 const router = express.Router();
+
 
 // GET all courses
 router.get("/course", async (req, res) => {
@@ -14,37 +17,8 @@ router.get("/course", async (req, res) => {
 });
 
 
-// GET subjects for a course
-// router.get("/course/:id/ManageCourse", async (req, res) => {
-//   const courseId = req.params.id;
-
-//   try {
-//       const db = await connectToDatabase(); // Get DB connection
-//       const [results] = await db.execute(`
-//           SELECT subjects.subject_name, course.course_name
-//           FROM subjects
-//           INNER JOIN course ON subjects.course_id = course.course_id  
-//           WHERE course.course_id = ?`, [courseId]);
-
-//       if (results.length > 0) {
-//           const courseName = results[0].course_name;
-//           const subjects = results.map(row => ({
-//               id: row.id,
-//               subject_name: row.subject_name
-//           }));
-//           return res.json({ course_name: courseName, subjects });
-//       } else {
-//           return res.json({ course_name: "Course Not Found", subjects: [] });
-//       }
-//   } catch (err) {
-//       console.error("Database error:", err);
-//       return res.status(500).json({ error: "Database error" });
-//   }
-// });
-
-
 // ✅ GET subjects & instructors for a course
-router.get("/course/:id/ManageCourse", async (req, res) => {
+router.get("/course/:id/ManageCourse", authMiddleware, async (req, res) => {
     const courseId = req.params.id;
 
     try {
@@ -84,7 +58,7 @@ router.get("/course/:id/ManageCourse", async (req, res) => {
 });
 
 // ✅ UPDATE multiple subject instructors
-router.put("/course/:courseId/ManageCourse/update", async (req, res) => {
+router.put("/course/:courseId/ManageCourse/update", authMiddleware, async (req, res) => {
     const { updates } = req.body;  // Expecting an array of updates
 
     if (!updates || !Array.isArray(updates) || updates.length === 0) {
@@ -108,5 +82,34 @@ router.put("/course/:courseId/ManageCourse/update", async (req, res) => {
     }
 });
 
+
+// ✅ Add a New Instructor
+router.post("/faculty/add", authMiddleware, async (req, res) => {
+    const { name } = req.body;
+
+    if (!name || !name.trim()) {
+        return res.status(400).json({ error: "Instructor name is required" });
+    }
+
+    try {
+        const db = await connectToDatabase();
+
+        // ✅ Insert new instructor into faculty table
+        const [result] = await db.execute(
+            "INSERT INTO faculty (name) VALUES (?)",
+            [name]
+        );
+
+        const newFaculty = {
+            faculty_id: result.insertId,
+            name,
+        };
+
+        res.status(201).json({ message: "Instructor added successfully", newFaculty });
+    } catch (error) {
+        console.error("Database insert error:", error);
+        res.status(500).json({ error: "Failed to add instructor" });
+    }
+});
   
 export default router; // Use `export default` for ES modules

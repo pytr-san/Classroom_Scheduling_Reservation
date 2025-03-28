@@ -1,13 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+//import { Link, useNavigate, useLocation, replace} from "react-router-dom";
 import axios from "axios";
 import styles from "./Login.module.css";
+import useAuth from "../Hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthProvider";
 
-export default function Login({setAuth}) {
 
+export default function Login({setIsAuthenticated, setUser}) {
 
+    const userRef = useRef();
     const navigate = useNavigate();
 
+     const { setAuth} = useAuth();
+    // const navigate = useNavigate();
+    // const Location = useLocation();
+    // const from = location.State?.from?.pathname || "/";
+
+    // const errRef = userRef();
+
+   // const [user, setUser] = useState('');
+    //const [pwd, setPwd] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const [data, setData] =  useState({
@@ -16,31 +29,45 @@ export default function Login({setAuth}) {
         password: '',
     })
 
+    // useEffect(() => {
+    //     userRef.current.fucos();
+    // }, [])
+
+    // useEffect(() => {
+    //     errorMessage('');
+    // }, [user, pwd])
+    
     const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post("http://localhost:8000/auth/login", data, { withCredentials: true });
-    
-            console.log("Login Response:", response); // ✅ Debugging log
 
-            if (response.status === 200 || response.status === 201) { // ✅ Allow both 200 & 201
-                localStorage.setItem("token", response.data.token); // Store JWT token
-                setAuth(true); // Updates state in App.jsx
-                localStorage.setItem("isAuthenticated", "true"); // Stores in localStorage
-                navigate('/');
-            }
+        try {
+            // Send login request with credentials (so cookie is stored)
+            const response = await axios.post("http://localhost:8000/auth/login", data, { withCredentials: true });
+
+            console.log("✅ Login successful:", response.data);
+            const { user, token, role } = response.data;
+
+            setAuth({ user, token, role }); // ✅ Stores user data globally
+            navigate("/");
+                      // Redirect based on role
+            // if (role === "admin") {
+            //     navigate("/");
+            // } else if (role === "student") {
+            //     navigate("/newStudent");
+            // } else {
+            //     navigate("/");
+            // }
     
         } catch (err) {
             if (err.response) {
-                console.error("Login Error:", err.response.data.error);
-                setErrorMessage(err.response.data.error); // Update state to show error in UI
+                setErrorMessage(err.response.data.error); // Show error in UI
             } else {
-                console.error("Something went wrong:", err);
                 setErrorMessage("An unexpected error occurred. Please try again.");
             }
         }
     };
-
+    
+    
     return (
     <>
         <div className={styles.container}>
@@ -52,16 +79,19 @@ export default function Login({setAuth}) {
                         type="email"
                         placeholder="Enter email"
                         className={styles.input}
+                        ref={userRef}
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
+                        required
                     />
                     <label className={styles.label}>Password</label>
                     <input
                         type="password"
                         placeholder="Enter password"
-                        className={styles.input}
+                        className={styles.input}                   
                         value={data.password}
                         onChange={(e) => setData({ ...data, password: e.target.value })}
+                        required
                     />
                     <button type="submit" className={styles.button}>Login</button>
                 </form>

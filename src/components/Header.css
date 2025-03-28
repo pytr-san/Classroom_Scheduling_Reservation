@@ -52,4 +52,61 @@
     border-radius: 50px;
     transition: all 0.3s ease-in-out;
   }
+
+
+
+  /* Profile Modal css*/
+
+  .profile-modal {
+    position: fixed;
+    top: 70px; /* Below navbar */
+    right: 0;
+    width: 320px; /* Adjust width */
+    height: calc(100vh - 70px);
+    background: white;
+    box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px 0 0 10px;
+    padding: 20px;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */  
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%); /* Initially hidden */
+    z-index: 1000; /* Ensures it's above everything */
+  }
+  
+  .profile-modal.open {
+    transform: translateX(0); /* Slide in when open */
+    align-items: center;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Dark overlay */
+    display: none; /* Initially hidden */
+    z-index: 999; /* Below the modal but above content */
+  }
+  
+  .modal-overlay.show {
+    display: block; /* Show overlay when modal is open */
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .close-btn:hover {
+    color: red;
+  }
+
   
