@@ -10,6 +10,7 @@ function Header({ toggleSidebar, user, handleLogout }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false); // State for profile modal
   const inactivityTimer = useRef(null);
   const { auth } = useAuth();
+  
   // Function to set active status
   const markUserActive = () => {
     setIsActive(true);

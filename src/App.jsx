@@ -1,29 +1,25 @@
 
-import Navbar from "./components/Navbar.jsx";
 import Home from "./Pages/Home/Home.jsx";
 import Classroom from "./Pages/Classroom/Classroom.jsx";
-import Header from "./components/Header.jsx";
 import Course from "./Pages/Course/Course.jsx";
 import Settings from "./Pages/Settings/Settings.jsx";
 import Register from "./Pages/Register.jsx";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useState, useEffect} from "react"; // ✅ Moved `useContext` here
 import Login from "./Pages/Login.jsx";
 import ManageCourse from "./Pages/Course/ManageCourse.jsx";
-import ErrorBoundary from "./components/ErrorBoundary";
+//import ErrorBoundary from "./components/ErrorBoundary";
 import axios from "axios";
-import AuthContext from "./context/AuthProvider";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth.jsx";
-import useAuth from "./Hooks/useAuth.jsx";
-import { useCallback } from "react";
 import UnauthorizedPage from "./Unauthorized.jsx";
+import AdminAccess from "./components/AdminAccess.jsx"
 
     const ROLES ={
         student: "student",
         admin: "admin",
         faculty: "faculty"
     }
+    axios.defaults.withCredentials = true;
 
     function App() {
 
@@ -87,7 +83,8 @@ import UnauthorizedPage from "./Unauthorized.jsx";
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
+                {/* <Route path="/admin-access" element={<AdminAccess />} /> */}
+                
                 <Route path ="/" element={<Layout />}>
                     {/* Protected Routes (With Layout) */}
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin, ROLES.student, ROLES.faculty]} />}> 
@@ -99,7 +96,8 @@ import UnauthorizedPage from "./Unauthorized.jsx";
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin]} />}>
                             <Route path="/classroom" element={<Classroom />} />
                             <Route path="/course" element={<Course />} />
-                            <Route path="/course/:id/manage" element={<ManageCourse />} />         
+                            <Route path="/course/:id/manage" element={<ManageCourse />} />
+                                  
                     </Route>
                 </Route>
                 {/* Redirect unknown routes */}

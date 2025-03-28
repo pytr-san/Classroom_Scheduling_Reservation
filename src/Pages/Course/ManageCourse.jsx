@@ -6,6 +6,7 @@ import CreatableSelect from "react-select/creatable"; // ✅ Import react-select
 import styles from "./ManageCourse.module.css";
 import { FaArrowLeft, FaSyncAlt, FaCheck } from "react-icons/fa"; // Font Awesome Icon
 import ConfirmModal from "../../components/Modal/ConfirmInstructor";
+import useAuth from "../../Hooks/useAuth";
 
 const ManageCourse = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const ManageCourse = () => {
   const [faculty, setFaculty] = useState([]);
   const [updatedSubjects, setUpdatedSubjects] = useState({});
   const [pendingInstructor, setPendingInstructor] = useState(null);
+  const { auth } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -22,8 +24,9 @@ const ManageCourse = () => {
   const handleCloseModal = () => setShowModal(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/course/${id}/ManageCourse`)
+    axios.get(`http://localhost:8000/api/course/${id}/manage`, {withCredentials: true, }) // ✅ Ensure cookies (token) are sent
       .then((response) => {
+        console.log("Subject list:",response.data)
         setSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
@@ -48,7 +51,7 @@ const ManageCourse = () => {
     if (!pendingInstructor) return;
     const { name, subject_id } = pendingInstructor;
 
-    axios.post("http://localhost:8000/api/faculty/add", { name })
+    axios.post("http://localhost:8000/api/faculty/add", { name }, {withCredentials: true, })
       .then(({ data }) => {
         const newFaculty = data.newFaculty;
         setFaculty([...faculty, newFaculty]); // ✅ Update UI
@@ -76,7 +79,7 @@ const ManageCourse = () => {
       return;
     }
 
-    axios.put(`http://localhost:8000/api/course/${id}/ManageCourse/update`, { updates })
+    axios.put(`http://localhost:8000/api/course/${id}/manage/update`, { updates }, {withCredentials: true, })
       .then(() => alert("Changes saved!"))
       .catch((error) => console.error("Error updating:", error));
   };

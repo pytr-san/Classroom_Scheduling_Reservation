@@ -15,28 +15,30 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen, handleLogout }) {
       onMouseLeave={() => setIsSidebarOpen(false)}
     >
       <nav className="nav flex-column p-3">
-        <Link className="nav-link" to='/'>
-          <img src={accesslogo} alt="access logo" className="logo me-2" /> <span>Home</span>
+        {/* Home (Visible to All) */}
+        <Link className="nav-link" to="/">
+          <img src={accesslogo} alt="access logo" className="logo me-2" /> 
+          <span>Home</span>
         </Link>
 
-        {/* Conditionally render links based on role */}
-        {auth.role === 'admin' && (
-          <Link className="nav-link" to='classroom'>
-            <i className="bi bi-people me-2"></i> <span>Classroom</span>
-          </Link>
+        {/* Course & Classroom (Only for Admins) */}
+        {auth?.role === "admin" && (
+          <>
+            <Link className="nav-link" to="/classroom">
+              <i className="bi bi-people me-2"></i> <span>Classroom</span>
+            </Link>
+            
+            <Link className="nav-link" to="/course">
+              <i className="bi bi-book me-2"></i> <span>Course</span>
+            </Link>
+          </>
         )}
 
-        {auth.role === 'student' && (
-          <Link className="nav-link" to='course'>
-            <i className="bi bi-book me-2"></i> <span>Course</span>
-          </Link>
-        )}
-
-        {auth.role === 'faculty' && (
-          <Link className="nav-link" to='settings'>
+         {/* Settings (Visible to All) */}
+        <Link className="nav-link" to="/settings">
             <i className="bi bi-gear me-2"></i> <span>Settings</span>
-          </Link>
-        )}
+        </Link>
+
       </nav>
 
       {/* Logout Button at the bottom */}

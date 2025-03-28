@@ -4,7 +4,7 @@ import authRouter from './routes/authRoute.js';
 import courseRouter from "./routes/courseRoute.js";
 import cookieParser from "cookie-parser";
 import homeRouter from "./routes/homeRoute.js";
-//import getUserData from "./utils/getUserData.js"
+import adminRouter from "./routes/adminRoute.js";
 import dotenv from 'dotenv';
 dotenv.config({ path: "./server/.env" });
 
@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use('/auth', authRouter) 
 app.use('/api', courseRouter);
 app.use("/", homeRouter);
-// app.use("/user", getUserData);
+app.use("/api/admin", adminRouter);
 
 
 const PORT = process.env.PORT || 8000;

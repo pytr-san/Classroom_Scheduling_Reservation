@@ -1,5 +1,10 @@
+import jwt from 'jsonwebtoken';
+
 const authMiddleware = (req, res, next) => {
-    const token = req.cookies?.token;
+
+    console.log("Cookies received:", req.cookies);
+
+    const token = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });

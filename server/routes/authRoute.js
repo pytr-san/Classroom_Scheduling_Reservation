@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
         //     return res.status(403).json({ error: "Invalid role. Only Faculty and Students can register." });
         // }
 
-        let tableName = role=== "faculty" ? "faculty" : "student";
+        let tableName = role.toLowerCase()=== "faculty" ? "faculty" : "student";
 
         // ✅ Check if user already exists in the respective table
         const [existingUserRows] = await db.execute(
@@ -129,7 +129,7 @@ router.post('/login', async (req, res) => {
         res.cookie("token", token,{
             httpOnly: true,
             secure: false,  // Set `true` in production with HTTPS
-            sameSite: "none",
+            sameSite: "lax",//"none",
             maxAge: 24 * 60 * 60 *1000,
             path: "/"
          });

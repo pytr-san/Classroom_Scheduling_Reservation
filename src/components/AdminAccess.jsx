@@ -1,14 +1,17 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom"; 
-import "./Admin.css"; 
+import "./AdminAccess.css"; 
+import axios from "axios";
+import doggoSecurity from "../assets/doggoSecurity.jpg";
 
-function AdminAccess() {
+function AdminAccess({onAccessGranted }) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState(false);
   const inputsRef = useRef([]);
 
   const navigate = useNavigate();
 
+  const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN; // 🔥 Use env variable
   
   const handleInputChange = (index, value) => {
     if (/^[0-9]?$/.test(value)) {
@@ -28,16 +31,32 @@ function AdminAccess() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const accessCode = code.join("");
-    if (accessCode === "123456") { 
-      navigate("/classroom"); 
-    } else {
+    try {
+      const response = await axios.post("http://localhost:8000/api/admin/verify-pin", { pin: accessCode } , { withCredentials: true });
+      console.log("Status:",response.data)
+      if (response.data.success) {
+        onAccessGranted(); 
+      } else {
+        setError(true);
+        setCode(["", "", "", "", "", ""]);
+        inputsRef.current[0].focus();
+      }
+    } catch (error) {
       setError(true);
-      setCode(["", "", "", "", "", ""]);
-      inputsRef.current[0].focus();
     }
   };
+  // const handleSubmit = () => {
+  //   const accessCode = code.join("");
+  //   if (accessCode === "123456") { 
+  //     navigate("/classroom"); 
+  //   } else {
+  //     setError(true);
+  //     setCode(["", "", "", "", "", ""]);
+  //     inputsRef.current[0].focus();
+  //   }
+  // };
 
   return (
     <div>
@@ -61,7 +80,13 @@ function AdminAccess() {
           {error && <p id="error-message" className="error">Incorrect code, please try again!</p>}
           <button id="submit-btn" onClick={handleSubmit}>Submit</button>
         </div>
-    </div>
+         {/* ✅ Add Image Below */}
+    <img 
+        src={doggoSecurity} 
+        alt="Doggo Security" 
+        className="access-image"
+    />
+  </div>
   );
 }
 

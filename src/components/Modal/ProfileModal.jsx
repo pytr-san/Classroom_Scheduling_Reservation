@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useAuth
- from "../../Hooks/useAuth";
+import useAuth from "../../Hooks/useAuth";
+
 const ProfileModal = () => {
   const [isOpen, setIsOpen] = useState(false);
 

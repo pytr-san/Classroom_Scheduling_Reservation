@@ -59,7 +59,7 @@ export default function Login({setIsAuthenticated, setUser}) {
             // } else if (role === "student") {
             //     navigate("/newStudent");
             // } else {
-            //     navigate("/");
+            //     navigate("/");   
             // }
     
         } catch (err) {

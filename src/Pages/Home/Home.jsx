@@ -1,28 +1,51 @@
+import React, { useState, useEffect } from "react";
+import useAuth from "../../Hooks/useAuth";
+import AdminAccess from "../../components/AdminAccess";
 
+const Home = () => {
+    const { auth } = useAuth();
+    const [hasAdminAccess, setHasAdminAccess] = useState(
+        sessionStorage.getItem("adminAccess") === "granted"
+    );
 
+    const onAccessGranted = () => {
+        sessionStorage.setItem("adminAccess", "granted"); // ✅ Store in session
+        setHasAdminAccess(true); // ✅ Update state
+    };
 
-const Home = ({ user }) => {
+    useEffect(() => {
+        if (sessionStorage.getItem("adminAccess") === "granted") {
+            setHasAdminAccess(true);
+        }
+    }, [auth]);
 
-    if (!user) {
-        return <div>Loading user data...</div>;  // ✅ Prevent crash
+    if (!auth.user) {
+        return <div>Loading user data...</div>;
     }
 
     return (
         <div>
-            <h1>Welcome, {user.name}!</h1>
+            <h1>Welcome, {auth.user.name}!</h1>
 
-            {user.role === "admin" && (
-                <p>🔹 Admin Dashboard - Manage users, courses, and settings.</p>
+            {auth.user.role === "admin" && (
+                <>
+                    {!hasAdminAccess ? (
+                        <AdminAccess onAccessGranted={onAccessGranted} />
+                    ) : (
+                        <p>🔹 Admin Dashboard - Manage users, courses, and settings.</p>
+                    )}
+                </>
             )}
 
-            {user.role === "faculty" && (
-                <p>📘 Faculty Panel - View assigned courses and interact with students.</p>
+            {auth.user.role === "faculty" && (
+                <p>📘 Faculty Panel - View assigned courses and track schedules.</p>
             )}
 
-            {user.role === "student" && (
-                <p>🎓 Student Dashboard - Access enrolled courses and track progress.</p>
+            {auth.user.role === "student" && (
+                <p>🎓 Student Dashboard - Access enrolled courses and track schedules.</p>
             )}
         </div>
-    )
-}
+    );
+};
+
 export default Home;

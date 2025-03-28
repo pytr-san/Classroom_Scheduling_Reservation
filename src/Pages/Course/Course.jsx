@@ -5,12 +5,14 @@ import axios from "axios";
 import styles from "./Course.module.css"; // Import CSS module
 import { useNavigate } from "react-router-dom";
 
+
 const Courses = () => {
   const [courses, setCourses] = useState([]);
 
   const navigate = useNavigate();
+  
   useEffect(() => {
-    axios.get("http://localhost:8000/api/course")
+    axios.get("http://localhost:8000/api/course", {withCredentials: true, })
       .then((response) => {
         console.log("Courses API Response:", response.data); // Debug
         setCourses(response.data);
@@ -41,7 +43,7 @@ const Courses = () => {
             <span className={styles.courseName}>{course.course_name}</span>
             <Gear size={20} 
             className={styles.icon}
-            onClick={() => navigate(`/course/${course.course_id}/ManageCourse`)} 
+            onClick={() => navigate(`/course/${course.course_id}/manage`)} 
             style={{ cursor: "pointer" }} />
           </div>
         ))

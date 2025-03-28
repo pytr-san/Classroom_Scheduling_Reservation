@@ -18,7 +18,7 @@ router.get("/course", async (req, res) => {
 
 
 // ✅ GET subjects & instructors for a course
-router.get("/course/:id/ManageCourse", authMiddleware, async (req, res) => {
+router.get("/course/:id/manage", authMiddleware, async (req, res) => {
     const courseId = req.params.id;
 
     try {
@@ -58,7 +58,7 @@ router.get("/course/:id/ManageCourse", authMiddleware, async (req, res) => {
 });
 
 // ✅ UPDATE multiple subject instructors
-router.put("/course/:courseId/ManageCourse/update", authMiddleware, async (req, res) => {
+router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) => {
     const { updates } = req.body;  // Expecting an array of updates
 
     if (!updates || !Array.isArray(updates) || updates.length === 0) {

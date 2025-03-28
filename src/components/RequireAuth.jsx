@@ -7,14 +7,9 @@ const RequireAuth = ({ allowedRoles }) => {
     console.log("Current auth:", auth);
     console.log("Allowed roles:", allowedRoles);
 
-    // if (!auth?.user) {
-    //     return <Navigate to="/login" state={{ from: location }} replace />;
-    // }
-    
-    // if (allowedRoles.includes(auth?.role)) {
-    //     return <Outlet />;
-    // }
-//<Navigate to="/unauthorized" state={{ from: location }} replace />;
+    // const isAdmin = auth?.role === "admin";
+    // const hasAdminAccess = Boolean(sessionStorage.getItem("adminAccess")); 
+
     return  (
 
         allowedRoles.includes(auth?.role)
