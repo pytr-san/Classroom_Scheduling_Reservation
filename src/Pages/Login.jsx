@@ -45,9 +45,13 @@ export default function Login({setIsAuthenticated, setUser}) {
             const response = await axios.post("http://localhost:8000/auth/login", data, { withCredentials: true });
 
             console.log("✅ Login successful:", response.data);
-            const { user, token, role } = response.data;
+           // const { user, token, role } = response.data;
+           const { user, token } = response.data;
+           const name = user.name;
+            const role = user.role;
 
-            setAuth({ user, token, role }); // ✅ Stores user data globally
+            setAuth({ name, user, token, role }); // ✅ Stores user data globally
+            console.log("Setting auth with:", { user, token, role });
             navigate("/");
                       // Redirect based on role
             // if (role === "admin") {

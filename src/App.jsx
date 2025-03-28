@@ -17,10 +17,12 @@ import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth.jsx";
 import useAuth from "./Hooks/useAuth.jsx";
 import { useCallback } from "react";
+import UnauthorizedPage from "./Unauthorized.jsx";
+
     const ROLES ={
-        'student': "student",
-        'admin': "admin",
-        'faculty': "faculty"
+        student: "student",
+        admin: "admin",
+        faculty: "faculty"
     }
 
     function App() {
@@ -84,6 +86,7 @@ import { useCallback } from "react";
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
                 <Route path ="/" element={<Layout />}>
                     {/* Protected Routes (With Layout) */}

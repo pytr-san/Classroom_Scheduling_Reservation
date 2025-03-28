@@ -4,9 +4,10 @@ import Header from "./Header";
 import {useState } from "react";
 import useAuth from "../Hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Layout = () => {
-    const { auth } = useAuth();
+    const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -27,7 +28,7 @@ const Layout = () => {
     return (
         <div className="app-container">
                 <>
-                    <Header toggleSidebar={toggleSidebar} handleLogout={handleLogout} />
+                    <Header toggleSidebar={toggleSidebar} user={auth.user} handleLogout={handleLogout} />
                     <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
                 </>
 

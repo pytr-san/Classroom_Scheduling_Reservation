@@ -3,12 +3,13 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Header.css";
 import spistlogo from "../assets/logo1.png";
 import { useState, useEffect, useRef } from "react";
+import useAuth from "../Hooks/useAuth";
 
 function Header({ toggleSidebar, user, handleLogout }) {
   const [isActive, setIsActive] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // State for profile modal
   const inactivityTimer = useRef(null);
-
+  const { auth } = useAuth();
   // Function to set active status
   const markUserActive = () => {
     setIsActive(true);
@@ -25,7 +26,7 @@ function Header({ toggleSidebar, user, handleLogout }) {
   };
 
   useEffect(() => {
-    if (user) {
+    if (auth.user) {
       setIsActive(true); // Set active when user logs in
       resetInactivityTimer();
 
@@ -39,7 +40,7 @@ function Header({ toggleSidebar, user, handleLogout }) {
         clearTimeout(inactivityTimer.current);
       };
     }
-  }, [user]); // Runs when `user` changes
+  }, [auth.user]); // Runs when `user` changes
 
   // Function to toggle profile modal
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
@@ -73,9 +74,9 @@ function Header({ toggleSidebar, user, handleLogout }) {
           </div>
 
           {/* User Profile Section */}
-          {user && (
+          {auth.user && (
             <div className="d-flex align-items-center position-relative">
-              <span className="me-2 text-white fw-bold">{user   .email}</span>
+              <span className="me-2 text-white fw-bold">{auth.user.email}</span>
               <div className="position-relative" onClick={toggleProfile} style={{ cursor: "pointer" }}>
                 <i className="bi bi-person-circle text-white" style={{ fontSize: "1.8rem" }}></i>
                 {/* Active Status Indicator */}

@@ -25,12 +25,12 @@ router.post('/register', async (req, res) => {
         }
 
         // ✅ Ensure only Faculty & Students can register via this API
-        const validRoles = ["faculty", "student"];
-        if (!validRoles.includes(role.toLowerCase())) {
-            return res.status(403).json({ error: "Invalid role. Only Faculty and Students can register." });
-        }
+        // const validRoles = ["faculty", "student"];
+        // if (!validRoles.includes(role.toLowerCase())) {
+        //     return res.status(403).json({ error: "Invalid role. Only Faculty and Students can register." });
+        // }
 
-        let tableName = role.toLowerCase() === "faculty" ? "faculty" : "student";
+        let tableName = role=== "faculty" ? "faculty" : "student";
 
         // ✅ Check if user already exists in the respective table
         const [existingUserRows] = await db.execute(
@@ -69,11 +69,11 @@ router.post('/login', async (req, res) => {
 
         // 🟢 Optimized Query to Search in All Tables at Once
         const [users] = await db.query(
-            `SELECT admin_id AS id, email, password, 'admin' AS role FROM admin WHERE email = ? 
+            `SELECT admin_id AS id, name, email, password, 'admin' AS role FROM admin WHERE email = ? 
              UNION 
-             SELECT student_id AS id, email, password, 'student' AS role FROM student WHERE email = ? 
+             SELECT student_id AS id, name, email, password, 'student' AS role FROM student WHERE email = ? 
              UNION 
-             SELECT faculty_id AS id, email, password, 'faculty' AS role FROM faculty WHERE email = ?`, 
+             SELECT faculty_id AS id, name, email, password, 'faculty' AS role FROM faculty WHERE email = ?`, 
             [email, email, email]
         );
 
@@ -109,7 +109,7 @@ router.post('/login', async (req, res) => {
 
         // ✅ Generate JWT Token
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.role },
+            { id: user.id,name: user.name, email: user.email, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '1hr' }
         );
@@ -141,8 +141,6 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
 
     // ✅ Add this route to verify token
     router.get("/verify-token", authMiddleware, (req, res) => {

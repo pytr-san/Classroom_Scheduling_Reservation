@@ -8,7 +8,7 @@ import axios from "axios";
 export default function Register() {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
-    const userRef = useRef();
+  //  const userRef = useRef();
 
     const [data, setData] = useState({
         name: "",
@@ -20,9 +20,9 @@ export default function Register() {
 
     const [passwordValid, setPasswordValid] = useState(false);
     const [passwordMatch, setPasswordMatch] = useState(false);
-    useEffect(()=> {
-        userRef.current.focus();
-    })
+    // useEffect(()=> {
+    //     userRef.current.focus();
+    // })
     useEffect(() => {
         setPasswordValid(data.password.length === 0 ? false : data.password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(data.password));
         setPasswordMatch(data.password && data.reTypePassword ? data.password === data.reTypePassword : false);
@@ -108,7 +108,7 @@ export default function Register() {
                             <FaUser className={styles.icon} /> Name
                         </label>
                         {errors.name && <p className={styles.errorMessage}>{errors.name}</p>}
-                        <input id="fullName" type="text" name="name" ref={userRef} placeholder="Enter full name" required value={data.name} onChange={handleChange} />
+                        <input id="fullName" type="text" name="name" placeholder="Enter full name" required value={data.name} onChange={handleChange} />
                     </div>
                     <div className={styles.inputGroup}>
                         <label className={styles.label} htmlFor="email">

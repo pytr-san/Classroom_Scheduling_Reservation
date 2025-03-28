@@ -1,10 +1,12 @@
 import { useState } from "react";
-
+import useAuth
+ from "../../Hooks/useAuth";
 const ProfileModal = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Function to toggle modal
   const toggleModal = () => setIsOpen(!isOpen);
+  const { auth } = useAuth();
 
   // Close modal when clicking outside
   const handleClickOutside = (event) => {
@@ -29,8 +31,8 @@ const ProfileModal = () => {
         <h2>Profile</h2>
         <div className="profile-content">
           <i className="bi bi-person-circle" style={{ fontSize: "4rem" }}></i>
-          <p><strong>Name:</strong> Juan Dela Cruz</p>
-          <p><strong>Email:</strong> c26-2025-02@spist.edu.ph</p>
+          <p><strong>Name:</strong> {user?.name || "No name provided"}</p>
+          <p><strong>Email:</strong> {user?.email || "No email provided"}</p>
           <button className="logout-btn">Log out</button>
         </div>
       </div>
