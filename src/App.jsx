@@ -12,7 +12,7 @@ import Login from "./Pages/Login.jsx";
 import ManageCourse from "./Pages/Course/ManageCourse.jsx";
 import ErrorBoundary from "./components/ErrorBoundary"  
 import axios from "axios";
-
+import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx"
 
 // //axios.defaults.baseURL ='http://localhost:8000'
 // axios.defaults.withCredentials = true
@@ -71,6 +71,7 @@ function App() {
                 {isAuthenticated ? (
                     <>
                         <Route path="/" element={<Home />} />
+                        <Route path="/class-schedule/:course/:year/:section" element={<ClassSchedule />} />                  
                         <Route path="/classroom" element={<Classroom />} />
                         <Route path="/course" element={<Course />} />
                         <Route path="/course/:id/ManageCourse" element={<ManageCourse />} />

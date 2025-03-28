@@ -1,0 +1,21 @@
+/* buttons.css */
+
+.action-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .btn {
+      width: 100%;  /* Make buttons full width on small screens */
+      justify-content: center;
+    }
+  }
+  

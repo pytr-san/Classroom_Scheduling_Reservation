@@ -11,7 +11,8 @@ export default function Register() {
 
     const [data, setData] = useState({
         name: "",
-        email: "",
+        email:"",
+        phone: "",
         password: "",
         reTypePassword: "",
     });
@@ -38,31 +39,50 @@ export default function Register() {
             setPasswordMatch(null);
         }
     }, [data.password, data.reTypePassword]);
-
     const handleRegister = async (e) => {
         e.preventDefault();
         let newErrors = {};
-
+    
+        // Name validation
         if (!data.name.trim()) newErrors.name = "Name is required.";
-        if (!data.email.trim()) {
-            newErrors.email = "Email is required.";
-        } else if (!data.email.endsWith("@spist.edu.ph")) {
-            newErrors.email = "Only @spist.edu.ph emails are allowed.";
+    
+        // Username validation (email or phone number)
+        if (!data.phone.trim()) {
+            newErrors.phone = "Email or phone number is required.";
+        } else {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const phoneRegex = /^[0-9]{10}$/; // Adjust as needed for phone format
+    
+            // Check if email or phone number
+            if (emailRegex.test(data.phone)) {
+                // Email validation: Only @spist.edu.ph allowed
+                if (!data.phone.endsWith("@spist.edu.ph")) {
+                    newErrors.phone = "Only @spist.edu.ph emails are allowed.";
+                }
+            } else if (!phoneRegex.test(data.phone)) {
+                // If it’s not a valid email, check if it’s a valid phone number
+                newErrors.phone = "Invalid email or phone number format.";
+            }
         }
+    
+        // Password validation
         if (!data.password) {
             newErrors.password = "Password is required.";
         } else if (!validatePassword(data.password)) {
             newErrors.password = "Password must be at least 6 characters and include a special character.";
         }
+    
+        // Confirm Password validation
         if (data.password !== data.reTypePassword) {
             newErrors.reTypePassword = "Passwords do not match.";
         }
-
+    
+        // If there are any errors, stop and display them
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
-
+    
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
             if (response.status === 201) {
@@ -72,6 +92,40 @@ export default function Register() {
             setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
         }
     };
+    
+    // const handleRegister = async (e) => {
+    //     e.preventDefault();
+    //     let newErrors = {};
+
+    //     if (!data.name.trim()) newErrors.name = "Name is required.";
+    //     if (!data.username.trim()) {
+    //         newErrors.username = "Email is required.";
+    //     } else if (!data.username.endsWith("@spist.edu.ph")) {
+    //         newErrors.username = "Only @spist.edu.ph emails are allowed.";
+    //     }
+    //     if (!data.password) {
+    //         newErrors.password = "Password is required.";
+    //     } else if (!validatePassword(data.password)) {
+    //         newErrors.password = "Password must be at least 6 characters and include a special character.";
+    //     }
+    //     if (data.password !== data.reTypePassword) {
+    //         newErrors.reTypePassword = "Passwords do not match.";
+    //     }
+
+    //     if (Object.keys(newErrors).length > 0) {
+    //         setErrors(newErrors);
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
+    //         if (response.status === 201) {
+    //             navigate("/login");
+    //         }
+    //     } catch (err) {
+    //         setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
+    //     }
+    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -82,8 +136,8 @@ export default function Register() {
             const newErrors = { ...prevErrors };
             if (name === "name" && value.trim()) delete newErrors.name;
             if (name === "email") {
-                if (value.trim()) delete newErrors.email;
-                if (value.endsWith("@spist.edu.ph")) delete newErrors.email;
+                if (value.trim()) delete newErrors.username;
+                if (value.endsWith("@spist.edu.ph")) delete newErrors.username;
             }
             if (name === "password") {
                 if (value.length >= 6 && /[!@#$%^&*(),.?":{}|<>]/.test(value)) delete newErrors.password;
@@ -120,6 +174,21 @@ export default function Register() {
                             onChange={handleChange}
                         />
                     </div>
+                            {/* Email Input */}
+                        <div className={styles.inputGroup}>
+                        <label className={styles.label} htmlFor="username">
+                            <FaEnvelope className={styles.icon} /> Phone Number
+                        </label>
+                        {errors.phone && <p className={styles.errorMessage}>{errors.phone}</p>}
+                        <input
+                            id="phone"
+                            type="text"
+                            name="phone"
+                            placeholder="Enter your phone number (+63XXXXXXXXXX)" 
+                            value={data.phone}
+                            onChange={handleChange}
+                        />
+                    </div>
 
                     {/* Email Input */}
                     <div className={styles.inputGroup}>
@@ -131,7 +200,7 @@ export default function Register() {
                             id="email"
                             type="email"
                             name="email"
-                            placeholder="Enter your email"
+                            placeholder="Enter your email " 
                             value={data.email}
                             onChange={handleChange}
                         />

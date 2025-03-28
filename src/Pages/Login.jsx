@@ -12,7 +12,7 @@ export default function Login({setAuth}) {
 
     const [data, setData] =  useState({
 
-        email: '',
+        username: '',
         password: '',
     })
 
@@ -47,13 +47,14 @@ export default function Login({setAuth}) {
             <div className={styles.formContainer}>
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>
-                    <label className={styles.label}>Email</label>
+                    <label className={styles.label}>Email or Phone Number</label>
                     <input
-                        type="email"
-                        placeholder="Enter email"
+                        type="text"
+                        placeholder="Enter email or Phone Number"
                         className={styles.input}
-                        value={data.email}
-                        onChange={(e) => setData({ ...data, email: e.target.value })}
+                        value={data.username}
+                        onChange={(e) => setData({ ...data, username: e.target.value })}
+                        required
                     />
                     <label className={styles.label}>Password</label>
                     <input
@@ -62,6 +63,7 @@ export default function Login({setAuth}) {
                         className={styles.input}
                         value={data.password}
                         onChange={(e) => setData({ ...data, password: e.target.value })}
+                        required
                     />
                     <button type="submit" className={styles.button}>Login</button>
                 </form>

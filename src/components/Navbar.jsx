@@ -16,7 +16,7 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen, handleLogout}) {
         onMouseLeave={() => setIsSidebarOpen(false)}
       >
         <nav className="nav flex-column p-3">
-          <Link className="nav-link" to = 'Home'><img src={accesslogo} alt="access logo" className="logo me-2" /> <span>Home</span></Link>
+          <Link className="nav-link" to = '/'><img src={accesslogo} alt="access logo" className="logo me-2" /> <span>Home</span></Link>
           <Link className="nav-link" to = 'classroom'><i className="bi bi-people me-2"></i> <span>Classroom</span></Link>
           <Link className="nav-link" to = 'course'><i className="bi bi-book me-2"></i> <span>Course</span></Link>
           <Link className="nav-link" to = 'settings'><i className="bi bi-gear me-2"></i> <span>Settings</span></Link>
