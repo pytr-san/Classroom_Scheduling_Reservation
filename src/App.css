@@ -22,7 +22,8 @@
 .main-content {
   grid-area: content;
   padding: 20px;
-  margin-left: 80px; /* Match sidebar width */
+  /* margin-left: 80px;  */
+  /* Match sidebar width */
   margin-top: 70px; /* Match navbar height */
   transition: margin-left 0.3s ease;
 }

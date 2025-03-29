@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useAuth from "../../Hooks/useAuth";
 import AdminAccess from "../../components/AdminAccess";
+import AdminHome from "./AdminHome";
 
 const Home = () => {
     const { auth } = useAuth();
@@ -25,14 +26,14 @@ const Home = () => {
 
     return (
         <div>
-            <h1>Welcome, {auth.user.name}!</h1>
+            {/* <h1>Welcome, {auth.user.name}!</h1> */}
 
             {auth.user.role === "admin" && (
                 <>
                     {!hasAdminAccess ? (
                         <AdminAccess onAccessGranted={onAccessGranted} />
                     ) : (
-                        <p>🔹 Admin Dashboard - Manage users, courses, and settings.</p>
+                        <AdminHome/>
                     )}
                 </>
             )}

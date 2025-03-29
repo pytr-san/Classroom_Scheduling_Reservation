@@ -13,7 +13,7 @@ import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth.jsx";
 import UnauthorizedPage from "./Unauthorized.jsx";
 import AdminAccess from "./components/AdminAccess.jsx"
-
+import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx"
     const ROLES ={
         student: "student",
         admin: "admin",
@@ -94,6 +94,7 @@ import AdminAccess from "./components/AdminAccess.jsx"
 
                     {/* Admin-Only Routes */}
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin]} />}>
+                            <Route path="/class-schedule/:course/:year/:section" element={<ClassSchedule />} />
                             <Route path="/classroom" element={<Classroom />} />
                             <Route path="/course" element={<Course />} />
                             <Route path="/course/:id/manage" element={<ManageCourse />} />

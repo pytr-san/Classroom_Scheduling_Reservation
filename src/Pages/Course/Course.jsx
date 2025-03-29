@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
-
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -36,15 +37,32 @@ const Courses = () => {
     </div>
   
     {/* Course List */}
-    <div className={styles.courseCard}>
+    <div className={styles.courseCard} >
       {courses.length > 0 ? (
         courses.map((course, index) => (
-          <div key={index} className={styles.courseItem}>
+          <div key={index} className={styles.courseItem} 
+          onMouseEnter={() => setHoveredIndex(index)}
+          onMouseLeave={() => setHoveredIndex(null)}>
             <span className={styles.courseName}>{course.course_name}</span>
             <Gear size={20} 
             className={styles.icon}
             onClick={() => navigate(`/course/${course.course_id}/manage`)} 
-            style={{ cursor: "pointer" }} />
+            style={{ 
+              cursor: "pointer",
+              backgroundColor: hoveredIndex === index ? "#f0f0f0" : "transparent",  // Hover background
+              border: "2px", 
+              borderRadius: "50%", 
+              padding: "8px", 
+              width: "40px", 
+              height: "40px", 
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background-color 0.3s ease, border-color 0.3s ease"
+            }} 
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            />
           </div>
         ))
       ) : (

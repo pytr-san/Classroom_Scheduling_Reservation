@@ -26,11 +26,11 @@ const ProfileModal = () => {
       <div className={`modal-overlay ${isOpen ? "show" : ""}`} onClick={handleClickOutside}></div>
 
       {/* Profile Modal */}
-      <div className={`profile-modal ${isOpen ? "open" : ""}`}>
+      <div className={`profile-modal  ${isOpen ? "open" : ""}`}>
         <span className="close-btn" onClick={toggleModal}>×</span>
         <h2>Profile</h2>
-        <div className="profile-content">
-          <i className="bi bi-person-circle" style={{ fontSize: "4rem" }}></i>
+        <div className="profile-content" >
+          <i className="bi bi-person-circle " style={{ fontSize: "4rem" }}></i>
           <p><strong>Name:</strong> {user?.name || "No name provided"}</p>
           <p><strong>Email:</strong> {user?.email || "No email provided"}</p>
           <button className="logout-btn">Log out</button>
