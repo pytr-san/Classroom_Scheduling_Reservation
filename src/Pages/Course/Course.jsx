@@ -13,15 +13,19 @@ const Courses = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    axios.get("http://localhost:8000/api/course", {withCredentials: true, })
-      .then((response) => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
         console.log("Courses API Response:", response.data); // Debug
         setCourses(response.data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching courses:", error);
-      });
+      }
+    };
+  
+    fetchCourses();
   }, []);
+  
 
   return (
     <div className={styles.container}>

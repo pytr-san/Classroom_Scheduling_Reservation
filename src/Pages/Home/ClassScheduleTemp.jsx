@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, faPlus } from "@fortawesome/free-solid-svg-icons";
 import html2canvas from 'html2canvas';
 import "./schedule.css";
-
+import "./table.css";
 const ClassSchedule = () => {
   const [selectedSection, setSelectedSection] = useState("Select Section");
   const [selectedCells, setSelectedCells] = useState(new Set());

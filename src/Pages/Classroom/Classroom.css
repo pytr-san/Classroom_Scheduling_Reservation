@@ -1,0 +1,72 @@
+/* Card Layout */
+.card {
+    display: flex;
+    flex-direction: row; /* Ensure side-by-side layout */
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(to right, #333, #444);
+    max-width: 100%;
+    gap: 20px; /* Ensures spacing between sections */
+}
+
+/* Left Section - Classroom List */
+.classroom-info {
+    flex: 1; /* Takes available space */
+    min-width: 50%; /* Ensures it takes half the space */
+    padding-right: 20px;
+    border-right: 2px solid rgba(255, 255, 255, 0.3); /* Adds separation */
+}
+.classroom-info .btn {
+    max-width: 300px; /* Adjust width as needed */
+    padding: 12px 20px; /* Increase padding for better spacing */
+    font-size: 1.1rem; /* Slightly larger text */
+    font-weight: bold;
+}
+
+/* Right Section - Floor Image */
+.floor-container {
+    flex: 1; /* Takes available space */
+    min-width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 20px; /* Adds spacing from border */
+}
+
+/* Floor Image Styling */
+.floor-image {
+    width: 450px; /* Ensures it doesn't stretch */
+    max-width: 100%;
+    height: 280px; /* Ensures aspect ratio */
+    max-height: 280px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .classroom-info {
+        width: 100%;
+        border-right: none;
+        padding-right: 0;
+        text-align: center;
+    }
+
+    .floor-container {
+        width: 100%;
+        padding-left: 0;
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+h4 {
+    color: #00ff5e; /* or any color you prefer */
+}

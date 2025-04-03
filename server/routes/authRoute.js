@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     try {
         const db = await connectToDatabase();
         console.log("📩 Register endpoint hit! Request body:", req.body);
-
+        
         const { name, email, password, role } = req.body;
 
         if (!name || !email || !password || !role) {
@@ -33,12 +33,12 @@ router.post('/register', async (req, res) => {
         let tableName = role.toLowerCase()=== "faculty" ? "faculty" : "student";
 
         // ✅ Check if user already exists in the respective table
-        const [existingUserRows] = await db.execute(
+        const [rows] = await db.execute(
             `SELECT * FROM ${tableName} WHERE email = ? OR name = ?`,
             [email, name]
         );
 
-        if (existingUserRows.length > 0) {
+        if (rows.length > 0) {
             return res.status(400).json({ error: `${role} already exists` });
         }
 
@@ -50,8 +50,8 @@ router.post('/register', async (req, res) => {
             `INSERT INTO ${tableName} (name, email, password, role) VALUES (?, ?, ?, ?)`,
             [name, email, hashedPassword, role.toLowerCase()]
         );
-
-        res.status(201).json({ message: `${role} registered successfully` });
+        console.log("User registered:", { name, email, role });
+        res.status(201).json({ user: { name, email, role: role.toLowerCase() }, message: `${role.toLowerCase()} registered successfully` });
 
     } catch (err) {
         console.error("Registration error:", err);
@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
 
         console.log("🟢 Debug: Raw query result:", JSON.stringify(users, null, 2));
 
-        if (users.length > 0) {
+        if (users.length > 0) { 
             user = users[0]; // ✅ Pick first matched user
             console.log("✅ Extracted user:", user);
         }

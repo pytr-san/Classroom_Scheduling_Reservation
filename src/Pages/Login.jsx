@@ -5,12 +5,14 @@ import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthProvider";
-
+import { useLocation } from "react-router-dom";
 
 export default function Login({setIsAuthenticated, setUser}) {
 
     const userRef = useRef();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { name } = location.state || {};  // Access the user data passed via state
 
      const { setAuth} = useAuth();
     // const navigate = useNavigate();
@@ -51,14 +53,12 @@ export default function Login({setIsAuthenticated, setUser}) {
             const role = user.role;
 
             setAuth({ name, user, token, role }); // ✅ Stores user data globally
-            console.log("Setting auth with:", { user, token, role });
+            console.log("Setting auth with:", {name, user, token, role });
             navigate("/");
-                      // Redirect based on role
-            // if (role === "admin") {
-            //     navigate("/");
-            // } else if (role === "student") {
+            //Redirect based on role
+            // if (role === "student") {
             //     navigate("/newStudent");
-            // } else {
+            // }else {
             //     navigate("/");   
             // }
     
@@ -74,7 +74,9 @@ export default function Login({setIsAuthenticated, setUser}) {
     
     return (
     <>
+
         <div className={styles.container}>
+            <h1>You Successfully Registered {name} login to proceed</h1>
             <div className={styles.formContainer}>
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>

@@ -1,0 +1,205 @@
+General container styling
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  /* Header styling */
+  .header {
+    display: flex;
+    margin-left: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .sub-header {
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  /* Search bar styling */
+  .search-bar {
+    max-width: 300px;
+  }
+  
+  /* Classroom grid layout */
+  .classroom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    height: 68vh;
+    gap: 40px;
+    margin-top: 20px;
+  }
+  
+  /* Classroom card styling */
+  .classroom-card {
+    position: relative;
+    background: linear-gradient(to bottom, #000000, #efefef98);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    overflow: hidden;
+  }
+  .classroom-card:hover {
+    transform: translateY(-5px); /* Adding hover effect for a smooth animation */
+  }
+  
+  /* Add blur effect using a pseudo-element */
+  .classroom-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.6); /* Semi-transparent overlay */
+    backdrop-filter: blur(8px); /* Apply the blur */
+    opacity: 0; /* Initially hide the blur effect */
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    pointer-events: none; /* Ensure the blur doesn't block interactions */
+    z-index: -1; 
+  }
+  
+  .classroom-card:hover::after {
+    opacity: 1; /* Show the blur effect when hovering */
+  }
+  .classroom-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Top-left: Capacity */
+  .capacity {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    /* background: #919191; */
+    color: white;
+    /* padding: 5px 10px;
+    border-radius: 5px; */
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  /* Top-right: Unavailable checkbox & Camera button */
+  .top-right-container {
+    position: absolute;
+    top: 1px;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* Unavailable checkbox */
+  .unavailable-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;   
+    font-size: 14px;
+  }
+  
+  .unavailable-checkbox input {
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+  
+  /* Camera Button */
+  .camera-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #007bff;
+    transition: color 0.2s;
+  }
+  
+  .camera-button:hover {
+    color: #0056b3;
+  }
+  
+  .camera-icon {
+    top: 5px;
+    right: 5px;
+    pointer-events: none;
+    color: #919191;
+  }
+  
+  /* Room content */
+  .classroom-content {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .classroom-image img {
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+/* Room name positioned at the bottom-left */
+.room-name {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+  }
+  
+  /* Hover Buttons */
+  .button1-container {
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 1;
+  }
+  
+  .classroom-card:hover .button1-container {
+    display: block;
+    backdrop-filter: blur(8px); /* Apply blur effect when hovering */
+  }
+  
+
+  .classroom-card:hover {
+    transform: translateY(-5px); /* Adding hover effect for a smooth animation */
+  }
+
+  /* Reservation Button */
+  .reservation-btn {
+    background-color: #28a745;
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  
+  .reservation-btn:hover {
+    background-color: #218838;
+  }
+  
+  /* Unavailable room styling */
+  .unavailable {
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+
+  }
+  .unavailable h7,
+  .unavailable p {
+    color: #000000;  /* Change to the color you want */
+  }
+  .unavailable .capacity{
+    background: #dc3545;
+    color: #000000;
+  }
+  
+  h7, p {
+    color: #c1c1c1; /* Set the color */
+  }

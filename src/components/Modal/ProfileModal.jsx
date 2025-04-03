@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useAuth from "../../Hooks/useAuth";
+import "./Profile.css";
 
 const ProfileModal = () => {
   const [isOpen, setIsOpen] = useState(false);

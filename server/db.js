@@ -3,37 +3,27 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "./server/.env" });
 
-let connection;
+let pool;
 
 export const connectToDatabase = async () => {
-  if (!connection) {
+  if (!pool) {
     try {
-      connection = await mysql.createConnection({
+      pool = mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         waitForConnections: true,
         connectionLimit: 10,
-        queueLimit: 0
+        queueLimit: 0,
       });
 
-      console.log(" Database Connected Successfully");
-      // Handle connection errors
-      connection.on("error", (err) => {
-        console.error(" Database Error:", err);
-        if (err.code === "PROTOCOL_CONNECTION_LOST") {
-          console.log(" Reconnecting to database...");
-          connection = null; // Reset connection and attempt reconnect
-          connectToDatabase();
-        }
-      });
-
+      console.log("✅ Database Connected Successfully");
     } catch (error) {
-      console.error(" Database Connection Failed:", error);
-      connection = null; // Ensure no faulty connection persists
+      console.error("❌ Database Connection Failed:", error);
+      throw error;
     }
   }
 
-  return connection;
+  return pool;
 };

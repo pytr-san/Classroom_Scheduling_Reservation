@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRouter from './routes/authRoute.js';
 import courseRouter from "./routes/courseRoute.js";
+import classRoute from "./routes/classroomRoute.js";
 import cookieParser from "cookie-parser";
 import homeRouter from "./routes/homeRoute.js";
 import adminRouter from "./routes/adminRoute.js";
@@ -24,6 +25,7 @@ app.use('/auth', authRouter)
 app.use('/api', courseRouter);
 app.use("/", homeRouter);
 app.use("/api/admin", adminRouter);
+app.use("/classrooms", classRoute);  
 
 
 const PORT = process.env.PORT || 8000;

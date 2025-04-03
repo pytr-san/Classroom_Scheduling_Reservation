@@ -4,11 +4,12 @@ import styles from "./Register.module.css";
 import { FaUser, FaEnvelope, FaLock, FaCheckCircle } from "react-icons/fa";
 import accesslogo from "../assets/bg.png";
 import axios from "axios";
+import useAuth from "../Hooks/useAuth";
 
 export default function Register() {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
-  //  const userRef = useRef();
+    const { setAuth } = useAuth();
 
     const [data, setData] = useState({
         name: "",
@@ -59,15 +60,20 @@ export default function Register() {
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
 
-            if (response.status === 201) {
-                navigate("/login");
+            console.log("🚀 Server Response:", response.data);
+
+            const { user } = response.data;
+            const role = user?.role; // Ensure `role` exists before checking
+            const name = user?.name;
+            if (role === "student") {
+                console.log("✅ Role is student. Navigating to /newstudent...");
+                setAuth({ user });  
+                navigate("/register/newstudent", { state: { user } });
+            } else {
+                console.log("❌ Role is not student. Navigating to /login...");
+                navigate("/login", { state: { name } });
             }
             
-            // if (response.status === 201 && !role==="student") {
-            //     navigate("/login");
-            // }else{
-            //     navigate("/newStudent");
-            // }
         } catch (err) {
             setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
         }
@@ -75,7 +81,10 @@ export default function Register() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData({ ...data, [name]: value });
+        setData({ ...data, 
+            [name]: value
+        });
+
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
             if (name in newErrors) delete newErrors[name];
