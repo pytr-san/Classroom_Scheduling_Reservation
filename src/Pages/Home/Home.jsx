@@ -33,6 +33,7 @@ const Home = () => {
                     {!hasAdminAccess ? (
                         <AdminAccess onAccessGranted={onAccessGranted} />
                     ) : (
+   
                         <AdminHome/>
                     )}
                 </>

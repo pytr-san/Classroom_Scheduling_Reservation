@@ -1,7 +1,7 @@
-import "./CreateSchedModal.css";
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import "./CreateSchedModal.css";
 
 const Modal = ({ show, handleClose }) => {
     const [course, setCourse] = useState('');

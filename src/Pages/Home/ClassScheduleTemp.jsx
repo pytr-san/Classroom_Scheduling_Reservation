@@ -5,7 +5,7 @@ import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, f
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import "./schedule.css";
-
+import "./table.css";
 const ClassSchedule = () => {
   const [selectedSection, setSelectedSection] = useState("Select Section");
   const [selectedCells, setSelectedCells] = useState(new Set());

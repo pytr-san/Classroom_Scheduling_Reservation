@@ -83,12 +83,12 @@ router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) =
 });
 
 
-// ✅ Add a New Instructor
+// ✅ Add a New Instructor assined to a subject
 router.post("/faculty/add", authMiddleware, async (req, res) => {
-    const { name } = req.body;
+    const { name, subject_id } = req.body; // Make sure to get subject_id from the request body
 
-    if (!name || !name.trim()) {
-        return res.status(400).json({ error: "Instructor name is required" });
+    if (!name || !name.trim() || !subject_id) {
+        return res.status(400).json({ error: "Instructor name and subject_id are required" });
     }
 
     try {
@@ -105,11 +105,25 @@ router.post("/faculty/add", authMiddleware, async (req, res) => {
             name,
         };
 
-        res.status(201).json({ message: "Instructor added successfully", newFaculty });
+        // ✅ Add instructor to the subject by inserting into the subjects table
+        const [subjectResult] = await db.execute(
+            "UPDATE subjects SET faculty_id = ? WHERE subject_id = ?",
+            [newFaculty.faculty_id, subject_id]
+        );
+
+        if (subjectResult.affectedRows === 0) {
+            return res.status(404).json({ error: "Subject not found or already has an instructor" });
+        }
+
+        res.status(201).json({
+            message: "Instructor added and assigned to subject successfully",
+            newFaculty,
+        });
     } catch (error) {
         console.error("Database insert error:", error);
         res.status(500).json({ error: "Failed to add instructor" });
     }
 });
+
   
 export default router; // Use `export default` for ES modules
