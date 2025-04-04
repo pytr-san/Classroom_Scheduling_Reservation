@@ -3,8 +3,8 @@
 const NewStudentPage = () => {
     return (
         <>
-        
-        
+    
+
         </>
     )
 }

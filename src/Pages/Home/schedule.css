@@ -1,26 +1,29 @@
 /* ================ GENERAL STYLING ================ */
 :root {
-    --primary-green: #2e7d32;
-    --light-green: #e8f5e9;
-    --medium-green: #81c784;
-    --dark-green: #1b5e20;
-    --accent-yellow: #fff9c4;
+    --primary-green: #2e7d32; 
+    --light-green: #e8f5e9; 
+    --medium-green: #81c784; 
+    --dark-green: #1b5e20; 
+    --accent-yellow: #fff9c4; 
     --accent-red: #ef9a9a;
     --white: #ffffff;
     --shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
-  }
-  
-  body {
+    --soft-green: #a5d6a7; 
+    --hover-green: #4caf50; 
+    --table-header-green: #388e3c; 
+}
+
+body {
     background: var(--light-green);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--primary-green);
+    color: var(--dark-green);
     margin: 0;
     padding: 20px;
     line-height: 1.6;
-  }
-  
-  /* ================ LAYOUT & CONTAINERS ================ */
-  .container {
+}
+
+/* ================ LAYOUT & CONTAINERS ================ */
+.container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
@@ -28,48 +31,57 @@
     background: var(--white);
     border-radius: 10px;
     box-shadow: var(--shadow);
-  }
-  
-  .row {
+}
+
+.row {
     margin-bottom: 20px;
-  }
-  
-  /* ================ TYPOGRAPHY ================ */
-  h4, h5 {
+}
+
+/* ================ TYPOGRAPHY ================ */
+h4, h5 {
     font-weight: 600;
     margin-bottom: 1.2rem;
-  }
-  
-  h4 {
+}
+
+h4 {
     font-size: 1.5rem;
     color: var(--dark-green);
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  }
-  
-  h5 {
+}
+
+h5 {
     font-size: 1.2rem;
     color: var(--primary-green);
-  }
-  
-  .text-muted {
+}
+
+.text-muted {
     color: #6c757d;
     font-size: 0.95rem;
-  }
-  
-  /* ================ TABLE STYLING ================ */
-  .custom-schedule-table {
+}
+
+/* ================ TABLE CONTAINER ================ */
+.table-container {
     width: 100%;
+    height: 800px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    position: relative;
+}
+
+/* ================ TABLE STYLING ================ */
+.custom-schedule-table {
+    table-layout: fixed; 
+    width: 100%; 
     margin-top: 20px;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse; 
     border-radius: 10px;
-    overflow: hidden;
     border: 2px solid var(--medium-green);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  .custom-schedule-table thead.table-header-green th {
-    background-color: var(--primary-green);
+    box-sizing: border-box;
+}
+
+.custom-schedule-table thead.table-header-green th {
+    background-color: var(--table-header-green);
     color: var(--white);
     font-weight: 600;
     padding: 14px;
@@ -80,154 +92,224 @@
     text-transform: uppercase;
     font-size: 0.9rem;
     letter-spacing: 0.5px;
-  }
-  
-  .custom-schedule-table thead.table-header-green th.time-header {
-    background-color: #388e3c;
-  }
-  
-  .custom-schedule-table tbody .time-cell {
+    width: 120px; 
+    height: 40px; 
+    max-height: 40px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.custom-schedule-table thead.table-header-green th.time-header {
+    background-color: var(--primary-green);
+    width: 80px; 
+}
+
+.custom-schedule-table tbody tr {
+    height: 60px; 
+    max-height: 60px;
+}
+
+.custom-schedule-table tbody .time-cell {
     background-color: var(--light-green);
     font-weight: 500;
     color: var(--dark-green);
     padding: 12px;
     border-right: 2px solid var(--medium-green);
-  }
-  
-  .custom-schedule-table td {
-    padding: 12px;
+    border-bottom: 1px solid #c8e6c9;
+    border-left: 1px solid #c8e6c9;
+    border-top: 1px solid #c8e6c9;
+    width: 80px; 
+    height: 60px; 
+    max-height: 60px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.custom-schedule-table td {
+    padding: 0; 
     text-align: center;
     vertical-align: middle;
-    border: 1px solid #c8e6c9;
+    border: 1px solid #c8e6c9; 
     transition: all 0.3s ease;
     font-size: 0.95rem;
-  }
-  
-  .custom-schedule-table tr:nth-child(even) {
-    background-color: #f8fbf8;
-  }
-  
-  /* ================ CELL STYLING ================ */
-  .cell {
+    width: 120px; /* Fixed width for each column (except time column) */
+    height: 60px; /* Fixed height for each cell */
+    max-height: 60px; /* Prevent cell from expanding */
+    overflow: hidden; /* Prevent content from overflowing */
+    box-sizing: border-box; /* Ensure padding is included in height/width */
+}
+
+/* Ensure merged cells do not expand beyond the sum of individual cells */
+.custom-schedule-table td[rowspan],
+.custom-schedule-table td[colspan] {
+    padding: 0; /* Remove padding to prevent expansion */
+    box-sizing: border-box;
+}
+
+/* Remove alternating row background to avoid visual confusion with merged cells */
+.custom-schedule-table tr:nth-child(even) {
+    background-color: transparent;
+}
+
+/* Ensure merged cells maintain borders */
+.custom-schedule-table td.cell-merged {
+    border: 2px solid var(--medium-green) !important; /* Thicker border for merged cells */
+}
+
+/* ================ CELL STYLING ================ */
+.cell {
     cursor: pointer;
-    min-height: 80px;
     position: relative;
-    padding: 15px 10px !important;
+    padding: 5px !important; /* Reduced padding to fit content */
     transition: all 0.3s ease;
-  }
-  
-  .cell:hover {
+    overflow: hidden; /* Prevent content from overflowing */
+    box-sizing: border-box; /* Ensure padding is included in height */
+    width: 100%;
+    height: 100%;
+}
+
+.cell:hover {
     background-color: #e0f7fa !important;
-  }
-  
-  .cell-content {
+}
+
+.cell-content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-  }
-  
-  /* Cell Status Colors */
-  .cell-selected {
+    gap: 2px; /* Reduced gap to fit content within fixed height */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    height: 100%; /* Ensure content takes the full height of the cell */
+    max-height: 100%; /* Prevent content from exceeding cell height */
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* Cell Status Colors */
+.cell-selected {
     background-color: #f0f4c8 !important;
     border: 2px solid #dce775 !important;
     box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
-  }
-  
-  .cell-f2f {
+}
+
+.cell-f2f {
     background-color: var(--medium-green) !important;
     border: 2px solid #4caf50 !important;
-  }
-  
-  .cell-online {
+}
+
+.cell-online {
     background-color: var(--accent-yellow) !important;
     border: 2px solid #fff59d !important;
-  }
-  
-  .cell-conflict {
+}
+
+.cell-conflict {
     background-color: var(--accent-red) !important;
     border: 2px solid #e57373 !important;
-  }
-  
-  .cell-merged {
-    background-color: #c8e6c9 !important;
-    border: 2px solid var(--medium-green) !important;
-  }
-  
-  /* ================ DROPDOWNS ================ */
-  .dropdown-toggle {
+}
+
+.cell-merged {
+    background-color: #c8e6c9; /* Remove !important to allow status classes to override */
+}
+
+/* Ensure status classes override cell-merged when both are applied */
+.cell-merged.cell-f2f {
+    background-color: var(--medium-green) !important;
+    border: 2px solid #4caf50 !important;
+}
+
+.cell-merged.cell-online {
+    background-color: var(--accent-yellow) !important;
+    border: 2px solid #fff59d !important;
+}
+
+.cell-merged.cell-conflict {
+    background-color: var(--accent-red) !important;
+    border: 2px solid #e57373 !important;
+}
+
+/* ================ DROPDOWNS ================ */
+.dropdown-toggle {
     transition: all 0.3s ease;
-  }
-  
-  .cell .dropdown-toggle {
+}
+
+.cell .dropdown-toggle {
     background-color: var(--white);
     color: var(--dark-green);
-    border: 1px solid #a5d6a7;
+    border: 1px solid var(--soft-green);
     width: 100%;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-align: left;
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    padding: 4px 8px; /* Reduced padding to fit within fixed height */
+    font-size: 0.8rem; /* Reduced font size to fit content */
     border-radius: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  
-  .cell .dropdown-toggle::after {
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.cell .dropdown-toggle::after {
     float: right;
-    margin-top: 7px;
-  }
-  
-  .cell .dropdown-menu {
+    margin-top: 5px;
+}
+
+.cell .dropdown-menu {
     min-width: 180px;
     font-size: 0.9rem;
-    border: 1px solid #a5d6a7;
+    border: 1px solid var(--soft-green);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  /* Course Dropdown */
-  .course-dropdown .dropdown-toggle {
+}
+
+/* Course Dropdown */
+.course-dropdown .dropdown-toggle {
     width: 100%;
     padding: 12px 15px;
     font-size: 1rem;
-    background-color: #66bb6a;
+    background-color: var(--hover-green);
     color: var(--white);
     border: none;
     border-radius: 8px;
     transition: all 0.3s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .course-dropdown .dropdown-toggle:hover {
-    background-color: #4caf50;
+}
+
+.course-dropdown .dropdown-toggle:hover {
+    background-color: var(--table-header-green);
     transform: translateY(-2px);
-  }
-  
-  .dropdown-menu {
+}
+
+.dropdown-menu {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 93, 5, 0.2);
-    border: 1px solid #c8e6c9;
+    border: 1px solid var(--light-green);
     padding: 10px 0;
     max-height: 300px;
     overflow-y: auto;
-  }
-  
-  .dropdown-item {
+}
+
+.dropdown-item {
     padding: 10px 18px;
     font-size: 0.95rem;
-    color: #388e3c;
+    color: var(--table-header-green);
     transition: all 0.2s;
-  }
-  
-  .dropdown-item:hover,
-  .dropdown-item:focus {
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
     background-color: var(--light-green);
     color: var(--primary-green);
     font-weight: 500;
-  }
-  
-  /* ================ BUTTONS ================ */
-  .btn {
+}
+
+/* ================ LEGEND STYLING ================ */
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--soft-green);
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ================ BUTTONS ================ */
+.btn {
     padding: 10px 18px;
     font-size: 1rem;
     border-radius: 8px;
@@ -238,166 +320,164 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-  }
-  
-  .btn-primary {
-    background-color: #388e3c;
+}
+
+.btn-primary {
+    background-color: var(--table-header-green);
     color: var(--white);
-  }
-  
-  .btn-primary:hover {
-    background-color: #2e7d32;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-green);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  }
-  
-  .btn-success {
-    background-color: #4caf50;
+}
+
+.btn-success {
+    background-color: var(--hover-green);
     color: var(--white);
-  }
-  
-  .btn-success:hover {
-    background-color: #388e3c;
+}
+
+.btn-success:hover {
+    background-color: var(--table-header-green);
     transform: translateY(-2px);
-  }
-  
-  .btn-secondary {
+}
+
+.btn-secondary {
     background-color: #6c757d;
-  }
-  
-  .btn-info {
-    background-color: #17a2b8;
-  }
-  
-  .btn-danger {
+    color: var(--white);
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background-color: var(--medium-green);
+    color: var(--white);
+}
+
+.btn-info:hover {
+    background-color: var(--primary-green);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
     background-color: #dc3545;
-  }
-  
-  /* ================ LEGEND ================ */
-  .legend {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: var(--light-green);
-    border-radius: 10px;
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .legend-box {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    border-radius: 4px;
-    border: 1px solid rgba(0,0,0,0.1);
-  }
-  
-  /* ================ ACTION BUTTONS ================ */
-  .action-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  
-  /* ================ MODALS ================ */
-  .modal-content {
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #c62828;
+    transform: translateY(-2px);
+}
+
+/* ================ MODAL STYLING ================ */
+.modal-content {
     border-radius: 10px;
     border: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
-  
-  .modal-header {
-    background-color: var(--primary-green);
-    color: var(--white);
-    border-radius: 10px 10px 0 0;
-    padding: 15px 20px;
-  }
-  
-  .modal-title {
+    box-shadow: var(--shadow);
+}
+
+.modal-header {
+    background-color: var(--light-green);
+    border-bottom: 1px solid var(--medium-green);
+}
+
+.modal-title {
+    color: var(--dark-green);
     font-weight: 600;
-  }
-  
-  .modal-footer {
-    border-top: 1px solid #e9ecef;
-    padding: 15px 20px;
-  }
-  
-  /* ================ RESPONSIVE ADJUSTMENTS ================ */
-  @media (max-width: 768px) {
+}
+
+.modal-footer {
+    border-top: 1px solid var(--medium-green);
+}
+
+/* ================ FORM STYLING ================ */
+.form-control, .form-select {
+    border-radius: 5px;
+    border: 1px solid var(--medium-green);
+    font-size: 0.95rem;
+    padding: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 5px rgba(46, 125, 50, 0.3);
+}
+
+/* ================ PRINT STYLING ================ */
+@media print {
+    body {
+        background: none;
+    }
+
     .container {
-      padding: 15px;
+        box-shadow: none;
+        border: none;
+        padding: 0;
     }
-  
+
+    .row, .col-md-3, .col-md-9 {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .table-container {
+        overflow: hidden;
+        height: auto;
+    }
+
     .custom-schedule-table {
-      font-size: 0.85rem;
+        margin: 0;
+        border: 1px solid #000;
     }
-    
+
     .custom-schedule-table th,
     .custom-schedule-table td {
-      padding: 8px;
+        border: 1px solid #000 !important;
+        font-size: 10pt;
     }
-  
-    .action-buttons {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-  
-  /* ================ PRINT STYLES ================ */
-  @media print {
-    body {
-      background: var(--white);
-      padding: 0;
-      font-size: 12pt;
-    }
-    
-    .container {
-      box-shadow: none;
-      padding: 0;
-      max-width: 100%;
-    }
-    
-    .no-print {
-      display: none !important;
-    }
-    
-    .custom-schedule-table {
-      box-shadow: none;
-      border: 2px solid #ddd;
-      page-break-inside: avoid;
-    }
-  
-    .custom-schedule-table thead {
-      display: table-header-group;
-    }
-  
-    .custom-schedule-table tr {
-      page-break-inside: avoid;
-    }
-    
-    /* Force colors to print */
-    .cell-f2f, 
-    .cell-online, 
-    .cell-conflict, 
-    .cell-merged, 
-    .cell-selected {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-  }
 
-  
+    .custom-schedule-table thead.table-header-green th {
+        background-color: #dcedc8 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .custom-schedule-table tbody .time-cell {
+        background-color: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cell-f2f {
+        background-color: #a5d6a7 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cell-online {
+        background-color: #fff9c4 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cell-conflict {
+        background-color: #ef9a9a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cell-merged {
+        background-color: #c8e6c9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .btn, .dropdown-button, .action-buttons, .save-load-buttons {
+        display: none !important;
+    }
+}

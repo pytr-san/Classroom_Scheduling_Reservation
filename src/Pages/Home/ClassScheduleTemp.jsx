@@ -3,6 +3,7 @@ import { Container, Row, Col, Table, Button, Dropdown, DropdownButton, Tooltip, 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, faPlus } from "@fortawesome/free-solid-svg-icons";
 import html2canvas from 'html2canvas';
+import { jsPDF } from "jspdf";
 import "./schedule.css";
 
 const ClassSchedule = () => {
@@ -17,7 +18,7 @@ const ClassSchedule = () => {
   const [courses, setCourses] = useState({
     BSIT: ["1A", "1B", "2A", "2B", "3A", "3B", "4A"],
     BSCPE: ["1", "2", "3", "4"],
-    BSCS: ["1", "2", "A", "4"],
+    BSCS: ["1", "2", "A", "4"], 
   });
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedCellKey, setSelectedCellKey] = useState(null);
@@ -71,33 +72,77 @@ const ClassSchedule = () => {
   };
 
   const confirmMerge = () => {
-    if (selectedCells.size > 1) {
-      const cellsArray = Array.from(selectedCells);
-      const [firstCell, ...restCells] = cellsArray;
-
-      setMergedCells(prev => ({
-        ...prev,
-        [firstCell]: cellsArray
-      }));
-
-      cellsArray.forEach(cell => {
-        setCellStatus(prev => ({
-          ...prev,
-          [cell]: 'Merged'
-        }));
-      });
-
-      setCellDetails(prev => ({
-        ...prev,
-        [firstCell]: prev[firstCell] || {
-          professor: professors[0],
-          subject: subjects[0],
-          room: rooms[0]
-        }
-      }));
-
-      setSelectedCells(new Set());
+    if (selectedCells.size < 2) {
+      alert("Please select at least two cells to merge.");
+      return;
     }
+
+    const cellsArray = Array.from(selectedCells);
+    const cellIndices = cellsArray.map(key => {
+      const [row, col] = key.split('-').map(Number);
+      return { key, row, col };
+    });
+
+    const minRow = Math.min(...cellIndices.map(cell => cell.row));
+    const maxRow = Math.max(...cellIndices.map(cell => cell.row));
+    const minCol = Math.min(...cellIndices.map(cell => cell.col));
+    const maxCol = Math.max(...cellIndices.map(cell => cell.col));
+
+    const expectedCellCount = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+    if (cellsArray.length !== expectedCellCount) {
+      alert("Please select a contiguous rectangular block of cells to merge.");
+      setSelectedCells(new Set());
+      return;
+    }
+
+    for (let row = minRow; row <= maxRow; row++) {
+      for (let col = minCol; col <= maxCol; col++) {
+        const key = `${row}-${col}`;
+        if (!selectedCells.has(key)) {
+          alert("Please select a contiguous rectangular block of cells to merge.");
+          setSelectedCells(new Set());
+          return;
+        }
+      }
+    }
+
+    const rowSpan = maxRow - minRow + 1;
+    const colSpan = maxCol - minCol + 1;
+    const anchorCell = `${minRow}-${minCol}`;
+
+    console.log(`Merging cells: ${cellsArray.join(', ')}`);
+    console.log(`Anchor cell: ${anchorCell}, rowSpan: ${rowSpan}, colSpan: ${colSpan}`);
+
+    setMergedCells(prev => ({
+      ...prev,
+      [anchorCell]: {
+        cells: cellsArray,
+        rowSpan,
+        colSpan,
+        minRow,
+        maxRow,
+        minCol,
+        maxCol
+      }
+    }));
+
+    cellsArray.forEach(cell => {
+      setCellStatus(prev => ({
+        ...prev,
+        [cell]: 'Merged'
+      }));
+    });
+
+    setCellDetails(prev => ({
+      ...prev,
+      [anchorCell]: prev[anchorCell] || {
+        professor: professors[0],
+        subject: subjects[0],
+        room: rooms[0]
+      }
+    }));
+
+    setSelectedCells(new Set());
   };
 
   const cancelMerge = () => {
@@ -111,7 +156,7 @@ const ClassSchedule = () => {
       const newMergedCells = {...prev};
       cellsToUnmerge.forEach(cell => {
         const groupKey = Object.keys(newMergedCells).find(key => 
-          newMergedCells[key].includes(cell)
+          newMergedCells[key].cells.includes(cell)
         );
         
         if (groupKey) {
@@ -146,14 +191,28 @@ const ClassSchedule = () => {
 
   const handleDownloadSchedule = () => {
     if (scheduleTableRef.current) {
-      html2canvas(scheduleTableRef.current).then((canvas) => {
+      html2canvas(scheduleTableRef.current, { scale: 2 }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = imgData;
-        link.download = 'class_schedule.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: 'a4'
+        });
+
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+        const scaledWidth = imgWidth * ratio;
+        const scaledHeight = imgHeight * ratio;
+
+        const xOffset = (pdfWidth - scaledWidth) / 2;
+        const yOffset = (pdfHeight - scaledHeight) / 2;
+
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+        pdf.save('class_schedule.pdf');
       });
     }
   };
@@ -163,10 +222,28 @@ const ClassSchedule = () => {
   };
 
   const markCellStatus = (key, status) => {
-    setCellStatus(prevStatus => ({
-      ...prevStatus,
-      [key]: status
-    }));
+    // Check if the cell is part of a merged group
+    const groupKey = Object.keys(mergedCells).find(anchorKey => 
+      mergedCells[anchorKey].cells.includes(key)
+    );
+
+    if (groupKey) {
+      // If the cell is part of a merged group, update the status of all cells in the group
+      const groupCells = mergedCells[groupKey].cells;
+      setCellStatus(prevStatus => {
+        const updatedStatus = { ...prevStatus };
+        groupCells.forEach(cell => {
+          updatedStatus[cell] = status;
+        });
+        return updatedStatus;
+      });
+    } else {
+      // If the cell is not part of a merged group, update only its status
+      setCellStatus(prevStatus => ({
+        ...prevStatus,
+        [key]: status
+      }));
+    }
   };
 
   const updateCellDetails = (key, detailType, value) => {
@@ -212,7 +289,6 @@ const ClassSchedule = () => {
   };
 
   return (
-
     <Container className="main mt-4">
       <Header 
         setShowCreateModal={setShowCreateModal} 
@@ -415,93 +491,127 @@ const CourseSelector = ({ courses, setSelectedSection, selectedSection }) => (
   </>
 );
 
-const ScheduleTable = ({ times, selectedCells, mergedCells, cellStatus, cellDetails, toggleCellSelection, handleStatusChange, updateCellDetails, selectedSection, professors, subjects, rooms }) => (
-  <Table bordered size="sm" className="text-center custom-schedule-table">
-    <thead className="table-header-green">
-      <tr>
-        <th className="time-header">Time</th>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
-      </tr>
-    </thead>
-    <tbody>
-      {times.map((time, timeIndex) => (
-        <tr key={timeIndex}>
-          <td className="time-cell">{time}</td>
-          {Array.from({ length: 6 }).map((_, dayIndex) => {
-            const key = `${timeIndex}-${dayIndex}`;
-            
-            const isMerged = Object.entries(mergedCells).some(([firstCell, group]) => 
-              group.includes(key) && key !== firstCell
-            );
-            if (isMerged) return null;
-            
-            const isFirstCellOfGroup = mergedCells[key] !== undefined;
-            
-            return (
-              <td
-                key={dayIndex}
-                rowSpan={isFirstCellOfGroup ? mergedCells[key].length : 1}
-                className={`cell ${selectedCells.has(key) ? "cell-selected" : ""}
-                           ${cellStatus[key] === 'F2F' ? "cell-f2f" : ""}
-                           ${cellStatus[key] === 'Online' ? "cell-online" : ""}
-                           ${cellStatus[key] === 'Time Conflict' ? "cell-conflict" : ""}
-                           ${isFirstCellOfGroup ? "cell-merged" : ""}`}
-                onClick={() => toggleCellSelection(key)}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  handleStatusChange(key, 'F2F');
-                }}
-                onDoubleClick={() => handleStatusChange(key, 'Online')}
-              >
-                {isFirstCellOfGroup && (
-                  <div className="cell-content">
-                    <DropdownButton
-                      title={cellDetails[key]?.professor || "Select Professor"}
-                      variant="secondary"
-                      size="sm"
-                      onSelect={(value) => updateCellDetails(key, 'professor', value)}
-                      className="mb-1"
-                    >
-                      {professors.map((prof, index) => (
-                        <Dropdown.Item key={index} eventKey={prof}>{prof}</Dropdown.Item>
-                      ))}
-                    </DropdownButton>
-                    <DropdownButton
-                      title={cellDetails[key]?.subject || "Select Subject"}
-                      variant="secondary"
-                      size="sm"
-                      onSelect={(value) => updateCellDetails(key, 'subject', value)}
-                      className="mb-1"
-                    >
-                      {subjects.map((subj, index) => (
-                        <Dropdown.Item key={index} eventKey={subj}>{subj}</Dropdown.Item>
-                      ))}
-                    </DropdownButton>
-                    <DropdownButton
-                      title={cellDetails[key]?.room || "Select Room"}
-                      variant="secondary"
-                      size="sm"
-                      onSelect={(value) => updateCellDetails(key, 'room', value)}
-                    >
-                      {rooms.map((room, index) => (
-                        <Dropdown.Item key={index} eventKey={room}>{room}</Dropdown.Item>
-                      ))}
-                    </DropdownButton>
-                  </div>
-                )}
-              </td>
-            );
-          })}
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-);
+const ScheduleTable = ({ times, selectedCells, mergedCells, cellStatus, cellDetails, toggleCellSelection, handleStatusChange, updateCellDetails, selectedSection, professors, subjects, rooms }) => {
+  console.log(`Rendering ScheduleTable with ${times.length} time slots: ${times.join(', ')}`);
+
+  return (
+    <div className="table-container">
+      <Table bordered size="sm" className="text-center custom-schedule-table">
+        <thead className="table-header-green">
+          <tr>
+            <th className="time-header">Time</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {times.map((time, timeIndex) => (
+            <tr key={timeIndex}>
+              <td className="time-cell">{time}</td>
+              {Array.from({ length: 6 }).map((_, dayIndex) => {
+                const key = `${timeIndex}-${dayIndex}`;
+                
+                let isMerged = false;
+                let isAnchor = false;
+                let rowSpan = 1;
+                let colSpan = 1;
+
+                for (const [anchorKey, group] of Object.entries(mergedCells)) {
+                  const { cells, minRow, maxRow, minCol, maxCol } = group;
+                  const [anchorRow, anchorCol] = anchorKey.split('-').map(Number);
+
+                  if (
+                    timeIndex >= minRow && timeIndex <= maxRow &&
+                    dayIndex >= minCol && dayIndex <= maxCol
+                  ) {
+                    if (key === anchorKey) {
+                      isAnchor = true;
+                      rowSpan = maxRow - minRow + 1;
+                      colSpan = maxCol - minCol + 1;
+                    } else {
+                      isMerged = true;
+                      break;
+                    }
+                  }
+                }
+
+                if (isMerged) {
+                  console.log(`Skipping cell ${key} because it is merged into another group.`);
+                  return null;
+                }
+
+                console.log(`Rendering cell ${key}: isAnchor=${isAnchor}, rowSpan=${rowSpan}, colSpan=${colSpan}`);
+
+                // Determine the cell's status class
+                const statusClass = cellStatus[key] === 'F2F' ? "cell-f2f" :
+                                   cellStatus[key] === 'Online' ? "cell-online" :
+                                   cellStatus[key] === 'Time Conflict' ? "cell-conflict" : "";
+
+                return (
+                  <td
+                    key={dayIndex}
+                    rowSpan={rowSpan}
+                    colSpan={colSpan}
+                    className={`cell ${selectedCells.has(key) ? "cell-selected" : ""} 
+                               ${statusClass} 
+                               ${isAnchor ? "cell-merged" : ""}`}
+                    onClick={() => toggleCellSelection(key)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      handleStatusChange(key, 'F2F');
+                    }}
+                    onDoubleClick={() => handleStatusChange(key, 'Online')}
+                  >
+                    {isAnchor && (
+                      <div className="cell-content">
+                        <DropdownButton
+                          title={cellDetails[key]?.professor || "Select Professor"}
+                          variant="secondary"
+                          size="sm"
+                          onSelect={(value) => updateCellDetails(key, 'professor', value)}
+                          className="mb-1"
+                        >
+                          {professors.map((prof, index) => (
+                            <Dropdown.Item key={index} eventKey={prof}>{prof}</Dropdown.Item>
+                          ))}
+                        </DropdownButton>
+                        <DropdownButton
+                          title={cellDetails[key]?.subject || "Select Subject"}
+                          variant="secondary"
+                          size="sm"
+                          onSelect={(value) => updateCellDetails(key, 'subject', value)}
+                          className="mb-1"
+                        >
+                          {subjects.map((subj, index) => (
+                            <Dropdown.Item key={index} eventKey={subj}>{subj}</Dropdown.Item>
+                          ))}
+                        </DropdownButton>
+                        <DropdownButton
+                          title={cellDetails[key]?.room || "Select Room"}
+                          variant="secondary"
+                          size="sm"
+                          onSelect={(value) => updateCellDetails(key, 'room', value)}
+                        >
+                          {rooms.map((room, index) => (
+                            <Dropdown.Item key={index} eventKey={room}>{room}</Dropdown.Item>
+                          ))}
+                        </DropdownButton>
+                      </div>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
 
 const ActionButtons = ({ selectedCells, confirmMerge, cancelMerge, unmergeCells }) => (
   <>
@@ -552,7 +662,7 @@ const SaveAndLoadButtons = ({ handleSaveSchedule, handleDownloadSchedule, handle
           <FontAwesomeIcon icon={faSave} className="me-2" /> Save
         </Button>
       </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={<Tooltip>Download as image</Tooltip>}>
+      <OverlayTrigger placement="top" overlay={<Tooltip>Download as PDF</Tooltip>}>
         <Button variant="secondary" className="me-2" onClick={handleDownloadSchedule}>
           <FontAwesomeIcon icon={faDownload} className="me-2" /> Download
         </Button>
@@ -564,7 +674,6 @@ const SaveAndLoadButtons = ({ handleSaveSchedule, handleDownloadSchedule, handle
       </OverlayTrigger>
     </Col>
   </Row>
-
 );
 
 export default ClassSchedule;

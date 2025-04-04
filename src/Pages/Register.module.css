@@ -1,179 +1,202 @@
-
+/* General container */
 .container {
-    background: #004000;
-    display: flex;
-    flex-direction: row; /* Side-by-side layout */
-    justify-content: center;
-    align-items: center;
-    height: 100vh;  /* Full viewport height */
-    width: 100vw;   /* Full viewport width */
-    padding: 20px;
-    box-sizing: border-box;
-    gap: 20px; /* Space between the logo and form */
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* Left Image Section */
 .imageContainer {
-    flex: 1; /* Left side takes up half the screen */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url('/assets/your-binary-bg.png') center/cover no-repeat;
-    border-right: 5px solid #004000; /* Border between sections */
+  flex: 1;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000 url('/path-to-binary-bg.png') center/cover no-repeat; /* Replace with actual binary background path */
 }
 
 /* Logo Image */
 .logoImage {
-    width: 100%;
- 
-    max-width: 1000px; /* Adjust as necessary */
-    max-height: 100vh; /* Ensures it fits within the viewport */
-    object-fit: contain; /* Keeps aspect ratio while fitting inside */
+  width: 80%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
 }
 
 /* Right Form Section */
-.div1 {
-    flex: 1; /* Right side takes up half the screen */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #00991fdd; /* Light green */
-    border-left: 5px solid #004200;
+.formWrapper {
+  flex: 1;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e6e6e6;
 }
 
 /* Form Container */
 .formContainer {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    display: flex;
-    justify-content: center;
-    height: auto; /* Fix the incorrect '100hv' */
-    flex-direction: column;
-    border: 1px solid #004000;
-    background-color: rgb(208, 208, 208);
+  background: #e6e6e6;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #004000;
 }
 
-/* RESPONSIVE DESIGN FOR MOBILE */
+/* Responsive Design for Mobile */
 @media (max-width: 768px) {
-    .container {
-        flex-direction: column; /* Stack items vertically */
-        gap: 10px;
-    }
+  .container {
+      flex-direction: column;
+  }
 
-    .imageContainer {
-        flex: none;
-        width: 100%; /* Make image take full width */
-        border-right: none; /* Remove border */
-        border-bottom: 5px solid #004000; /* Add separator */
-    }
+  .imageContainer {
+      width: 100%;
+      height: 40vh;
+  }
 
-    .div1 {
-        flex: none;
-        width: 100%; /* Form takes full width */
-        border-left: none; /* Remove side border */
-    }
+  .logoImage {
+      width: 70%;
+      max-height: 30vh;
+  }
 
-    .formContainer {
-        width: 90%; /* Make form responsive */
-        max-width: 400px;
-    }
+  .formWrapper {
+      width: 100%;
+      height: 60vh;
+  }
+
+  .formContainer {
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+  }
 }
 
-  
-  .title {
-    text-align: center;
-    font-weight: bold;
-  }
-  
-  .inputGroup {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: bold;
-    color: #004000;
-  }
-  
-  .inputGroup input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #004000;
-    border-radius: 5px;
-  }
-  
-  .inputWithIcon {
-    position: relative;
-  }
-  
-  .inputWithIcon input {
-    width: 100%;
-    padding-right: 30px;
-  }
-  
-  .checkIcon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgb(219, 219, 219);
-  }
-  
-  .buttonContainer {
-    text-align: center;
-  }
-  
-  .confirmBtn {
-    width: 100%;
-    background: linear-gradient(to bottom, #008000, #004000);
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  .confirmBtn:hover {
-    background: linear-gradient(90deg, #00c500, #1bff1b); /* Lighter green on hover */
-    transform: scale(1.0); /* Slightly enlarges */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Adds glow effect */
-    color: black;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
-  .loginBtn {
-    width: 100%;
-    background: gray;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .loginBtn:hover{
-    background: linear-gradient(90deg, #171717, #9b9b9b); /* Lighter green on hover */
-    transform: scale(1.05); /* Slightly enlarges */
-    box-shadow: 0px 4px 10px rgba(145, 145, 145, 0.667); /* Adds glow effect */
-  }
-  
-  .errorMessage {
-    color: red;
-    font-size: 12px;
-    margin-bottom: 5px;
+/* Title Styling */
+.title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #000;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif;
+  text-transform: uppercase;
 }
 
+/* Input Group Styling */
+.inputGroup {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.inputGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #000;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 5px;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-family: 'Arial', sans-serif;
+  background: #fff;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #004000;
+}
+
+/* Icon Styling */
+.icon {
+  color: #000;
+}
+
+/* Check Icon Styling */
+.checkIcon {
+  position: absolute;
+  right: 10px;
+  top: 35px;
+}
+
+/* Password Hint */
 .passwordHint {
-  font-size: 0.5rem;
-  color: #4a4a4a; /* Gray color for a subtle hint */
+  font-size: 0.8rem;
+  color: #666;
   margin-top: 5px;
-  margin-left: 5px;
-margin-top: 10px;
-margin-bottom: 0px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Button Container */
+.buttonContainer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Confirm Button */
+.confirmBtn {
+  width: 100%;
+  background: #008000;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'Arial', sans-serif;
+  transition: background 0.3s ease;
+}
+
+.confirmBtn:hover {
+  background: #006600;
+}
+
+/* Link Text */
+.linkText {
+  font-size: 0.9rem;
+  color: #000;
+  margin: 10px 0;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Login Button */
+.loginBtn {
+  width: 100%;
+  background: #666;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'Arial', sans-serif;
+  transition: background 0.3s ease;
+}
+
+.loginBtn:hover {
+  background: #555;
+}
+
+/* Error Message */
+.errorMessage {
+  color: #ff3333;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  font-family: 'Arial', sans-serif;
 }

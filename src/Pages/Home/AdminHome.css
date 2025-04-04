@@ -14,10 +14,10 @@ body {
     /* flex-direction: column; 
     justify-content: flex-start; */
     height: 100vh;
-    /* max-width: fit-content;
+    max-width: fit-content;
     margin: auto;
     position: relative;
-    overflow: hidden;  */
+    overflow: hidden;  
   }
   
   /* Navbar Styles - Fixed at top */

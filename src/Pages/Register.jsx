@@ -59,15 +59,15 @@ export default function Register() {
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
 
-            if (response.status === 201) {
-                navigate("/login");
-            }
-            
-            // if (response.status === 201 && !role==="student") {
+            // if (response.status === 201) {
             //     navigate("/login");
-            // }else{
-            //     navigate("/newStudent");
             // }
+            
+            if (response.status === 201 && !role==="student") {
+                navigate("/login");
+            }else{
+                navigate("/newStudent");
+            }
         } catch (err) {
             setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
         }
