@@ -3,33 +3,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthProvider";
-import { useLocation } from "react-router-dom";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
-export default function Login({setIsAuthenticated, setUser}) {
-
+export default function Login() {
     const userRef = useRef();
     const navigate = useNavigate();
-    const location = useLocation();
-    const { name } = location.state || {};  // Access the user data passed via state
+    const { setAuth } = useAuth();
 
-     const { setAuth} = useAuth();
-    // const navigate = useNavigate();
-    // const Location = useLocation();
-    // const from = location.State?.from?.pathname || "/";
-
-    // const errRef = userRef();
-
-   // const [user, setUser] = useState('');
-    //const [pwd, setPwd] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-
-    const [data, setData] =  useState({
-
-        email: '',
-        password: '',
-    })
+    const [errorMessage, setErrorMessage] = useState("");
+    const [data, setData] = useState({
+        email: "",
+        password: "",
+    });
 
     useEffect(() => {
         userRef.current.focus();
@@ -52,16 +37,9 @@ export default function Login({setIsAuthenticated, setUser}) {
             const name = user.name;
             const role = user.role;
 
-            setAuth({ name, user, token, role }); // ✅ Stores user data globally
-            console.log("Setting auth with:", {name, user, token, role });
+            setAuth({ name, user, token, role });
+            console.log("Setting auth with:", { user, token, role });
             navigate("/");
-            //Redirect based on role
-            // if (role === "student") {
-            //     navigate("/newStudent");
-            // }else {
-            //     navigate("/");   
-            // }
-    
         } catch (err) {
             if (err.response) {
                 setErrorMessage(err.response.data.error);
@@ -72,36 +50,65 @@ export default function Login({setIsAuthenticated, setUser}) {
     };
 
     return (
-    <>
-
         <div className={styles.container}>
-            <h1>You Successfully Registered {name} login to proceed</h1>
-            <div className={styles.formContainer}>
-                <h2>Login</h2>
-                <form onSubmit={handleLogin}>
-                    <label className={styles.label}>Email</label>
-                    <input
-                        type="email"
-                        placeholder="Enter email"
-                        className={styles.input}
-                        ref={userRef}
-                        value={data.email}
-                        onChange={(e) => setData({ ...data, email: e.target.value })}
-                        required
-                    />
-                    <label className={styles.label}>Password</label>
-                    <input
-                        type="password"
-                        placeholder="Enter password"
-                        className={styles.input}                   
-                        value={data.password}
-                        onChange={(e) => setData({ ...data, password: e.target.value })}
-                        required
-                    />
-                    <button type="submit" className={styles.button}>Login</button>
-                </form>
-                <button className={styles.registerButton} onClick={() => navigate("/register")}>Go to Register</button>
-                {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+            <div className={styles.leftSection}>
+                <h1 className={styles.title}>Classroom Scheduling and Reservation System</h1>
+            </div>
+
+            <div className={styles.rightSection}>
+                <div className={styles.formContainer}>
+                    <form onSubmit={handleLogin}>
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Email</label>
+                            <div className={styles.inputWrapper}>
+                                <FaEnvelope className={styles.inputIcon} />
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className={styles.input}
+                                    ref={userRef}
+                                    value={data.email}
+                                    onChange={(e) => setData({ ...data, email: e.target.value })}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Password</label>
+                            <div className={styles.inputWrapper}>
+                                <FaLock className={styles.inputIcon} />
+                                <input
+                                    type="password"
+                                    placeholder="Enter password"
+                                    className={styles.input}
+                                    value={data.password}
+                                    onChange={(e) => setData({ ...data, password: e.target.value })}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <button type="submit" className={styles.loginButton}>Login</button>
+
+                        <a href="/forgot-password" className={styles.forgotPasswordLink}>
+                            Forgot Password?
+                        </a>
+                    </form>
+
+                    {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+
+                    <div className={styles.signUpContainer}>
+                    <button
+                        type="button"
+                        className={styles.signUpButton}
+                        onClick={() => navigate("/register")}
+                    >
+                        Sign Up
+                    </button>
+
+                    </div>
+                </div>
             </div>
         </div>
     );

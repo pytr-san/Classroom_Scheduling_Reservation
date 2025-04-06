@@ -1,33 +1,23 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./Register.module.css";
-import { FaUser, FaEnvelope, FaLock, FaCheckCircle } from "react-icons/fa";
-import accesslogo from "../assets/bg.png";
 import axios from "axios";
+import styles from "./Register.module.css";
 import useAuth from "../Hooks/useAuth";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import accesslogo from "../assets/bg.png";
 
 export default function Register() {
     const navigate = useNavigate();
-    const [errors, setErrors] = useState({});
     const { setAuth } = useAuth();
 
+    const [errors, setErrors] = useState({});
     const [data, setData] = useState({
         name: "",
         email: "",
         password: "",
         reTypePassword: "",
-        role: "", 
+        role: "",
     });
-
-    const [passwordValid, setPasswordValid] = useState(false);
-    const [passwordMatch, setPasswordMatch] = useState(false);
-    // useEffect(()=> {
-    //     userRef.current.focus();
-    // })
-    useEffect(() => {
-        setPasswordValid(data.password.length === 0 ? false : data.password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(data.password));
-        setPasswordMatch(data.password && data.reTypePassword ? data.password === data.reTypePassword : false);
-    }, [data.password, data.reTypePassword]);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -41,13 +31,12 @@ export default function Register() {
         }
         if (!data.password) {
             newErrors.password = "Password is required.";
-        } else if (!passwordValid) {
-            newErrors.password = "Password must be at least 8 characters and include a special character.";
+        } else if (data.password.length < 8) {
+            newErrors.password = "Password must be at least 8 characters.";
         }
         if (data.password !== data.reTypePassword) {
             newErrors.reTypePassword = "Passwords do not match.";
         }
-
         if (!data.role) {
             newErrors.role = "Role selection is required.";
         }
@@ -59,21 +48,16 @@ export default function Register() {
 
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
-
-            console.log("🚀 Server Response:", response.data);
-
             const { user } = response.data;
-            const role = user?.role; // Ensure `role` exists before checking
+            const role = user?.role;
             const name = user?.name;
+            
             if (role === "student") {
-                console.log("✅ Role is student. Navigating to /newstudent...");
-                setAuth({ user });  
+                setAuth({ user });
                 navigate("/register/newstudent", { state: { user } });
             } else {
-                console.log("❌ Role is not student. Navigating to /login...");
                 navigate("/login", { state: { name } });
             }
-            
         } catch (err) {
             setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
         }
@@ -81,79 +65,120 @@ export default function Register() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData({ ...data, 
-            [name]: value
-        });
+        setData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
 
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
             if (name in newErrors) delete newErrors[name];
-        if (name === "role" && value) delete newErrors.role;
+            if (name === "role" && value) delete newErrors.role;
             return newErrors;
         });
     };
 
     return (
-    
         <div className={styles.container}>
-            <div className={styles.imageContainer}>
-                <img src={accesslogo} alt="Access Logo" className={styles.logoImage} />
+            <div className={styles.leftSection}>
+                <h1 className={styles.title}>Classroom Scheduling and Reservation System</h1>
+                <img src={accesslogo} alt="Access Logo" className={styles.logo} />
             </div>
-            <div className="div1">
+            <div className={styles.rightSection}>
                 <form onSubmit={handleRegister} className={styles.formContainer}>
-                    <h2 className={styles.title}>REGISTRATION FORM</h2>
-                    {errors.server && <p className={styles.errorMessage}>{errors.server}</p>}
                     <div className={styles.inputGroup}>
-                        <label className={styles.label} htmlFor="role">Role</label>
+                        <label className={styles.label}>Select Role</label>
                         {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
-                        <select id="role" name="role" value={data.role} onChange={handleChange}>
+                        <select 
+                            name="role" 
+                            value={data.role} 
+                            onChange={handleChange}
+                            className={styles.input}
+                        >
                             <option value="">Select Role</option>
                             <option value="Faculty">Faculty</option>
                             <option value="Student">Student</option>
                         </select>
                     </div>
+                    
                     <div className={styles.inputGroup}>
-                        <label className={styles.label} htmlFor="fullName">
-                            <FaUser className={styles.icon} /> Name
-                        </label>
+                        <label className={styles.label}>NAME</label>
                         {errors.name && <p className={styles.errorMessage}>{errors.name}</p>}
-                        <input id="fullName" type="text" name="name" placeholder="Enter full name" required value={data.name} onChange={handleChange} />
+                        <div className={styles.inputWrapper}>
+                            <FaUser className={styles.inputIcon} />
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Enter your name"
+                                className={styles.input}
+                                value={data.name}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
+                    
                     <div className={styles.inputGroup}>
-                        <label className={styles.label} htmlFor="email">
-                            <FaEnvelope className={styles.icon} /> Email
-                        </label>
+                        <label className={styles.label}>EMAIL</label>
                         {errors.email && <p className={styles.errorMessage}>{errors.email}</p>}
-                        <input id="email" type="email" name="email" placeholder="Enter your email" value={data.email} onChange={handleChange} />
+                        <div className={styles.inputWrapper}>
+                            <FaEnvelope className={styles.inputIcon} />
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                className={styles.input}
+                                value={data.email}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
+                    
                     <div className={styles.inputGroup}>
-                        <label className={styles.label} htmlFor="password">
-                            <FaLock className={styles.icon} /> Password
-                        </label>
+                        <label className={styles.label}>PASSWORD</label>
                         {errors.password && <p className={styles.errorMessage}>{errors.password}</p>}
-                        <div className={styles.inputWithIcon}>
-                            <input id="password" type="password" name="password" placeholder="Enter password" value={data.password} onChange={handleChange} />
-                            {data.password && <FaCheckCircle className={styles.checkIcon} style={{ color: passwordValid === null ? "gray" : passwordValid ? "green" : "red" }} />}
+                        <div className={styles.inputWrapper}>
+                            <FaLock className={styles.inputIcon} />
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Enter password"
+                                className={styles.input}
+                                value={data.password}
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
+                    
                     <div className={styles.inputGroup}>
-                        <label className={styles.label} htmlFor="confirmPassword">
-                            <FaLock className={styles.icon} /> Re-type Password
-                        </label>
+                        <label className={styles.label}>RE-TYPE PASSWORD</label>
                         {errors.reTypePassword && <p className={styles.errorMessage}>{errors.reTypePassword}</p>}
-                        <div className={styles.inputWithIcon}>
-                            <input id="confirmPassword" type="password" name="reTypePassword" placeholder="Re-type password" value={data.reTypePassword} onChange={handleChange} />
-                            {data.reTypePassword && <FaCheckCircle className={styles.checkIcon} style={{ color: passwordMatch === null ? "gray" : passwordMatch ? "green" : "red" }} />}
+                        <div className={styles.inputWrapper}>
+                            <FaLock className={styles.inputIcon} />
+                            <input
+                                type="password"
+                                name="reTypePassword"
+                                placeholder="Backtype password"
+                                className={styles.input}
+                                value={data.reTypePassword}
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
-                    <div className={styles.buttonContainer}>
-                        <button type="submit" className={styles.confirmBtn}>Sign up</button>
-                        <p>Already have an account?</p>
-                        <button className={styles.loginBtn} onClick={() => navigate("/login")}>Login</button>
-                    </div>
+                    
+                    <button type="submit" className={styles.registerButton}>
+                        Sign up
+                    </button>
+                    
+                    <p className={styles.loginText}>Already have an account?</p>
+                    <button 
+                        type="button" 
+                        className={styles.loginButton}
+                        onClick={() => navigate("/login")}
+                    >
+                        Login
+                    </button>
                 </form>
             </div>
         </div>
-    
     );
 }
