@@ -70,24 +70,20 @@ const ManageCourse = () => {
       // Add the instructor to the faculty and assign them to the subject
       const { data } = await axios.post("http://localhost:8000/api/faculty/add", { name, subject_id }, { withCredentials: true });
   
-      const newFaculty = data.newFaculty; // The newly added instructor
+      const newFaculty = data.newFaculty;
   
-      // Update the faculty state to reflect the newly added instructor
       setFaculty((prevFaculty) => [...prevFaculty, newFaculty]);
   
-      // Update the subjects state to reflect the new instructor assignment
       setSubjects((prevSubjects) => prevSubjects.map(subject => 
         subject.subject_id === subject_id ? 
         { ...subject, faculty_id: newFaculty.faculty_id } : subject
       ));
-  
-      // Update the updatedSubjects state
+
       setUpdatedSubjects((prevSubjects) => ({
         ...prevSubjects,
-        [subject_id]: newFaculty.faculty_id, // Associate the faculty_id with the subject_id
+        [subject_id]: newFaculty.faculty_id, 
       }));
   
-      // Reset pending instructor and close the modal
       setPendingInstructor(null);
       handleCloseModal();
     } catch (error) {

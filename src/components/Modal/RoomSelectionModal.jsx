@@ -1,77 +1,129 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./RoomSelectionModal.css";
+import axios from "axios";
 
-const RoomSelectionModal = ({ show, handleClose, onConfirm }) => {
-  const floors = [
-    { name: "1st Floor", rooms: ["Room 101", "Room 102", "Room 103", "Computer Lab", "Electronics Lab", "AV Room"] },
-    { name: "2nd Floor", rooms: ["Room 201", "Room 202", "Room 203", "Computer Lab", "Electronics Lab", "AV Room"] },
-    { name: "3rd Floor", rooms: ["Room 301", "Room 302", "Room 303", "Computer Lab", "Electronics Lab", "AV Room"] },
-    { name: "4th Floor", rooms: ["Room 401", "Room 402", "Room 403", "Computer Lab", "Electronics Lab", "AV Room"] },
-  ];
+const RoomSelectionModal = ({ show, handleClose, classrooms }) => {
+  
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/course");
+        setCourses(response.data); // Assuming API returns an array of course names
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+  
+    fetchCourses();
+  }, []);
+    
+
+  const groupedByFloor = (classrooms || []).reduce((acc, room) => {
+    const floor = room.floor_building || "Unknown Floor";
+    if (!acc[floor]) acc[floor] = [];
+    acc[floor].push(room);
+    return acc;
+  }, {});
 
   const [selectedRooms, setSelectedRooms] = useState([]);
 
   const handleCheckboxChange = (room) => {
     setSelectedRooms((prev) =>
-      prev.includes(room) ? prev.filter((r) => r !== room) : [...prev, room]
+      prev.some((r) => r.room_id === room.room_id)
+        ? prev.filter((r) => r.room_id !== room.room_id)
+        : [...prev, room]
     );
   };
-
+  
+  
   const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm(selectedRooms);
-    }
-    handleClose(); // Close modal after confirming
-  };
 
+    const cleanedSelectedRooms = selectedRooms.filter(
+      (room) => room.room_id && room.room_name
+    );
+
+    if (!selectedCourse || !selectedYear || !selectedSection || selectedRooms.length === 0) {
+      alert("Please complete all selections before confirming.");
+      return;
+    }
+
+    navigate("/create-room-schedule", {
+      state: {
+        newSchedule: {
+          selectedCourse,
+          selectedYear,
+          selectedSection,
+          selectedRooms: cleanedSelectedRooms,
+        },
+      },
+    });
+    
+    handleClose();
+  };
+  
+
+  
   return (
-    <Modal show={show} onHide={handleClose} centered size="lg">
+    <Modal show={show} onHide={handleClose} centered dialogClassName="custom-modal-width">
       <Modal.Header closeButton>
         <Modal.Title>Select Course, Year, and Section</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="px-3 py-2">
         {/* Course Selection */}
         <div className="d-flex justify-content-between mb-3">
-          <Form.Select className="w-30">
-            <option>Course</option>
-            <option>BS Computer Science</option>
-            <option>BS Information Technology</option>
-            <option>BS Electronics Engineering</option>
+          <Form.Select style={{ width: '30%' }} value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
+            <option value="">Course</option>
+            {courses.map((course) => (
+              <option key={course.course_id} value={course.course_name}>
+                {course.course_name}
+              </option>
+            ))}
           </Form.Select>
-          <Form.Select className="w-30">
-            <option>Year</option>
+
+          <Form.Select style={{ width: '30%' }} value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+            <option value="">Year</option>
             <option>1st Year</option>
             <option>2nd Year</option>
             <option>3rd Year</option>
             <option>4th Year</option>
           </Form.Select>
-          <Form.Select className="w-30">
-            <option>Section</option>
+
+          <Form.Select style={{ width: '30%' }}  value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
+            <option value="">Section</option>
             <option>A</option>
             <option>B</option>
             <option>C</option>
           </Form.Select>
+
         </div>
 
         <hr />
         <h6>Select Rooms:</h6>
 
         {/* Room Selection */}
-        <div className="row">
-          {floors.map((floor, index) => (
-            <div key={index} className="col-md-6 mb-3">
-              <strong>{floor.name}</strong>
-              {floor.rooms.map((room, i) => (
+        <div className="room-columns">
+          {Object.entries(groupedByFloor).map(([floorName, rooms], index) => (
+            <div key={index} className="room-floor">
+              <strong>{floorName}</strong>
+              {rooms.map((room, i) => (
                 <Form.Check
-                  key={i}
+                  key={room.room_id}
                   type="checkbox"
-                  label={room}
-                  checked={selectedRooms.includes(room)}
+                  label={`${room.room_name} - (${room.capacity})`}
+                  checked={selectedRooms.some((r) => r.room_id === room.room_id)}
                   onChange={() => handleCheckboxChange(room)}
                   className="ms-3"
                 />
+
               ))}
             </div>
           ))}
@@ -83,8 +135,17 @@ const RoomSelectionModal = ({ show, handleClose, onConfirm }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleConfirm}>
-          Confirm
+        <Button 
+        variant="primary" 
+        onClick={handleConfirm}
+        disabled={
+          !selectedCourse ||
+          !selectedYear ||
+          !selectedSection ||
+          selectedRooms.length === 0
+        } 
+        >
+          Confirm 
         </Button>
       </Modal.Footer>
     </Modal>

@@ -5,12 +5,25 @@ import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, f
 import html2canvas from 'html2canvas';
 import "./schedule.css";
 import "./table.css";
-const ClassSchedule = () => {
+import axios from "axios";
+import { useLocation } from 'react-router-dom';
+
+const ClassSchedule = () => { 
+  // CHANGED
+    const location = useLocation();
+    const courseName = location.state?.courseName || '';
+    const courseId = location.state?.courseId || '';
+    const year = location.state?.year || '';
+    const section = location.state?.section || '';
+
+    const [course, setCourse] = useState(courseId);
+    const [yearLevel, setYearLevel] = useState(year);
+  // CHANGED
   const [selectedSection, setSelectedSection] = useState("Select Section");
   const [selectedCells, setSelectedCells] = useState(new Set());
   const [mergedCells, setMergedCells] = useState({});
   const [cellStatus, setCellStatus] = useState({});
-  const [cellDetails, setCellDetails] = useState({});
+  const [cellDetails, setCellDetails] = useState({}); 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCourse, setNewCourse] = useState("BSIT");
   const [newSection, setNewSection] = useState("");
@@ -19,6 +32,7 @@ const ClassSchedule = () => {
     BSCPE: ["1", "2", "3", "4"],
     BSCS: ["1", "2", "A", "4"],
   });
+  
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedCellKey, setSelectedCellKey] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -26,15 +40,49 @@ const ClassSchedule = () => {
   const [selectedSchoolYear, setSelectedSchoolYear] = useState("2023-2024");
   const scheduleTableRef = useRef(null);
 
+
   const times = [
     "7:00 - 8:00", "8:00 - 9:00", "9:00 - 10:00", "10:00 - 11:00",
     "11:00 - 12:00", "12:00 - 1:00", "1:00 - 2:00", "2:00 - 3:00",
     "3:00 - 4:00", "4:00 - 5:00", "5:00 - 6:00", "6:00 - 7:00"
   ];
-
-  const professors = ["Ms. Mangalindan", "Mr. Santos", "Mr.Villanueva"];
-  const subjects = ["SAAD", "DSA", "IAS"];
-  const rooms = ["Room 301", "Computer Lab", "Room 302"];
+  
+  useEffect(() => {
+    // Fetch professors
+    axios.get('http://localhost:8000/api/professors', { withCredentials: true })
+      .then(res => {
+        console.log("Professors Data:", res.data);
+        setProfessors(res.data);
+      })
+      .catch(err => console.error('Error fetching professors:', err));
+  
+   if (course && yearLevel) {
+    axios.get('http://localhost:8000/api/subjects', {
+        params: {
+          course: course,
+          yearLevel: yearLevel
+        },
+        withCredentials: true
+      })
+      .then(res => {
+        console.log("Subjects Data:", res.data);
+        setSubjects(res.data);
+      })
+      .catch(err => console.error('Error fetching subjects:', err));
+            }
+  
+    // Fetch rooms
+    axios.get('http://localhost:8000/api/rooms', { withCredentials: true })
+      .then(res => {
+        console.log("Rooms Data:", res.data);
+        setRooms(res.data);
+      })
+      .catch(err => console.error('Error fetching rooms:', err));
+  }, [course, yearLevel]);
+  
+  const [professors, setProfessors] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const semesters = ["Semester 1", "Semester 2"];
   const schoolYears = ["2023-2024", "2024-2025"];
 
@@ -87,14 +135,16 @@ const ClassSchedule = () => {
         }));
       });
 
+
+      // CHANGED
       setCellDetails(prev => ({
         ...prev,
         [firstCell]: prev[firstCell] || {
-          professor: professors[0],
-          subject: subjects[0],
-          room: rooms[0]
+          professor: professors[0] ? professors[0].name : '',
+          subject: subjects[0] ? subjects[0].subject_name : '',
+          room: rooms[0] ? rooms[0].room_name : ''
         }
-      }));
+      }));//CHANGED
 
       setSelectedCells(new Set());
     }
@@ -460,17 +510,21 @@ const ScheduleTable = ({ times, selectedCells, mergedCells, cellStatus, cellDeta
               >
                 {isFirstCellOfGroup && (
                   <div className="cell-content">
+                    
+                    {/* Professor Dropdown */}
                     <DropdownButton
-                      title={cellDetails[key]?.professor || "Select Professor"}
+                      title={cellDetails[key]?.professor?.name || "Select Professor"} 
                       variant="secondary"
                       size="sm"
                       onSelect={(value) => updateCellDetails(key, 'professor', value)}
                       className="mb-1"
                     >
                       {professors.map((prof, index) => (
-                        <Dropdown.Item key={index} eventKey={prof}>{prof}</Dropdown.Item>
+                        <Dropdown.Item key={index} eventKey={prof.name}>{prof.name}</Dropdown.Item> 
                       ))}
                     </DropdownButton>
+            
+                    {/* Subject Dropdown */}
                     <DropdownButton
                       title={cellDetails[key]?.subject || "Select Subject"}
                       variant="secondary"
@@ -479,23 +533,26 @@ const ScheduleTable = ({ times, selectedCells, mergedCells, cellStatus, cellDeta
                       className="mb-1"
                     >
                       {subjects.map((subj, index) => (
-                        <Dropdown.Item key={index} eventKey={subj}>{subj}</Dropdown.Item>
+                        <Dropdown.Item key={index} eventKey={subj.subject_name}>{subj.subject_name}</Dropdown.Item> 
                       ))}
                     </DropdownButton>
+            
+                    {/* Room Dropdown */}
                     <DropdownButton
-                      title={cellDetails[key]?.room || "Select Room"}
+                      title={cellDetails[key]?.room?.room_name || "Select Room"}
                       variant="secondary"
                       size="sm"
                       onSelect={(value) => updateCellDetails(key, 'room', value)}
                     >
                       {rooms.map((room, index) => (
-                        <Dropdown.Item key={index} eventKey={room}>{room}</Dropdown.Item>
+                        <Dropdown.Item key={index} eventKey={room.room_name}>{room.room_name}</Dropdown.Item>
                       ))}
                     </DropdownButton>
                   </div>
                 )}
               </td>
             );
+            
           })}
         </tr>
       ))}
@@ -559,7 +616,7 @@ const SaveAndLoadButtons = ({ handleSaveSchedule, handleDownloadSchedule, handle
       </OverlayTrigger>
       <OverlayTrigger placement="top" overlay={<Tooltip>Print schedule</Tooltip>}>
         <Button variant="info" onClick={handlePrintSchedule}>
-          <FontAwesomeIcon icon={faPrint} className="me-2" /> Print
+          <FontAwesomeIcon icon={faPrint} className="me-2" /> Print 
         </Button>
       </OverlayTrigger>
     </Col>

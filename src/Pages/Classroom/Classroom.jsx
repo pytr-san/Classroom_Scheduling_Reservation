@@ -1,130 +1,257 @@
-import doggo from "../../assets/doggoSecurity.jpg"
-import { Button, Form, InputGroup } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
-import "./Classroom.css";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
+    import doggo from "../../assets/doggoSecurity.jpg"
+    import { Button, Form, InputGroup } from "react-bootstrap";
+    import React, { useEffect, useState } from "react";
+    import "./Classroom.css";
+    import { useNavigate } from "react-router-dom";
+    import axios from "axios";
+    import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
 
-const Classroom = () => {
+    const Classroom = () => {
 
-    const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
+        const [loading, setLoading] = useState(true);
+        const [showModal, setShowModal] = useState(false);
+        const [sortByCapacity, setSortByCapacity] = useState(false);
+        const navigate = useNavigate();
 
-    const handleCreatebtn = (e) => {
-        e.preventDefault();
-        setShowModal(true);
-    }
+        // Check if a floor is saved in localStorage
+        const savedFloor = localStorage.getItem("currentFloor");
+        const initialFloor = savedFloor ? parseInt(savedFloor, 10) : 1;
 
+        const [classrooms, setClassrooms] = useState([]);
+        const [currentFloor, setCurrentFloor] = useState(initialFloor);
+        const [searchQuery, setSearchQuery] = useState("");
+        
+    // Fetch classrooms when component mounts
+        useEffect(() => {
+            const fetchClassrooms = async () => {
+                try {
+                    const response = await axios.get("http://localhost:8000/classrooms/list");
+                    console.log("Classroom data from API:", response.data);
+                    setClassrooms(response.data);
+                    
+                } catch (error) {
+                    console.error("Error fetching classrooms:", error);
+                }finally {
+                    setLoading(false);
+                }
+            };
+            fetchClassrooms();
+        }, []);
 
-    const [classrooms, setClassrooms] = useState([]);
-    const [floor, setFloor] = useState("");
-    const [status, setStatus] = useState("true"); // 'true' for available, 'false' for occupied
-  
-  // Fetch classrooms when component mounts
-    useEffect(() => {
-        const fetchClassrooms = async () => {
-            try {
-                const response = await axios.get("http://localhost:8000/classrooms");
-                setClassrooms(response.data);
-            } catch (error) {
-                console.error("Error fetching classrooms:", error);
-            }
+        // Save the current floor in localStorage whenever it changes
+        useEffect(() => {
+            localStorage.setItem("currentFloor", currentFloor); // Store the current floor in localStorage
+        }, [currentFloor]);
+
+        const handlePrevFloor = () => {
+            setCurrentFloor((prev) => (prev > 1 ? prev - 1 : prev));
         };
-        fetchClassrooms();
-    }, []);
 
-    const handleReserve = (e) =>{
-        navigate("/classroom/reservation", { state: { classrooms: classrooms } });
-    }
+        const handleNextFloor = () => {
+            setCurrentFloor((prev) => (prev < 4 ? prev + 1 : prev));
+        };
+
+        const getOrdinalSuffix = (n) => {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        };
+        const getFloorLabel = (floor) => `${floor}${getOrdinalSuffix(floor)} Floor`;
+
+        const handleSearchChange = (event) => {
+            setSearchQuery(event.target.value); // Update search query as user types
+          };
+       
+        
+            // 🔽 Apply search first
+        const searchedRooms = classrooms.filter((room) =>
+            room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        // 🔽 Then sort if needed
+        const sortedRooms = [...searchedRooms].sort((a, b) => {
+            if (!sortByCapacity) return 0;
+            return a.capacity - b.capacity; 
+        });
+
+        // 🔽 Then filter by floor
+        const filteredRooms = sortedRooms.filter(
+            (room) =>
+                room.floor_building === `${currentFloor}${getOrdinalSuffix(currentFloor)} Floor`
+        );
 
 
-    return ( 
-    
-    <div className="container mt-4">
+        const handleReserve = (e) =>{
+            navigate("/classroom/reservation", { state: { 
+                    classrooms: filteredRooms,
+                    floor: currentFloor,
+                } 
+            });
+        }
+
+        const handleCreatebtn = (e) => {
+            e.preventDefault();
+            setShowModal(true);
+        }
+
+        return ( 
+        
+            <div className="container mt-4">
             {/* Header */}
-        <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center gap-2">
-                <i className="bi bi-building fs-3"></i> {/* Floor Building Icon */}
-                <h1 className="fw-bold mb-0">Floor Building - Classrooms</h1>
+            <div className="d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center gap-2">
+                    <i className="bi bi-building fs-2"></i>
+                    <h1 className="fw-bold mb-0">Floor Building - Classrooms</h1>
+                </div>
+                <div className="d-flex justify-content-end ">
+                    <Button variant="outline-secondary" className="ms-auto" onClick={() => navigate(-1)}>
+                        <i className="bi bi-arrow-left fs-5"></i>
+                    </Button>
+                </div>
             </div>
 
-            <div className="d-flex justify-content-end ">
-                <Button variant="outline-secondary" className="ms-auto" onClick={() => navigate(-1)}>
-                <i className="bi bi-arrow-left fs-5"></i> 
-                </Button>
-            </div>
-        </div>
-
-            {/* Navigation & Date */}
+            {/* Navigation */}
             <div className="d-flex align-items-center gap-3 mt-3">
-                <h2 variant="secondary">{classrooms.length > 0 ? classrooms[0].floor_building : "No Data"}</h2>
-                    <Button variant="light" className="border px-2">
-                        <i className="bi bi-chevron-left"></i>
-                    </Button>
-                    <Button variant="light" className="border px-2">
-                        <i className="bi bi-chevron-right"></i>
-                    </Button>
+                <Form.Select 
+                    style={{ width: "150px" }} 
+                    value={currentFloor} 
+                    onChange={(e) => setCurrentFloor(Number(e.target.value))}
+                >
+                    {[1, 2, 3, 4].map((floor) => (
+                        <option key={floor} value={floor}>{getFloorLabel(floor)}</option>
+                    ))}
+                </Form.Select>
+
+                <Button variant="light" className="border px-2" onClick={handlePrevFloor} disabled={currentFloor === 1}>
+                    <i className="bi bi-chevron-left"></i>
+                </Button>
+                <Button variant="light" className="border px-2" onClick={handleNextFloor} disabled={currentFloor === 4}>
+                    <i className="bi bi-chevron-right"></i>
+                </Button>
                 <span><i className="bi bi-calendar"></i></span>
 
-                     {/* Right: Search Bar */}
+                {/* Right: Search + Filter */}
                 <div className="d-flex align-items-center gap-2 ms-auto">
                     <InputGroup style={{ maxWidth: "300px" }}>
                         <InputGroup.Text className="bg-light border-0">
-                        <i className="bi bi-search"></i>
+                            <i className="bi bi-search"></i>
                         </InputGroup.Text>
-                        <Form.Control type="text" placeholder="Search..." className="border border-secondary rounded" />
+                        <Form.Control 
+                        type="text" 
+                        placeholder="Search..." 
+                        className="border border-secondary rounded" 
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        />
                     </InputGroup>
-
-                    {/* Filter Button (Right-Aligned) */}
-                    <Button variant="outline-secondary">
-                    <i className="bi bi-filter"></i> Filter
+                    <Button 
+                        variant="outline-secondary"
+                        onClick={() => setSortByCapacity((prev) => !prev)} 
+                        style={{ width: "300px" }}
+                    >
+                         <i className="bi bi-filter"></i>{" "}
+                        {sortByCapacity ? "Clear Filter" : "Sort by Capacity"}
                     </Button>
                 </div>
             </div>
-
 
             {/* Main Content */}
             <div className="card text-white bg-dark mt-4 p-4">
-            {/* Left Section - Classroom List */}
-            <section className="classroom-info">
-                <h2 className="fw-bold">Tia Maria Building, {classrooms.length > 0 ? classrooms[0].floor_building : "No Data"}.</h2>
-                <h4 className="mt-3" style={{ color: "white" }}>Classroom list:</h4>
-                <ul className="list-unstyled">
-                    {classrooms.map((room, index) => (
-                        <li key={index}><strong>{room.room_name}</strong></li>
-                    ))}
-                </ul>
-                  {/* Buttons */}
-                <div className="d-flex flex-column gap-3 mt-4 ">
-                    <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" 
-                        onClick={handleCreatebtn}
-                    >
-                    <i className="bi bi-plus-lg me-2"></i> Create Schedule
-                    </Button>
-                    <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center"
-                        onClick={handleReserve}   
-                    >
-                    <i className="bi bi-plus-lg me-2"></i> Reserve a Room
-                    </Button>
-                </div>
-            </section>
+                <section className="classroom-info">
+                    <h2 className="fw-bold">Tia Maria Building, {getFloorLabel(currentFloor)}.</h2>
+                    <h4 className="mt-3" style={{ color: "white" }}>Classroom list:</h4>
+                    {/* <ul className="list-unstyled">
 
-            {/* Right Section - Image */}
-            <section className="floor-container">
-                <img src={doggo} alt="Floor Image" className="floor-image" />
-            </section>
+                    {loading ? (
+                            <li>Loading classrooms...</li>
+                        ) : ( filteredRooms.length > 0 ? (
+                            filteredRooms.map((room, index) => (
+                                <li key={index}><strong>{room.room_name}</strong></li>
+                            ))
+                        ) : (
+                            <li>No classrooms on this floor.</li>
+                            )
+                    )}
+                    </ul> */}
+                    <ul className="list-unstyled">
+                        {loading ? (
+                            <li>Loading classrooms...</li>
+                        ) : searchQuery.trim() !== "" ? (
+                            // Group search results by floor
+                            (() => {
+                                const searchedRooms = classrooms.filter((room) =>
+                                    room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                                );
 
+                                if (searchedRooms.length === 0) {
+                                    return <li>No classrooms match your search.</li>;
+                                }
 
+                                // Group by floor
+                                const groupedByFloor = searchedRooms.reduce((groups, room) => {
+                                    const floor = room.floor_building;
+                                    if (!groups[floor]) groups[floor] = [];
+                                    groups[floor].push(room);
+                                    return groups;
+                                }, {});
+
+                                return Object.entries(groupedByFloor).map(([floor, rooms]) => (
+                                    
+                                    <li key={floor}>
+                                        <h5 className="text-info mt-3">{floor}</h5>
+                                        <ul className="ps-3">
+                                            {rooms.map((room, index) => (
+                                                <li key={index}>
+                                                    <strong>{room.room_name} - ( {room.capacity} )</strong>                                                  
+                                                </li>
+                                            ))} 
+                                        </ul>
+                                    </li>
+                                ));
+                            })()
+                        ) : (
+                            // No search — show rooms on the current floor only
+                            filteredRooms.length > 0 ? (
+                                filteredRooms.map((room, index) => (
+                                    <li key={index}>
+                                        <strong>{room.room_name} - ( {room.capacity} ) </strong>
+                                   
+                                    </li>
+                                ))
+                            ) : (
+                                <li>No classrooms on this floor.</li>
+                            )
+                        )}
+                    </ul>
+
+                    <div className="d-flex flex-column gap-3 mt-4 ">
+                        <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleCreatebtn}>
+                            <i className="bi bi-plus-lg me-2"></i> Create Schedule
+                        </Button>
+                        <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleReserve}>
+                            <i className="bi bi-plus-lg me-2"></i> Reserve a Room
+                        </Button>
+                    </div>
+                </section>
+
+                {/* Right Section - Image */}
+                <section className="floor-container">
+                    <img src={doggo} alt="Building floor map" className="floor-image" />
+                </section>
             </div>
-         {/* Modal */}
-         <RoomSelectionModal 
-            show={showModal} 
-            handleClose={() => setShowModal(false)} 
-            onConfirm={(selectedRooms) => console.log("Selected Rooms:", selectedRooms)} 
-            />
-      </div>
-    )
-}
 
-export default Classroom;
+            {/* Modal */}
+            <RoomSelectionModal 
+                show={showModal} 
+                handleClose={() => setShowModal(false)} 
+                onConfirm={(selectedRooms) => console.log("Selected Rooms:", selectedRooms)} 
+                classrooms={classrooms} // 🔽 Pass the classrooms here
+                size="lg" 
+                centered
+            />
+
+        </div>
+        )
+    }
+
+    export default Classroom;

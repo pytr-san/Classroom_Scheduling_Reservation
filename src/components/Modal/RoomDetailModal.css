@@ -1,0 +1,93 @@
+/* General styles for the reservation report */
+.report-container {
+    max-width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+    margin: 20mm auto;
+    padding: 20mm;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .report-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .report-header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+  }
+  
+  .report-header p {
+    font-size: 16px;
+    color: #555;
+  }
+  
+  .report-content {
+    margin-top: 20px;
+  }
+  
+  .report-content .section {
+    margin-bottom: 20px;
+  }
+  
+  .report-content .section h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #333;
+    border-bottom: 2px solid #28a745; /* Green underline for section headers */
+    padding-bottom: 5px;
+  }
+  
+  .report-content .section p {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+  }
+  
+  .report-content .section p strong {
+    font-weight: bold;
+  }
+  
+  .print-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 30px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .print-button:hover {
+    background-color: #218838;
+  }
+  
+  @media print {
+    /* Styles for when printing */
+    body * {
+      visibility: hidden;
+    }
+    .report-container, .report-container * {
+      visibility: visible;
+    }
+    .report-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 10mm;
+    }
+    .print-button {
+      display: none;
+    }
+  }
+  

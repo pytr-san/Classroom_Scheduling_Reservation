@@ -5,7 +5,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 
-router.get("/", async  (req, res) => {
+router.get("/list", async  (req, res) => {
     try {
         const db = await connectToDatabase();
         const [results] = await db.execute("SELECT * FROM classroom"); 

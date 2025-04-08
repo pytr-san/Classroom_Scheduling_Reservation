@@ -1,61 +1,67 @@
 import { useState, useEffect } from "react";
 import "./ClassroomReservation.css";
 import { Button, InputGroup, Form } from "react-bootstrap";
-import { FaUsers, FaSearch, FaCamera } from "react-icons/fa";
+import { FaUsers,  FaClipboardCheck, FaSearch, FaCamera, FaTicketAlt } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import RoomDetailModal from "../../components/Modal/RoomDetailModal";  
 
 const ClassroomReservation = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const classrooms = state?.classrooms || [];
+  const currentFloor = state?.floor || 1;
 
-  // Load rooms from localStorage or use the initial classroom data
-  const storedRooms = JSON.parse(localStorage.getItem("rooms")) || classrooms;
-  const [rooms, setRooms] = useState(storedRooms);
+  const getOrdinalSuffix = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
 
-  // Modal state
+  // Initialize rooms state and load from localStorage by floor
+  const [rooms, setRooms] = useState(() => {
+    const storedRooms = JSON.parse(localStorage.getItem(`rooms-${currentFloor}`)); // Store rooms by floor
+    if (storedRooms && storedRooms.length) {
+      return storedRooms;
+    }
+    return classrooms || []; // Use classrooms passed from the previous page
+  });
+
+
   const [showModal, setShowModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
-  // Open modal and set the selected room
   const handleShow = (room) => {
     setSelectedRoom(room);
     setShowModal(true);
   };
   
-  // Close modal
   const handleClose = () => {
     setShowModal(false);
     setSelectedRoom(null);
   };
-  
-   // Handle Confirm button click (for example, save reservation)
-   const handleConfirm = () => {
+
+  const handleConfirm = () => {
     alert("Reservation confirmed for " + selectedRoom.room_name);
-    handleClose(); // Close the modal after confirmation
+    handleClose(); 
   };
 
-  // Handle Edit button click (for example, open the room details for editing)
   const handleEdit = () => {
     alert("Editing room: " + selectedRoom.room_name);
-    // You can add logic here to allow editing of room details
     handleClose();
   };
-  
-  // Save updated rooms to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("rooms", JSON.stringify(rooms));
-  }, [rooms]);
 
-  // Handle checkbox click to toggle room availability
+  // Persist rooms in localStorage whenever they change (per floor)
+  useEffect(() => {
+    localStorage.setItem(`rooms-${currentFloor}`, JSON.stringify(rooms)); // Save by floor
+  }, [rooms, currentFloor]);
+
   const handleUnavailableToggle = (index) => {
-    const updatedRooms = [...rooms];
-    updatedRooms[index].status = updatedRooms[index].status === 1 ? 0 : 1; // Toggle status
-    setRooms(updatedRooms);
+    const updatedRooms = [...rooms]; 
+    updatedRooms[index].status = updatedRooms[index].status === 1 ? 0 : 1; 
+    setRooms(updatedRooms); 
   };
 
-  // Handle image upload
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
@@ -69,10 +75,22 @@ const ClassroomReservation = () => {
     }
   };
 
+  
+
+  const getFloorLabel = (floor) => `${floor}${getOrdinalSuffix(floor)} Floor`;
+  const floorLabel = getFloorLabel(currentFloor);
+
+  const filteredRooms = rooms.filter((room) => 
+    room.floor_building?.toLowerCase() === floorLabel.toLowerCase()
+  );
+
   return (
     <div className="container mt-4">
       <header className="header">
-        <h1>Classroom Reservation</h1>
+        <h1>
+          <i className="bi bi-file-earmark-check fs-1"></i>
+          Classroom Reservation
+        </h1>
         <div className="d-flex justify-content-end">
           <Button variant="outline-secondary" className="ms-auto" onClick={() => navigate(-1)}>
             <i className="bi bi-arrow-left fs-5"></i>
@@ -82,8 +100,8 @@ const ClassroomReservation = () => {
 
       <div className="d-flex align-items-center gap-3 mt-3">
         <div className="sub-header">
-          <Button variant="secondary">Rooms</Button>
-          <span >3rd Floor Classrooms</span>
+          <h2><span>{floorLabel} Classrooms</span></h2>
+          
         </div>
 
         <div className="d-flex align-items-center gap-2 ms-auto">
@@ -97,7 +115,7 @@ const ClassroomReservation = () => {
       </div>
 
       <div className="classroom-grid">
-        {rooms.map((room, index) => (
+        {(filteredRooms.length > 0 ? filteredRooms : rooms).map((room, index) => (
           <div key={index} className={`classroom-card ${room.status === 0 ? "unavailable" : ""}`}>
             
             {/* ✅ Capacity in the top-left */}
@@ -107,15 +125,6 @@ const ClassroomReservation = () => {
 
             {/* ✅ Top-right container for checkbox & camera button */}
             <div className="top-right-container">
-              {/* Unavailable checkbox */}
-              <label className="unavailable-checkbox">
-                <input
-                  type="checkbox"
-                  checked={room.status === 0}
-                  onChange={() => handleUnavailableToggle(index)}
-                />
-                <h7>Unavailable</h7>
-              </label>
 
               {/* ✅ Camera Icon as a Button */}
               <button
@@ -133,6 +142,14 @@ const ClassroomReservation = () => {
                 style={{ display: "none" }}
                 onChange={(e) => handleImageUpload(index, e)}
               />
+                            {/* Unavailable checkbox */}
+                            <label className="unavailable-checkbox">
+                <input
+                  type="checkbox"
+                  checked={room.status === 0}
+                  onChange={() => handleUnavailableToggle(index)}
+                />
+              </label>
             </div>
 
             {/* ✅ Room image or upload option */}
@@ -150,25 +167,22 @@ const ClassroomReservation = () => {
             {/* Buttons that appear on hover */}
             <div className="button1-container">
               {room.status !== 0 && (
-                <Button className="reservation-btn"
-                onClick={() => handleShow(room)} 
-                >CREATE RESERVATION</Button>
+                <Button className="reservation-btn" onClick={() => handleShow(room)}>CREATE RESERVATION</Button>
               )}
             </div>
-
+            {room.status === 0 && <span className="unavailable-text">Unavailable</span>}
           </div>
         ))}
       </div>
-      
+
       {/* Modal to display room details */}
-      <RoomDetailModal  // Using the imported modal component
+      <RoomDetailModal 
         show={showModal}
         handleClose={handleClose}
         selectedRoom={selectedRoom}
         handleConfirm={handleConfirm}
         handleEdit={handleEdit}
       />
-
     </div>
   );
 };

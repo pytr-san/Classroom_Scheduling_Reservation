@@ -17,7 +17,7 @@ import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx"
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
 import NewStudent from "./Pages/NewStudentPage.jsx";
-
+import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
     const ROLES ={
         student: "student",
         admin: "admin",
@@ -100,6 +100,7 @@ import NewStudent from "./Pages/NewStudentPage.jsx";
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin]} />}>
                             <Route path="/class-schedule/:course/:year/:section" element={<ClassSchedule />} />
                             <Route path="/classroom/reservation" element={<ClassroomReservation/>} />
+                            <Route path="/create-room-schedule" element={<ScheduleTemp />} />
                             <Route path="/classroom" element={<Classroom />} />
                             <Route path="/course" element={<Course />} />
                             <Route path="/course/:id/manage" element={<ManageCourse />} />

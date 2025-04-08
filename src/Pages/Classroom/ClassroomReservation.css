@@ -29,7 +29,7 @@ General container styling
   .classroom-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    height: 68vh;
+    height: 65vh;
     gap: 40px;
     margin-top: 20px;
   }
@@ -40,6 +40,7 @@ General container styling
     background: linear-gradient(to bottom, #000000, #efefef98);
     border-radius: 12px;
     padding: 20px;
+    
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
     overflow: hidden;
@@ -90,6 +91,7 @@ General container styling
     top: 1px;
     right: 5px;
     display: flex;
+    flex-direction: column; /* Arrange items vertically */
     align-items: center;
     gap: 10px;
   }
@@ -100,6 +102,7 @@ General container styling
     align-items: center;
     gap: 5px;   
     font-size: 14px;
+    
   }
   
   .unavailable-checkbox input {
@@ -113,12 +116,12 @@ General container styling
     border: none;
     cursor: pointer;
     font-size: 1.5rem;
-    color: #007bff;
+    color: #058d00fd;
     transition: color 0.2s;
   }
   
   .camera-button:hover {
-    color: #0056b3;
+    color: #fcfcfc;
   }
   
   .camera-icon {
@@ -131,12 +134,15 @@ General container styling
   /* Room content */
   .classroom-content {
     text-align: center;
-    margin-top: 20px;
+    flex-grow: 1; /* Allow content to take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
   .classroom-image img {
     max-width: 100%;
-    height: 150px;
+    height: 130px;
     object-fit: cover;
     border-radius: 8px;
   }
@@ -191,15 +197,25 @@ General container styling
     border: 2px solid #dc3545;
 
   }
-  .unavailable h7,
+
+  .unavailable-text {
+    color: #dc3545; /* Red color for "Unavailable" */
+    font-weight: bold;
+    
+    margin-bottom: 5px; /* Add spacing between the button and text */
+    display: block; /* Make sure it takes up space */
+    text-align: center; /* Center the text below the button */
+  }
+
   .unavailable p {
     color: #000000;  /* Change to the color you want */
   }
   .unavailable .capacity{
-    background: #dc3545;
+    background: transparent;
     color: #000000;
   }
   
-  h7, p {
+  p {
     color: #c1c1c1; /* Set the color */
+
   }
