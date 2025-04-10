@@ -12,17 +12,10 @@ export default function Login({setIsAuthenticated, setUser}) {
     const userRef = useRef();
     const navigate = useNavigate();
     const location = useLocation();
-    const { name } = location.state || {};  // Access the user data passed via state
+ // Access the user data passed via state
 
      const { setAuth} = useAuth();
-    // const navigate = useNavigate();
-    // const Location = useLocation();
-    // const from = location.State?.from?.pathname || "/";
 
-    // const errRef = userRef();
-
-   // const [user, setUser] = useState('');
-    //const [pwd, setPwd] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const [data, setData] =  useState({
@@ -30,14 +23,6 @@ export default function Login({setIsAuthenticated, setUser}) {
         email: '',
         password: '',
     })
-
-    // useEffect(() => {
-    //     userRef.current.fucos();
-    // }, [])
-
-    // useEffect(() => {
-    //     errorMessage('');
-    // }, [user, pwd])
     
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -48,19 +33,11 @@ export default function Login({setIsAuthenticated, setUser}) {
 
             console.log("✅ Login successful:", response.data);
            // const { user, token, role } = response.data;
-           const { user, token } = response.data;
-           const name = user.name;
+            const { user, token } = response.data;
             const role = user.role;
-
-            setAuth({ name, user, token, role }); // ✅ Stores user data globally
-            console.log("Setting auth with:", {name, user, token, role });
+            
+            setAuth({ user, token, role}); // ✅ Stores user data globally
             navigate("/");
-            //Redirect based on role
-            // if (role === "student") {
-            //     navigate("/newStudent");
-            // }else {
-            //     navigate("/");   
-            // }
     
         } catch (err) {
             if (err.response) {
@@ -76,7 +53,6 @@ export default function Login({setIsAuthenticated, setUser}) {
     <>
 
         <div className={styles.container}>
-            <h1>You Successfully Registered {name} login to proceed</h1>
             <div className={styles.formContainer}>
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>

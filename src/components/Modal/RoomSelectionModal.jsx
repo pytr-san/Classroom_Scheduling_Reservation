@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./RoomSelectionModal.css";
 import axios from "axios";
 
-const RoomSelectionModal = ({ show, handleClose, classrooms }) => {
+const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
   
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -56,20 +56,29 @@ const RoomSelectionModal = ({ show, handleClose, classrooms }) => {
       return;
     }
 
-    navigate("/create-room-schedule", {
-      state: {
-        newSchedule: {
-          selectedCourse,
-          selectedYear,
-          selectedSection,
-          selectedRooms: cleanedSelectedRooms,
-        },
-      },
-    });
-    
+    const newSchedule = {
+      selectedCourse,
+      selectedYear,
+      selectedSection,
+      selectedRooms: cleanedSelectedRooms,
+    };
+    onConfirm(newSchedule); 
     handleClose();
+
+    setSelectedRooms([]); // Reset selected rooms to clear the checkboxes
+    setSelectedCourse(""); // Reset selected course
+    setSelectedYear(""); // Reset selected year
+    setSelectedSection(""); 
   };
-  
+  useEffect(() => {
+    if (!show) {
+      // Reset the selected rooms when modal is closed
+      setSelectedRooms([]);
+      setSelectedCourse("");
+      setSelectedYear("");
+      setSelectedSection("");
+    }
+  }, [show]);
 
   
   return (
@@ -91,10 +100,10 @@ const RoomSelectionModal = ({ show, handleClose, classrooms }) => {
 
           <Form.Select style={{ width: '30%' }} value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
             <option value="">Year</option>
-            <option>1st Year</option>
-            <option>2nd Year</option>
-            <option>3rd Year</option>
-            <option>4th Year</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
           </Form.Select>
 
           <Form.Select style={{ width: '30%' }}  value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
@@ -151,5 +160,6 @@ const RoomSelectionModal = ({ show, handleClose, classrooms }) => {
     </Modal>
   );
 };
+
 
 export default RoomSelectionModal;

@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 // GET all courses
-router.get("/course", async (req, res) => {
+router.get("/course",authMiddleware, async (req, res) => {
     try {
         const db = await connectToDatabase();
         const [results] = await db.execute("SELECT course_id, course_name FROM course"); // Using async/await

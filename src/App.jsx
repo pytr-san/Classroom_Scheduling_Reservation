@@ -7,7 +7,6 @@ import Register from "./Pages/Register.jsx";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "./Pages/Login.jsx";
 import ManageCourse from "./Pages/Course/ManageCourse.jsx";
-//import ErrorBoundary from "./components/ErrorBoundary";
 import axios from "axios";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth.jsx";
@@ -18,6 +17,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
 import NewStudent from "./Pages/NewStudentPage.jsx";
 import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
+
+
     const ROLES ={
         student: "student",
         admin: "admin",
@@ -26,59 +27,7 @@ import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
     axios.defaults.withCredentials = true;
 
     function App() {
-
-       // const [isAuthenticated, setIsAuthenticated] = useState(false);
-      //  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
      
-        // const { auth ,setAuth} = useAuth();
-        // const navigate = useNavigate();
-
-        // const [loading, setLoading] = useState(true);  // ✅ Added Loading State
-        // //const [user, setUser] = useState(null);
-    
-        //     // ✅ Verify token on page load
-        //     const verifyToken = useCallback(async () => {
-        //         try {
-        //             const response = await axios.get("http://localhost:8000/auth/verify-token", { withCredentials: true });
-            
-        //             if (response.data.valid && response.data.user) {
-        //                 setAuth((prev) => {
-        //                     // Only update if different
-        //                     if (prev.token !== response.data.token) {
-        //                         return {
-        //                             user: response.data.user,
-        //                             token: response.data.token,
-        //                             role: response.data.user.role 
-        //                         };
-        //                     }
-        //                     return prev;
-        //                 });
-        //             }
-        //         } catch (error) {
-        //             console.error("Token verification failed:", error.message);
-        //         }
-        //         setLoading(false);
-        //     }, [setAuth]);
-            
-        
-        //     useEffect(() => {
-        //         let isMounted = true; // ✅ Prevent setting state if unmounted
-
-        //         const checkAuth = async () => {
-        //             await verifyToken();
-        //         };
-
-        //         checkAuth();
-
-        //         return () => { isMounted = false }; // ✅ Cleanup
-        //     }, [verifyToken]);
-                
-
-  
-
-        // if (loading) {
-        //     return <div>Loading...</div>; // Prevents flicker while checking auth
-        // }
 
         return(
             <Routes>

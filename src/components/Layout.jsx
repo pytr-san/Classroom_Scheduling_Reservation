@@ -15,7 +15,7 @@ const Layout = () => {
         try {
             await axios.post("http://localhost:8000/auth/logout", { withCredentials: true });
             sessionStorage.removeItem("adminAccess"); 
-            setAuth({});  // ✅ Clear auth state
+            setAuth(null);  // ✅ Clear auth state
             navigate("/login");  // Redirect to login page
         } catch (error) {
             console.error("Logout failed:", error);
@@ -25,13 +25,18 @@ const Layout = () => {
         setIsSidebarOpen((prev) => !prev);
     };
 
+
     return (
         <div className="app-container">
+            <>
+                {/* Ensure auth is available before passing to Header */}
+                {auth && (
                 <>
                     <Header toggleSidebar={toggleSidebar} user={auth.user} handleLogout={handleLogout} />
                     <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
                 </>
-
+                )}
+            </>
 
             <div className="main-content">
                 <Outlet />

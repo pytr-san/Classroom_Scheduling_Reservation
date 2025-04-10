@@ -87,6 +87,9 @@
   
   .schedule-table {
     width: 100%;
+      /* Check for fixed heights or overflow settings */
+  height: auto;
+  overflow: visible;
     border-collapse: collapse;
   }
   
@@ -94,7 +97,7 @@
   .schedule-table td {
     padding: 6px 8px;
     font-size: 11px;
-    border: 1px solid #ddd;
+    border: 1px solid #141414;
     text-align: center;
   }
   
@@ -111,7 +114,12 @@
   .add-header:hover {
     background-color: #e9ecef;
   }
-  
+  /* Style the time header width */
+  .time-header {
+    background-color: #f1f1f1;
+    width: 120px; 
+  }
+
   .time-cell {
     background-color: #f1f1f1;
   }
@@ -182,3 +190,57 @@
       padding: 6px 12px;
     }
   }
+  .selected-cell {
+    background-color: #a1d3ff;
+    cursor: pointer;
+  }
+  
+  .selected-cell:hover {
+    background-color: #41aace;
+  }
+  
+
+
+
+
+
+
+  /*TAB BUTTON*/
+.tab-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #f0f0f0;  /* Default background */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+.tab-button:hover {
+  background-color: #e0e0e0;  /* Slightly darker background on hover */
+}
+
+/* Focused state */
+.tab-button:focus {
+  outline: none;  /* Remove default browser outline */
+  box-shadow: 0 0 5px rgba(198, 198, 198, 0.7); /* Orange glow when focused */
+  border-color: #3ffe5fb5;  /* Border turns orange when focused */
+}
+
+/* Active state (when the tab is selected) */
+.tab-button.active {
+  background-color: #00b04a;  
+  color: white;  
+  border-color: #000000;  
+  font-weight: bold; 
+}
+
+/* Optional: Active state with focus */
+.tab-button.active:focus {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* Bright white glow when focused and active */
+  border-color: #000000; /* Keep the active border color */
+}
+.highlight-row {
+  background-color: #d0f0d8; /* Light blue background for better visibility */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}

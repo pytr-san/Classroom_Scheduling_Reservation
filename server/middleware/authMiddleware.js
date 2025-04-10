@@ -1,9 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const authMiddleware = (req, res, next) => {
-
-    console.log("Cookies received:", req.cookies);
-
+    // Get the token from the cookies
     const token = req.cookies.token;
 
     if (!token) {
@@ -11,14 +9,16 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
+       
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        
-        next(); 
+        req.user = decoded;  
+
+        next();  
     } catch (error) {
+
         res.clearCookie("token");
         return res.status(403).json({ valid: false, message: "Invalid token" });
     }
 };
 
- export default authMiddleware;
+export default authMiddleware;

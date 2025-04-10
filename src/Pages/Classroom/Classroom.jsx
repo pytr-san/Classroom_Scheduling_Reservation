@@ -91,7 +91,8 @@
 
         const handleCreatebtn = (e) => {
             e.preventDefault();
-            setShowModal(true);
+            //setShowModal(true);
+            navigate("/create-room-schedule")
         }
 
         return ( 

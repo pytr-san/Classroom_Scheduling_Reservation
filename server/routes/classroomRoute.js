@@ -1,6 +1,6 @@
 import express from "express";
 import {connectToDatabase} from '../db.js'
-import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js"; 
 
 const router = express.Router();
 
@@ -14,5 +14,8 @@ router.get("/list", async  (req, res) => {
         res.status(500).json({ error: "Database error" });
     }
 });
+
+
+
 
 export default router;
