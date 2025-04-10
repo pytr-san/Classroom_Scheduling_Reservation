@@ -36,7 +36,7 @@ const AdminHome = () => {
   const [historyShow, setHistoryShow] = useState(false);
   
   const [schedules, setSchedules] = useState([
-    { course: "BSCPE_BSIT, BSCS", date: "June 9, 2024 | 10:04AM" },
+    { course: "BSCPE_BSIT, BSCS", date: "June 9, 2024 | 10:04AM" }, 
     { course: "BSCPE_BSIT, BSCS", date: "June 9, 2021 | 5:06AM" }
   ]);
 

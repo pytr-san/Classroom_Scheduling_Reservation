@@ -1,0 +1,163 @@
+.student-page-container {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0e0e0 0%, #b8b8b8 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    width: 100%;
+    max-width: 680px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #2d3436;
+    width: 100%;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.header .subheader {
+    font-size: 1.1rem;
+    color: #636e72;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: 400;
+    padding: 0 10%;
+    box-sizing: border-box;
+}
+
+.selection-container {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.selection-group {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(5px);
+}
+
+.selection-group h3 {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.options-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.option-card {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 16px 24px;
+    min-width: 120px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    font-weight: 500;
+    color: #2d3436;
+    flex: 1;
+    max-width: 160px;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-card.selected {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(45, 52, 54, 0.2);
+    transform: translateY(-2px);
+}
+
+.option-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.confirm-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 48px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    width: 100%;
+    max-width: 220px;
+}
+
+.confirm-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.confirm-button.disabled {
+    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .option-card {
+        padding: 14px 20px;
+        min-width: 100px;
+    }
+    
+    .confirm-button {
+        padding: 14px 40px;
+    }
+}
