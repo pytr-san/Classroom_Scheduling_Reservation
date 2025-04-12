@@ -157,7 +157,7 @@ export default function Register() {
                             <input
                                 type="password"
                                 name="reTypePassword"
-                                placeholder="Backtype password"
+                                placeholder="Re-type password"
                                 className={styles.input}
                                 value={data.reTypePassword}
                                 onChange={handleChange}

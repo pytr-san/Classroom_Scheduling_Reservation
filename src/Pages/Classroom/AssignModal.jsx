@@ -1,15 +1,14 @@
-import React, { useState,useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import "./AssignModal.css"
 
-const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects, proctors }) => {
+const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects, proctors, onCancelMerge }) => {
+  // Return null if the modal is not shown
+  if (!show) return null;
+
   const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedProctor, setSelectedProctor] = useState('');   
+  const [selectedProctor, setSelectedProctor] = useState('');
 
-  useEffect(() => {
-    if (show) {
-      console.log("Modal opened with:", selectedMergedCell);
-    }
-  }, [show]);
+console.log("proctors:", proctors);
 
   const handleSubmit = () => {
     if (!selectedSubject || !selectedProctor) {
@@ -17,28 +16,24 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
       return;
     }
 
-    // Prepare assignment data
     const assignmentData = {
       subject: selectedSubject,
       proctor: selectedProctor,
       mergedCell: selectedMergedCell,
     };
 
-    // Call onAssign function passed down from parent component
     onAssign(assignmentData);
-
-    // Reset input fields
-    setSelectedSubject('');
-    setSelectedProctor('');
-
-    // Close the modal
+    resetForm();
     handleClose();
   };
 
-  if (!show) return null; // Return nothing if the modal is not visible
+  const resetForm = () => {
+    setSelectedSubject('');
+    setSelectedProctor('');
+  };
 
   return (
-    <div className="modal-overlay" >
+    <div className="modal-overlay">
       <div className="modal-content">
         <h2>Assign Subject</h2>
         <p>Assign a subject to the selected time slot.</p>
@@ -51,9 +46,9 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
             <option value="">Select Subject</option>
-            {subjects.map((subject, index) => (
-              <option key={index} value={subject.id}>
-                {subject.name}
+            {subjects.map((subject) => (
+              <option key={subject.subject_id} value={subject.subject_name}>
+                {subject.subject_name}
               </option>
             ))}
           </select>
@@ -67,8 +62,8 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
             onChange={(e) => setSelectedProctor(e.target.value)}
           >
             <option value="">Select Proctor</option>
-            {proctors.map((proctor, index) => (
-              <option key={index} value={proctor.id}>
+            {proctors.map((proctor) => (
+              <option key={proctor.faculty_id} value={proctor.name}>
                 {proctor.name}
               </option>
             ))}
@@ -78,20 +73,13 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
         <div className="modal-buttons">
           <button onClick={handleSubmit}>Assign</button>
           <button onClick={handleClose}>Cancel</button>
+          <button onClick={onCancelMerge}>Cancel Merge</button>
         </div>
       </div>
     </div>
   );
 };
 
-// Define the PropTypes to make sure the correct data is passed
-AssignModal.propTypes = {
-  show: PropTypes.bool.isRequired, // If the modal should be shown or not
-  handleClose: PropTypes.func.isRequired, // Function to close the modal
-  onAssign: PropTypes.func.isRequired, // Function to handle the assignment
-  selectedMergedCell: PropTypes.object.isRequired, // The merged cell that was clicked
-  subjects: PropTypes.array.isRequired, // Array of subjects to choose from
-  proctors: PropTypes.array.isRequired, // Array of proctors to choose from
-};  
+
 
 export default AssignModal;

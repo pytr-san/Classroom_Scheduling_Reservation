@@ -104,14 +104,14 @@ const ClassroomReservation = () => {
           
         </div>
 
-        <div className="d-flex align-items-center gap-2 ms-auto">
+        {/* <div className="d-flex align-items-center gap-2 ms-auto">
           <InputGroup className="search-bar">
             <InputGroup.Text>
               <FaSearch />
             </InputGroup.Text>
             <Form.Control type="text" placeholder="Search..." className="search-input" />
           </InputGroup>
-        </div>
+        </div> */}
       </div>
 
       <div className="classroom-grid">

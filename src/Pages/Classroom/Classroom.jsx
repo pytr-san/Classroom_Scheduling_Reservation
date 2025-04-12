@@ -1,4 +1,4 @@
-    import doggo from "../../assets/doggoSecurity.jpg"
+    import Spist from "../../assets/accessBG.png"
     import { Button, Form, InputGroup } from "react-bootstrap";
     import React, { useEffect, useState } from "react";
     import "./Classroom.css";
@@ -105,7 +105,7 @@
                     <h1 className="fw-bold mb-0">Floor Building - Classrooms</h1>
                 </div>
                 <div className="d-flex justify-content-end ">
-                    <Button variant="outline-secondary" className="ms-auto" onClick={() => navigate(-1)}>
+                    <Button variant="outline-secondary" className="" onClick={() => navigate(-1)}>
                         <i className="bi bi-arrow-left fs-5"></i>
                     </Button>
                 </div>
@@ -237,7 +237,7 @@
 
                 {/* Right Section - Image */}
                 <section className="floor-container">
-                    <img src={doggo} alt="Building floor map" className="floor-image" />
+                    <img src={Spist} alt="Spist Building" className="floor-image" />
                 </section>
             </div>
 

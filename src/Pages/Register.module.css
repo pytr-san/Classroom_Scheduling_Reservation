@@ -52,6 +52,8 @@
 .rightSection {
     flex: 1; /* Ensures the section takes up half the screen */
     display: flex;
+    padding: 20px;
+    box-sizing: border-box;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #1a3c25, #2E7D32);
@@ -63,6 +65,8 @@
     backdrop-filter: blur(15px);
     padding: 40px;
     border-radius: 20px;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     width: 100%;
     max-width: 500px;
@@ -147,6 +151,8 @@
     background: linear-gradient(90deg, #38883a, #73c777);
     color: white;
     border: none;
+    overflow-y: auto;
+    max-height: 90vh;
     border-radius: 10px;
     font-size: 18px;
     font-weight: 600;
@@ -244,33 +250,35 @@
     }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        background: linear-gradient(180deg, #000 50%, #1A3C34 50%);
-    }
-
-    .leftSection, .rightSection {
-        flex: none;
-        width: 100%;
-        min-height: 50vh;
-    }
-
-    .title {
-        font-size: 24px;
-    }
-
     .formContainer {
-        max-width: 85%;
-        padding: 30px;
+        max-width: 90%;
+        padding: 20px;
+        max-height: 85vh;
     }
 
-    .input {
-        padding: 12px 12px 12px 40px;
+    .inputGroup {
+        margin-bottom: 20px;
     }
 
-    .registerButton {
+    .label {
         font-size: 16px;
+    }
+
+    .registerButton, .signUpButton {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .loginText {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .loginButton {
+        width: 100%;
+        font-size: 16px;
+        padding: 12px;
     }
 }

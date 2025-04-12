@@ -16,7 +16,7 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/course");
+        const response = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
         setCourses(response.data); // Assuming API returns an array of course names
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -89,21 +89,21 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
       <Modal.Body className="px-3 py-2">
         {/* Course Selection */}
         <div className="d-flex justify-content-between mb-3">
-          <Form.Select style={{ width: '30%' }} value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
+          <Form.Select style={{ width: '30%' }} value={selectedCourse.course_id} onChange={(e) => setSelectedCourse(e.target.value)}>
             <option value="">Course</option>
             {courses.map((course) => (
-              <option key={course.course_id} value={course.course_name}>
+              <option key={course.course_id} value={course.coure_id}>
                 {course.course_name}
               </option>
             ))}
           </Form.Select>
 
           <Form.Select style={{ width: '30%' }} value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
-            <option value="">Year</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
+          <option value="">Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
           </Form.Select>
 
           <Form.Select style={{ width: '30%' }}  value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>

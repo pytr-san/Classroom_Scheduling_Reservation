@@ -9,11 +9,12 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-h3 {
-    color: white;
+.access-code-box h3 {
+    color: rgb(255, 242, 242);
     font-size: 18px;
     margin-bottom: 10px;
 }
+
 
 .code-inputs {
     display: flex;
@@ -53,4 +54,20 @@ h3 {
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Soft shadow */
 }
+.access-container {
+    background-image: url('/path-to-your-image.jpg'); /* Replace with your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px); /* Optional: softens background behind translucent elements */
+    padding: 20px;
+}
 
+  
+
+  

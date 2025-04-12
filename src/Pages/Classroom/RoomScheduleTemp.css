@@ -96,6 +96,7 @@
   .schedule-table th,
   .schedule-table td {
     padding: 6px 8px;
+    transition: 0.2s; 
     font-size: 11px;
     border: 1px solid #141414;
     text-align: center;
@@ -191,13 +192,14 @@
     }
   }
   .selected-cell {
-    background-color: #a1d3ff;
-    cursor: pointer;
+    background-color: rgba(0, 128, 255, 0.2);
+    border: 2px dashed #007bff;
   }
   
   .selected-cell:hover {
     background-color: #41aace;
   }
+  
   
 
 
@@ -206,6 +208,21 @@
 
 
   /*TAB BUTTON*/
+.tab-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #f0f0f0;  
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s; /
+}
+
+.tab-button:hover {
+  background-color: #e0e0e0; 
+}
+
+/* Focused state */
 .tab-button {
   padding: 10px 20px;
   font-size: 16px;
@@ -240,7 +257,15 @@
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* Bright white glow when focused and active */
   border-color: #000000; /* Keep the active border color */
 }
+
+.highlight-header-row th {
+  background-color: #b7b7b7; /* Light green */
+  color: #000000;
+  transition: background-color 0.3s;
+}
+
 .highlight-row {
   background-color: #d0f0d8; /* Light blue background for better visibility */
   transition: background-color 0.3s; /* Smooth transition for background color */
 }
+

@@ -4,9 +4,13 @@ import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
 import axios from "axios";
 import "./RoomScheduleTemp.css";
 import AssignModal from "./AssignModal.jsx";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { useRef } from "react";
 
 const RoomScheduleTemp = () => {
- 
+  
+  const tableRef = useRef(null);
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +33,7 @@ const RoomScheduleTemp = () => {
   const [proctors, setProctors] = useState([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
 
-
+console.log("format:", selectedCourse);
     // Fetch subjects and proctors (example)
     useEffect(() => {
       // Fetch professors
@@ -41,21 +45,48 @@ const RoomScheduleTemp = () => {
         .catch(err => console.error('Error fetching professors:', err));
       }, []);
 
-    //useEffect(() => {  
-    //  if (course && yearLevel) {
-    //   axios.get('http://localhost:8000/api/subjects', {
-    //       params: {
-    //         course: course,
-    //         yearLevel: yearLevel
-    //       },
-    //       withCredentials: true
-    //     })
-    //     .then(res => {
-    //       console.log("Subjects Data:", res.data);
-    //       setSubjects(res.data);
-    //     })
-    //     .catch(err => console.error('Error fetching subjects:', err));
-    //           }
+
+      const yearNumberToString = (num) => {
+        switch (parseInt(num)) {
+          case 1: return '1st Year';
+          case 2: return '2nd Year';
+          case 3: return '3rd Year';
+          case 4: return '4th Year';
+          default: return '';
+        }
+      };
+      
+      useEffect(() => {
+        if (!activeTab) return;
+      
+        const [courseName, year, section] = activeTab.split(" - ");
+      
+        const formattedYear = yearNumberToString(year);
+        const courseNameToId = {
+          "BSIT": 1,
+          "BSCS": 2,
+          "BSCPE": 3,
+        };
+      
+        const courseId = courseNameToId[courseName];
+      console.log("data:", courseId);
+        if (!courseId) return;
+      
+        axios.get('http://localhost:8000/api/subjects', {
+          params: {
+            courseId,
+            yearLevel: formattedYear,
+          },
+          withCredentials: true,
+        })
+        .then((res) => {
+          console.log('Subjects Data:', res.data);
+          setSubjects(res.data);
+        })
+        .catch((err) => console.error('Error fetching subjects:', err));
+      }, [activeTab]);
+      
+      
     
     //   // Fetch rooms
     //   axios.get('http://localhost:8000/api/rooms', { withCredentials: true })
@@ -82,7 +113,7 @@ const RoomScheduleTemp = () => {
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/classrooms/list");
+        const response = await axios.get("http://localhost:8000/classrooms/list", { withCredentials: true });
         setClassrooms(response.data);
       } catch (error) {
         console.error("Error fetching classrooms:", error);
@@ -93,7 +124,6 @@ const RoomScheduleTemp = () => {
 
   // Logic for handling mouse down, up, and enter for cell selection and merging
   const handleMouseDown = (row, col, tabId) => {
-    console.log("Mouse down at:", row, col, tabId);
     setIsSelecting(true);
     setStartCell({ row, col, tabId });
     setEndCell(null);
@@ -101,37 +131,29 @@ const RoomScheduleTemp = () => {
 
   const handleMouseEnter = (row, col) => {
     if (isSelecting) {
-      console.log("Mouse enter at:", row, col);
-      setEndCell((prev) => ({ ...prev, row }));
+      setEndCell({ row, col });
     }
   };
-
   const handleMouseUp = () => {
-    setIsSelecting(false);
-  
-    if (!startCell || !endCell || startCell.col !== endCell.col) return;
+    setIsSelecting(false);   
+
+    if (!startCell || !endCell || startCell.col !== endCell.col){ 
+
+      return;}
   
     const startRow = Math.min(startCell.row, endCell.row);
     const endRow = Math.max(startCell.row, endCell.row);
     const key = startCell.tabId;
   
-    setMergedCells((prev) => {
+    setMergedCells(prev => {
       const updated = { ...prev };
-  
-      if (!updated[key]) {
-        updated[key] = [];
-      }
-  
-      updated[key] = [
-        ...updated[key],
-        {
-          startRow,
-          col: startCell.col,
-          rowSpan: endRow - startRow + 1,
-          tabId: key
-        }
-      ];
-      console.log("Updated mergedCells:", updated);   
+      updated[key] = updated[key] || [];
+      updated[key].push({
+        startRow,
+        col: startCell.col,
+        rowSpan: endRow - startRow + 1,
+        tabId: key
+      });
       return updated;
     });
   
@@ -148,29 +170,68 @@ const RoomScheduleTemp = () => {
       row < m.startRow + m.rowSpan
     ) || null;
   };
-  
+  const cancelMerge = () => {
+    setMergedCells((prev) => {
+      const updated = { ...prev };
+      const key = selectedMergedCell.tabId;
+      updated[key] = updated[key].filter(
+        (cell) => !(cell.startRow === selectedMergedCell.startRow && cell.col === selectedMergedCell.col)
+      );
+      return updated;
+    });
+    setShowAssignModal(false); // Close the modal if it's open
+  }; 
 
   const handleMergedCellClick = (mergedData) => {
-    console.log("Clicked merged cell:", mergedData);
     setSelectedMergedCell(mergedData);
     setShowAssignModal(true);
   };
 
-  useEffect(() => {
-    setMergedCells({
-      "BSIT - 1 - A": [
-        { startRow: 0, col: 1, rowSpan: 3, tabId: "BSIT - 1 - A" }
-      ]
-    });
-  }, []);
-  
   const handleAssignSubject = (assignmentData) => {
     const { subject, course, proctor, mergedCell } = assignmentData;
 
     console.log("Assigned data:", subject, course, proctor, mergedCell);
-
+    setMergedCells((prev) => {
+      const updated = { ...prev };
+      const key = mergedCell.tabId;
+      
+      // Find the merged cell that was clicked and update it with the subject and proctor
+      updated[key] = updated[key].map(cell => 
+        cell.startRow === mergedCell.startRow && cell.col === mergedCell.col
+          ? { ...cell, subject, proctor }
+          : cell
+      );
+      return updated;
+    });
     setShowAssignModal(false);
   };
+
+  const downloadPDF = async () => {
+    if (!tableRef.current || !activeTab) return;
+  
+    const highlighted = tableRef.current.querySelectorAll('.highlight-row');
+    highlighted.forEach(el => el.classList.remove('highlight-row'));
+
+    const canvas = await html2canvas(tableRef.current, {
+      scale: 2,
+      useCORS: true,
+      scrollY: -window.scrollY, // fixes scroll offset issues
+      backgroundColor: "#ffffff", // ensure white background if needed
+    });
+
+    highlighted.forEach(el => el.classList.add('highlight-row'));
+    const imgData = canvas.toDataURL("image/png");
+  
+    const pdf = new jsPDF("landscape", "pt", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${activeTab}.pdf`);
+  };
+  
+  
+
 
   const timeSlots = [
     "7:00 am - 7:30 am", "7:30 am - 8:00 am", "8:00 am - 8:30 am", "8:30 am - 9:00 am", 
@@ -179,7 +240,7 @@ const RoomScheduleTemp = () => {
     "1:00 pm - 1:30 pm", "1:30 pm - 2:00 pm", "2:00 pm - 2:30 pm", "2:30 pm - 3:00 pm", 
     "3:00 pm - 3:30 pm", "3:30 pm - 4:00 pm", "4:00 pm - 4:30 pm", "4:30 pm - 5:00 pm", 
     "5:00 pm - 5:30 pm", "5:30 pm - 6:00 pm", "6:00 pm - 6:30 pm", "6:30 pm - 7:00 pm", 
-    "7:00 pm - 7:30 pm", "7:30 pm - 8:00 pm", "8:00 pm - 8:30 pm", "8:30 pm - 9:00 pm"
+    "7:00 pm - 7:30 pm", "7:30 pm - 8:00 pm", "8:00 pm - 8:30 pm"
   ];
 
   const handleTabClick = (tab) => {
@@ -217,10 +278,10 @@ const RoomScheduleTemp = () => {
             const tabName = `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`;
             if (tabName === activeTab) {
               return (
-                <div key={index} className="schedule-table-wrapper">
+                <div key={index} className="schedule-table-wrapper" ref={tableRef}>
                   <table className="schedule-table">
                     <thead>
-                      <tr>
+                      <tr className="highlight-header-row">
                         <th className="time-header">Time</th>
                         {schedule.selectedRooms.map((room, roomIndex) => (
                           <th key={roomIndex}>{room.room_name}</th>
@@ -233,13 +294,10 @@ const RoomScheduleTemp = () => {
                         <tr key={rowIndex}
                         className={rowIndex % 2 === 0 ? "highlight-row" : ""} 
                         >
-                          <td className="time-cell">{slot}</td>
+                          <td  className={rowIndex % 2 === 0 ? "highlight-row" : ""} >{slot}</td>
                           {schedule.selectedRooms.map((room, colIndex) => {
                             const merged = isCellMerged(rowIndex, colIndex, tabName);
                             if (merged && merged.startRow !== rowIndex) return null;
-                            if (merged) {
-                              console.log(`Rendering merged cell at row ${rowIndex}, col ${colIndex}`, merged);
-                            }
                             return (
                               <td
                                 key={colIndex}
@@ -256,11 +314,32 @@ const RoomScheduleTemp = () => {
                                 onMouseDown={() => handleMouseDown(rowIndex, colIndex, tabName)}
                                 onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
                                 onMouseUp={handleMouseUp}
-                                onClick={() => merged && handleMergedCellClick(merged)}
-                                style={{ cursor: merged ? 'pointer' : 'default' }}
-                              >
 
-                                {merged ? <div>Click to assign</div> : null}
+                              >
+                              {merged ? (
+                                    <div
+                                      className="merged-cell"
+                                      onClick={() => {
+                                        console.log("Clicked merged cell:", merged);
+                                        handleMergedCellClick(merged); // 🔥 Trigger modal
+                                      }}
+                                      style={{
+                                        height: `${merged.rowSpan * 30}px`, // Adjust row height if needed
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        backgroundColor: "#e8f4fd",
+                                        border: "1px solid #ccc",
+                                        width: "100%",
+                                      
+                                        userSelect: "none"
+                                      }}
+                                    >
+                                      <div>{merged.subject ? merged.subject : "Click to assign"}</div>
+                                      <div>{merged.proctor ? `Proctor: ${merged.proctor}` : ""}</div>
+                                    </div>
+                                  ) : null}
                               </td>
                             );
                           })}
@@ -276,35 +355,34 @@ const RoomScheduleTemp = () => {
             return null;
           })}
         </div>
-
-        <AssignModal
-        show={showAssignModal}
-        handleClose={() => setShowAssignModal(false)}
-        onAssign={handleAssignSubject}
-        selectedMergedCell={selectedMergedCell}
-        subjects={subjects} // Pass subjects data
-        proctors={proctors} // Pass proctors data
-        /> 
       </div>
 
       {/* Pagination and Download */}
       <div className="pagination-download">
         <button className="nav-btn">{"<"}</button>
         <button className="nav-btn">{">"}</button>
-        <button className="publish-btn"
+        <button className="publish-btn" onClick={downloadPDF}
         >Publish and Download</button>
       </div>
 
-         
+      <AssignModal
+        show={showAssignModal}
+        handleClose={() => setShowAssignModal(false)}
+        onAssign={handleAssignSubject}
+        selectedMergedCell={selectedMergedCell}
+        subjects={subjects} // Pass subjects data
+        proctors={proctors} // Pass proctors data
+        onCancelMerge={cancelMerge}
+        />         
 
       <RoomSelectionModal
         show={showModal}
         handleClose={() => setShowModal(false)}
-        onConfirm={(newData) => {
-          const { selectedCourse, selectedYear, selectedSection, selectedRooms } = newData;
-          setSchedules((prev) => [...prev, newData]);
+        onConfirm={(newSchedule) => {
+          const { selectedCourse, selectedYear, selectedSection, selectedRooms } = newSchedule;
+          setSchedules((prev) => [...prev, newSchedule]);
           setSelectedCourse(selectedCourse);
-          setSelectedYear(selectedYear);
+          setSelectedYear(selectedYear);  
           setSelectedSection(selectedSection);
           setRoomHeaders(selectedRooms.map((room) => room.room_name));
           setActiveTab(`${selectedCourse} - ${selectedYear} - ${selectedSection}`);

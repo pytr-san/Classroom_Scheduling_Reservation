@@ -1,19 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState,useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "./AdminAccess.css"; 
 import axios from "axios";
-import doggoSecurity from "../assets/doggoSecurity.jpg";
+import bgAccess from "../assets/bghomepage.jpg";
 
 function AdminAccess({onAccessGranted }) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState(false);
   const inputsRef = useRef([]);
 
-  const navigate = useNavigate();
+  const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN;
 
-  const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN; // 🔥 Use env variable
+  useEffect(() => {
+    inputsRef.current[0]?.focus();
+  }, []);
   
-  const handleInputChange = (index, value) => {
+  const handleInputChange = async (index, value) => {
     if (/^[0-9]?$/.test(value)) {
       const newCode = [...code];
       newCode[index] = value;
@@ -21,6 +23,14 @@ function AdminAccess({onAccessGranted }) {
 
       if (value !== "" && index < 5) {
         inputsRef.current[index + 1].focus();
+      }
+
+      // Auto-submit if all digits are entered
+      if (index === 5 || newCode.every(digit => digit !== "")) {
+        const accessCode = newCode.join("");
+        if (accessCode.length === 6) {
+          await handleSubmit(accessCode);
+        }
       }
     }
   };
@@ -31,13 +41,15 @@ function AdminAccess({onAccessGranted }) {
     }
   };
 
-  const handleSubmit = async () => {
-    const accessCode = code.join("");
+  const handleSubmit = async (accessCode) => {
     try {
-      const response = await axios.post("http://localhost:8000/api/admin/verify-pin", { pin: accessCode } , { withCredentials: true });
-      console.log("Status:",response.data)
+      const response = await axios.post(
+        "http://localhost:8000/api/admin/verify-pin",
+        { pin: accessCode },
+        { withCredentials: true }
+      );
       if (response.data.success) {
-        onAccessGranted(); 
+        onAccessGranted();
       } else {
         setError(true);
         setCode(["", "", "", "", "", ""]);
@@ -45,6 +57,8 @@ function AdminAccess({onAccessGranted }) {
       }
     } catch (error) {
       setError(true);
+      setCode(["", "", "", "", "", ""]);
+      inputsRef.current[0].focus();
     }
   };
   // const handleSubmit = () => {
@@ -59,14 +73,19 @@ function AdminAccess({onAccessGranted }) {
   // };
 
   return (
-    <div>
+    <div className="access-container"
+    style={{
+      background: "linear-gradient(135deg, black, #003300)",
+    }}
+    // style={{ backgroundImage: `url(${bgAccess})` }}
+    >
         <div className="access-code-box">
           <h3>ENTER ACCESS CODE:</h3>
           <div className="code-inputs">
             {code.map((num, index) => (
               <input
                 key={index}
-                type="text"
+                type="password" 
                 maxLength="1"
                 className="code-box"
                 inputMode="numeric"
@@ -78,14 +97,7 @@ function AdminAccess({onAccessGranted }) {
             ))}
           </div>
           {error && <p id="error-message" className="error">Incorrect code, please try again!</p>}
-          <button id="submit-btn" onClick={handleSubmit}>Submit</button>
         </div>
-         {/* ✅ Add Image Below */}
-    <img 
-        src={doggoSecurity} 
-        alt="Doggo Security" 
-        className="access-image"
-    />
   </div>
   );
 }
