@@ -18,6 +18,7 @@ import NewStudent from "./Pages/NewStudentPage.jsx";
 import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
 
 
+
 const ROLES = {
   student: "student",
   admin: "admin",
@@ -28,8 +29,9 @@ const ROLES = {
      
 
         return(
+            
             <Routes>
-
+           
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />               
@@ -60,4 +62,4 @@ const ROLES = {
         )
     }
 
-    export default App
+export default App

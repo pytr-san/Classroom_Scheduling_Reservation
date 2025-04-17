@@ -122,7 +122,7 @@
     border-radius: 10px;
     font-size: 16px;
     background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    color: #0a0a0a;
     transition: all 0.3s ease;
 }
 
@@ -207,6 +207,27 @@
     transform: translateY(-2px);
 }
 
+.loginLink {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .loginLink:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+  
+  .errorMessage{
+
+    color: red;
+  }
+  .loginText {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 15px;
+}
 /* Animations */
 @keyframes fadeInBackground {
     from {
@@ -276,9 +297,9 @@
         margin-top: 15px;
     }
 
-    .loginButton {
+    /* .loginButton {
         width: 100%;
         font-size: 16px;
         padding: 12px;
-    }
+    } */
 }

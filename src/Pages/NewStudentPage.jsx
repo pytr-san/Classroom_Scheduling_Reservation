@@ -36,7 +36,7 @@ const NewStudentPage = () => {
     return (
         <div className="student-page-container">
             <div className="header">
-                <h1>WELCOME BACK TO SCHOOL</h1>
+                <h1>WELCOME BACK TO ACCESS DEPARTMENT</h1>
                 <p className="subheader">Fill to View Class Schedule</p>
             </div>
 

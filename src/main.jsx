@@ -6,7 +6,7 @@ import { BrowserRouter as Router} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from './context/AuthProvider.jsx'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-
+import { Toaster } from 'react-hot-toast';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,6 +15,7 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path="/*" element={<App />} />
         </Routes>
+        <Toaster position="top-center" reverseOrder={false} />
       </AuthProvider>
     </BrowserRouter> 
   </StrictMode>

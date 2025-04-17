@@ -16,7 +16,7 @@ select {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* Make sure it's on top of everything */
+    z-index: 999; /* Make sure it's on top of everything */
   }
   
   .modal-content {
@@ -36,5 +36,16 @@ select {
   
   .modal-buttons button {
     margin-left: 10px;
+    padding: 8px 16px; /* Adjust padding for size */
+    font-size: 14px;   /* Adjust the font size */
+    border-radius: 5px; /* Optional, for rounded corners */
+    border: 1px solid #ddd; /* Border style */
+    background-color: #3e3e3e; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer;
+  }
+  
+  .modal-buttons button:hover {
+    background-color: #008a00; /* Darker shade when hovering */
   }
   

@@ -7,12 +7,14 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
 
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedProctor, setSelectedProctor] = useState('');
+  const [selectedDay, setSelectedDay] = useState('Monday'); 
 
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 console.log("proctors:", proctors);
 
   const handleSubmit = () => {
-    if (!selectedSubject || !selectedProctor) {
-      alert("Please select both a subject and a proctor.");
+    if (!selectedSubject || !selectedProctor || !selectedDay) {
+      alert("Please select subject, proctor, and day.");
       return;
     }
 
@@ -20,6 +22,7 @@ console.log("proctors:", proctors);
       subject: selectedSubject,
       proctor: selectedProctor,
       mergedCell: selectedMergedCell,
+      day: selectedDay, 
     };
 
     onAssign(assignmentData);
@@ -30,6 +33,7 @@ console.log("proctors:", proctors);
   const resetForm = () => {
     setSelectedSubject('');
     setSelectedProctor('');
+    setSelectedDay('Day');
   };
 
   return (
@@ -39,13 +43,26 @@ console.log("proctors:", proctors);
         <p>Assign a subject to the selected time slot.</p>
 
         <div>
+          <label htmlFor="day">Day:</label>
+          <select
+            id="day"
+            value={selectedDay}
+            onChange={(e) => setSelectedDay(e.target.value)}
+          >
+            {daysOfWeek.map((day) => (
+              <option key={day} value={day}>{day}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="subject">Subject:</label>
           <select
             id="subject"
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
           >
-            <option value="">Select Subject</option>
+            <option value={""}>Select Subject</option>
             {subjects.map((subject) => (
               <option key={subject.subject_id} value={subject.subject_name}>
                 {subject.subject_name}

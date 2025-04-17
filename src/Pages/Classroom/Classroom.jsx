@@ -161,19 +161,6 @@
                 <section className="classroom-info">
                     <h2 className="fw-bold">Tia Maria Building, {getFloorLabel(currentFloor)}.</h2>
                     <h4 className="mt-3" style={{ color: "white" }}>Classroom list:</h4>
-                    {/* <ul className="list-unstyled">
-
-                    {loading ? (
-                            <li>Loading classrooms...</li>
-                        ) : ( filteredRooms.length > 0 ? (
-                            filteredRooms.map((room, index) => (
-                                <li key={index}><strong>{room.room_name}</strong></li>
-                            ))
-                        ) : (
-                            <li>No classrooms on this floor.</li>
-                            )
-                    )}
-                    </ul> */}
                     <ul className="list-unstyled">
                         {loading ? (
                             <li>Loading classrooms...</li>

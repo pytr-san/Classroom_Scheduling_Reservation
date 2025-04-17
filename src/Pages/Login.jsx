@@ -90,7 +90,6 @@ export default function Login() {
                         </div>
 
                         <button type="submit" className={styles.loginButton}>Login</button>
-
                         <a href="/forgot-password" className={styles.forgotPasswordLink}>
                             Forgot Password?
                         </a>
@@ -104,7 +103,7 @@ export default function Login() {
                         className={styles.signUpButton}
                         onClick={() => navigate("/register")}
                     >
-                        Sign Up
+                        Sign Up?
                     </button>
 
                     </div>

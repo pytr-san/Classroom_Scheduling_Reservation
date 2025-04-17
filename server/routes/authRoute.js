@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
         );
 
         if (rows.length > 0) {
-            return res.status(400).json({ error: `${role} already exists` });
+            return res.status(400).json({ error: "email or name already exists" });
         }
 
         // ✅ Hash the password before storing

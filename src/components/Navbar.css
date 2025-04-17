@@ -50,10 +50,10 @@
  /* Default sidebar width */
 }
 
-.sidebar:hover + .main-content,
+/* .sidebar:hover + .main-content,
 .sidebar.open + .main-content {
-  margin-left: 200px; /* Shift content when sidebar expands */
-}
+  margin-left: 200px; 
+} */
 
 .nav-link {
   border-radius: 10px; /* Initial border radius */
@@ -61,10 +61,18 @@
   padding: 10px; /* Ensuring padding consistency */
   width: 150px; /* Default width */
 }
+.nav-link.active {
+  background-color: #aff4c0; /* light indigo background */
+  color: #000000;   
+  border-radius: 20px;         /* darker indigo text */
+  font-weight: bold;
+
+}
 
 .nav-link:hover {
   border-radius: 20px; /* Smooth rounded effect */
   background: #d0f0d8;
+  color: #090909;  
   width: 150px; /* Expanded width */
 }
 

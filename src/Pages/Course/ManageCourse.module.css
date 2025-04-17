@@ -43,10 +43,61 @@
     position: sticky;
     top: 70px; /* Adjust this based on your navbar height */
     background: white;
-    z-index: 1050; /* Higher z-index to stay above other elements */
+    z-index: 1010; /* Higher z-index to stay above other elements */
     padding: 10px;
     border-radius: 10px;
     padding: 10px 20px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     
+  }
+  .buttonSmall {
+    background-color: #04890abe; /* green shade */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 130px;
+    text-align: center;
+  }
+  .yearHeader {
+    background-color: #6c757d; /* Bootstrap secondary */
+    color: white;
+    padding: 0.75rem 1.25rem;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+
+  .buttonSmall:hover {
+    background-color: #296e2c; /* darker green */
+    transform: translateY(-1px);
+  }
+
+  .buttonAdd{
+    background-color: #202aeebe; /* green shade */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 130px;
+    text-align: center;
+
+  }
+  .buttonAdd:hover {
+    background-color: #356dc1; /* darker green */
+    transform: translateY(-1px);
   }

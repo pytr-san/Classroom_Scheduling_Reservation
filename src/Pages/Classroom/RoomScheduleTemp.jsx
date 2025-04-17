@@ -87,6 +87,96 @@ console.log("format:", selectedCourse);
       }, [activeTab]);
       
       
+  
+
+
+      const [loading, setLoading] = useState(false);
+      const [message, setMessage] = useState('');
+
+    console.log("Response",message);
+
+      const saveScheduleByTab = async () => {
+
+        const activeTab = getActiveTab(); // Should return { course, year, section }
+    
+        const activeSchedule = schedules.find(
+          (schedule) =>
+            schedule.selectedCourse === activeTab.course &&
+            schedule.selectedYear === activeTab.year &&
+            schedule.selectedSection === activeTab.section
+        );
+    
+        if (!activeSchedule) {
+          setMessage('No schedule found for the current tab.');
+          return;
+        }
+    
+        const tabData = {
+          course: activeTab.course,
+          year: activeTab.year,
+          section: activeTab.section,
+          rooms: [],
+        };
+    
+        activeSchedule.selectedRooms.forEach((room, roomIndex) => {
+          const roomData = {
+            room_name: room.room_name,
+            time_slots: [],
+          };
+    
+          timeSlots.forEach((timeSlot, rowIndex) => {
+            const mergedCell = isCellMerged(
+              rowIndex,
+              roomIndex,
+              `${activeTab.course} - ${activeTab.year} - ${activeTab.section}`
+            );
+    
+            const cellData = {
+              timeSlot,
+              subject: mergedCell?.subject || '',
+              proctor: mergedCell?.proctor || '',
+            };
+    
+            roomData.time_slots.push(cellData);
+          });
+    
+          tabData.rooms.push(roomData);
+        });
+    
+        await sendScheduleToBackend(tabData);
+      };
+    
+      const sendScheduleToBackend = async (tabData) => {
+        try {
+          setLoading(true);
+          setMessage('');
+          const response = await axios.post('http://localhost:8000/classrooms/api/schedule/save', tabData
+          , { withCredentials: true })
+          if (response.status === 200) {
+            setMessage('✅ Schedule saved successfully!');
+          } else {
+            setMessage('⚠️ Failed to save schedule.');
+          }
+        } catch (error) {
+          console.error('Error saving schedule:', error);
+          setMessage('❌ An error occurred while saving.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+
+
+      
+      // Helper function to get the active tab (You can implement this based on your application logic)
+      const getActiveTab = () => {
+        return {
+          course: selectedCourse, // The active course
+          year: selectedYear,     // The active year
+          section: selectedSection, // The active section
+        };
+      };
+      
     
     //   // Fetch rooms
     //   axios.get('http://localhost:8000/api/rooms', { withCredentials: true })
@@ -134,32 +224,78 @@ console.log("format:", selectedCourse);
       setEndCell({ row, col });
     }
   };
+
+ 
   const handleMouseUp = () => {
-    setIsSelecting(false);   
-
-    if (!startCell || !endCell || startCell.col !== endCell.col){ 
-
-      return;}
+    setIsSelecting(false);
   
+    // Validate selection (if the selection is valid)
+    if (!startCell || !endCell || startCell.col !== endCell.col) {
+      return;
+    }
+  
+    // Determine the start and end row based on the selection
     const startRow = Math.min(startCell.row, endCell.row);
     const endRow = Math.max(startCell.row, endCell.row);
-    const key = startCell.tabId;
+    const key = startCell.tabId; // This is the day
+    const col = startCell.col;   // This is the room index
+    const timeRange = `${timeSlots[startRow]} - ${timeSlots[endRow]}`;
   
+    // Check for conflict: same room, same day, overlapping time
+    const existing = mergedCells[key] || [];
+    const hasConflict = Object.entries(mergedCells).some(([otherTabId, cells]) => {
+      return cells.some(cell => {
+        const sameRoom = cell.col === startCell.col;
+        const timeOverlap =
+          (startRow >= cell.startRow && startRow < cell.startRow + cell.rowSpan) ||
+          (endRow >= cell.startRow && endRow < cell.startRow + cell.rowSpan) ||
+          (startRow <= cell.startRow && endRow >= cell.startRow + cell.rowSpan - 1);
+  
+        return sameRoom && timeOverlap && otherTabId !== key;
+      });
+    });
+  
+    if (hasConflict) {
+      // Find the conflicting tab details (course, year, section)
+      const conflictingTab = Object.entries(mergedCells).find(([otherTabId]) => {
+        return otherTabId !== key && mergedCells[otherTabId].some(cell => {
+          const sameRoom = cell.col === startCell.col;
+          const timeOverlap =
+            (startRow >= cell.startRow && startRow < cell.startRow + cell.rowSpan) ||
+            (endRow >= cell.startRow && endRow < cell.startRow + cell.rowSpan) ||
+            (startRow <= cell.startRow && endRow >= cell.startRow + cell.rowSpan - 1);
+          return sameRoom && timeOverlap;
+        });
+      });
+  
+      // Get the name for the conflicting tab (course, year, section)
+      const conflictingTabDetails = conflictingTab ? conflictingTab[0] : 'Unknown Schedule';
+  
+      alert(`Conflict: This room is already booked during that time in schedule "${conflictingTabDetails}"`);
+      setStartCell(null);
+      setEndCell(null);
+      return;
+    }
+  
+    // No conflict, proceed to add merged cell
     setMergedCells(prev => {
       const updated = { ...prev };
       updated[key] = updated[key] || [];
       updated[key].push({
         startRow,
-        col: startCell.col,
+        col,
         rowSpan: endRow - startRow + 1,
-        tabId: key
+        tabId: key,
+        timeRange
       });
       return updated;
     });
   
+    // Clear the selected cells
     setStartCell(null);
     setEndCell(null);
   };
+  
   
 
   const isCellMerged = (row, col, tabId) => {
@@ -188,9 +324,9 @@ console.log("format:", selectedCourse);
   };
 
   const handleAssignSubject = (assignmentData) => {
-    const { subject, course, proctor, mergedCell } = assignmentData;
+    const { subject, proctor, mergedCell, day } = assignmentData;
 
-    console.log("Assigned data:", subject, course, proctor, mergedCell);
+    console.log("Assigned data:", subject, proctor, day, mergedCell);
     setMergedCells((prev) => {
       const updated = { ...prev };
       const key = mergedCell.tabId;
@@ -198,7 +334,7 @@ console.log("format:", selectedCourse);
       // Find the merged cell that was clicked and update it with the subject and proctor
       updated[key] = updated[key].map(cell => 
         cell.startRow === mergedCell.startRow && cell.col === mergedCell.col
-          ? { ...cell, subject, proctor }
+          ? { ...cell, subject, proctor, day }
           : cell
       );
       return updated;
@@ -254,6 +390,7 @@ console.log("format:", selectedCourse);
         <div className="right-controls">
           <select><option>Examination</option></select>
           <select><option>1st Semester</option></select>
+          <button  onClick={saveScheduleByTab} className="save-schedule-btn">Save Schedule</button>
           <button className="create-btn" onClick={() => setShowModal(true)}>+ Create</button>
         </div>
       </div>
@@ -261,15 +398,18 @@ console.log("format:", selectedCourse);
       <div className="schedule-body">
         {/* Vertical Tabs */}
         <div className="tabs">
-          {schedules.map((schedule, index) => (
-            <button
-              key={index}
-              className={`tab-button ${activeTab === `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}` ? 'active' : ''}`}
-              onClick={() => handleTabClick(`${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`)}
-            >
-              {schedule.selectedCourse} - {schedule.selectedYear}{schedule.selectedSection}
-            </button>
-          ))}
+          {schedules.map((schedule, index) => {
+            const tabName = `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`;
+            return (
+              <button
+                key={index}
+                className={`tab-button ${activeTab === tabName ? 'active' : ''}`}
+                onClick={() => handleTabClick(tabName)}
+              >
+                {tabName}
+              </button>
+            );
+          })}
         </div>
 
         {/* Schedule Table */}
@@ -286,12 +426,12 @@ console.log("format:", selectedCourse);
                         {schedule.selectedRooms.map((room, roomIndex) => (
                           <th key={roomIndex}>{room.room_name}</th>
                         ))}
-                        <th className="add-header">+ Add</th>
+    
                       </tr>
                     </thead>
                     <tbody>
                       {timeSlots.map((slot, rowIndex) => (
-                        <tr key={rowIndex}
+                        <tr key={rowIndex} 
                         className={rowIndex % 2 === 0 ? "highlight-row" : ""} 
                         >
                           <td  className={rowIndex % 2 === 0 ? "highlight-row" : ""} >{slot}</td>
@@ -329,16 +469,21 @@ console.log("format:", selectedCourse);
                                         flexDirection: "column",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        backgroundColor: "#e8f4fd",
+                                        backgroundColor: "#707372",
+                                        color:"white",
                                         border: "1px solid #ccc",
                                         width: "100%",
                                       
                                         userSelect: "none"
                                       }}
                                     >
-                                      <div>{merged.subject ? merged.subject : "Click to assign"}</div>
-                                      <div>{merged.proctor ? `Proctor: ${merged.proctor}` : ""}</div>
+                                      {/* <div>{merged.timeRange}</div> */}
+                                      
+                                      <div>{merged.day ? merged.day : ""}</div> 
+                                      <div>{merged.subject ? `Subject: ${merged.subject}` : "Click to assign"}</div>                                    
+                                      <div>{merged.proctor ? `Instructor: ${merged.proctor}` : ""}</div>
                                     </div>
+                                    
                                   ) : null}
                               </td>
                             );
@@ -362,7 +507,7 @@ console.log("format:", selectedCourse);
         <button className="nav-btn">{"<"}</button>
         <button className="nav-btn">{">"}</button>
         <button className="publish-btn" onClick={downloadPDF}
-        >Publish and Download</button>
+        >Download</button>
       </div>
 
       <AssignModal
@@ -379,7 +524,7 @@ console.log("format:", selectedCourse);
         show={showModal}
         handleClose={() => setShowModal(false)}
         onConfirm={(newSchedule) => {
-          const { selectedCourse, selectedYear, selectedSection, selectedRooms } = newSchedule;
+          const { selectedCourse, selectedYear, selectedSection, selectedRooms, day } = newSchedule;
           setSchedules((prev) => [...prev, newSchedule]);
           setSelectedCourse(selectedCourse);
           setSelectedYear(selectedYear);  

@@ -1,29 +1,111 @@
-.settings-container {
-    padding: 20px;
-    max-width: 600px;
-    margin: auto;
-}
+.settings-page {
+    margin-left: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 40px;
+    gap: 40px;
+  }
+  
+  .settings-container {
+    flex: 1;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  }
 
-h1 {
-    text-align: center;
-}
-
-h2 {
-    margin-top: 20px;
-    color: #007bff;
-}
-
-button {
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-    background: #007bff;
+  
+  .settings-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #00935d;
+    display: flex;
+    align-items: center;
+  }
+  
+  .settings-container p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  
+  .settings-container button {
+    background-color: #97979b;
     color: white;
+    padding: 10px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .settings-container button:hover {
+    background-color: #30a339;
+  }
+  
+  /* Role-specific styling (optional) */
+  .settings-container div.admin {
+    border-left-color: #111111; /* Red for admin */
+  }
+  .settings-container div.faculty {
+    border-left-color: #002d8d; /* Blue for faculty */
+  }
+  .settings-container div.student {
+    border-left-color: #16a34a; /* Green for student */
+  }
+  
+
+
+
+  /* Profile Section */
+
+  .profile-content strong {
+    font-weight: bold;
+    color: black;
+  }
+
+  .profile-section h2{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .profile-section {
+    width: 350px;
+    height: 600px;  
+    color: #000000;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  
+  .profile-icon {
+    font-size: 4rem;
+    color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+  .btnlogout {
+    margin-top: auto;
+    margin-bottom: 50px; 
+    display: block;
+    color: rgb(99, 99, 99);
     border: none;
     cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
-}
+    transition: background-color 0.3s ease;
+  }
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .btnlogout:hover {
+    color: #ef1b1b;
+    background-color: #ececec;
+  }

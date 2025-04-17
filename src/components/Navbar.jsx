@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Navbar.css"; 
 import accesslogo from "../assets/coppp.png";
-import { Link } from "react-router-dom";
+import { NavLink  } from "react-router-dom";
 import useAuth from "../Hooks/useAuth"; // Import useAuth to access user role
 
 function Navbar({ isSidebarOpen, setIsSidebarOpen, handleLogout }) {
@@ -16,28 +16,28 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen, handleLogout }) {
     >
       <nav className="nav flex-column p-3">
         {/* Home (Visible to All) */}
-        <Link className="nav-link" to="/">
+        <NavLink  className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} to="/">
           <img src={accesslogo} alt="access logo" className="logo me-2" /> 
           <span>Home</span>
-        </Link>
+        </NavLink >
 
         {/* Course & Classroom (Only for Admins) */}
         {auth?.role === "admin" && (
           <>
-            <Link className="nav-link" to="/classroom">
+            <NavLink  className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} to="/classroom">
               <i className="bi bi-people me-2"></i> <span>Classroom</span>
-            </Link>
+            </NavLink >
             
-            <Link className="nav-link" to="/course">
+            <NavLink  className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} to="/course">
               <i className="bi bi-book me-2"></i> <span>Course</span>
-            </Link>
+            </NavLink >
           </>
         )}
 
          {/* Settings (Visible to All) */}
-        <Link className="nav-link" to="/settings">
+        <NavLink  className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} to="/settings">
             <i className="bi bi-gear me-2"></i> <span>Settings</span>
-        </Link>
+        </NavLink >
 
       </nav>
 

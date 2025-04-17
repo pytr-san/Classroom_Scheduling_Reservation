@@ -1,6 +1,7 @@
 import { Modal, Button } from "react-bootstrap";
 
 const ConfirmInstructor = ({ show, onHide, onConfirm, instructorName, disabled  }) => {
+  
   return (
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>

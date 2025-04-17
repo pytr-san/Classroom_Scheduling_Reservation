@@ -111,8 +111,8 @@ function Header({ toggleSidebar, user, handleLogout }) {
             <h2>Profile</h2>
             <div className="profile-content">
               <i className="bi bi-person-circle" style={{ fontSize: "4rem" }}></i>
-              <p><strong>Name:</strong> {user?.name || "Juan Dela Cruz"}</p>
-              <p><strong>Email:</strong> {user?.email || "c26-2025-02@spist.edu.ph"}</p>
+              <p><strong>Name:</strong> {user?.name || ""}</p>
+              <p><strong>Email:</strong> {user?.email || ""}</p>
               <button className="logout-btn" onClick={handleLogout}>Log out</button>
             </div>
           </div>

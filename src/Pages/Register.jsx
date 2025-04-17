@@ -21,6 +21,8 @@ export default function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setErrors({});
+        
         let newErrors = {};
 
         if (!data.name.trim()) newErrors.name = "Name is required.";
@@ -58,8 +60,8 @@ export default function Register() {
             } else {
                 navigate("/login", { state: { name } });
             }
-        } catch (err) {
-            setErrors({ server: err.response?.data?.error || "Something went wrong. Please try again." });
+        } catch (error) {
+            setErrors({ server: error.response?.data?.error || "Something went wrong. Please try again." });
         }
     };
 
@@ -89,6 +91,7 @@ export default function Register() {
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Select Role</label>
                         {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
+                        {errors.server && <div className="alert alert-danger">{errors.server}</div>}
                         <select 
                             name="role" 
                             value={data.role} 
@@ -169,14 +172,16 @@ export default function Register() {
                         Sign up
                     </button>
                     
-                    <p className={styles.loginText}>Already have an account?</p>
-                    <button 
+                    <p className={styles.loginText}>Already have an account?<a 
+                    className={styles.loginLink}
+                    onClick={() => navigate("/login")}> Login?</a></p>
+                    {/* <button 
                         type="button" 
                         className={styles.loginButton}
                         onClick={() => navigate("/login")}
                     >
-                        Login
-                    </button>
+                        Login?
+                    </button> */}
                 </form>
             </div>
         </div>

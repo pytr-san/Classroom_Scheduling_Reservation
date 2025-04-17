@@ -87,14 +87,15 @@
   
   .schedule-table {
     width: 100%;
-      /* Check for fixed heights or overflow settings */
-  height: auto;
-  overflow: visible;
+    table-layout: fixed;
+    height: auto;
+    overflow: visible;
     border-collapse: collapse;
   }
   
   .schedule-table th,
   .schedule-table td {
+    width: 100%;  
     padding: 6px 8px;
     transition: 0.2s; 
     font-size: 11px;
@@ -107,17 +108,11 @@
     font-weight: bold;
   }
   
-  .add-header {
-    background-color: #f8f9fa;
-    cursor: pointer;
-  }
-  
-  .add-header:hover {
-    background-color: #e9ecef;
-  }
+
   /* Style the time header width */
   .time-header {
     background-color: #f1f1f1;
+    color: #000000;
     width: 120px; 
   }
 
@@ -135,12 +130,12 @@
     padding: 5px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: #f8f9fa;
+    background-color: #f0f0f0;
     cursor: pointer;
   }
   
   .nav-btn:hover {
-    background-color: #e9ecef;
+    background-color: #8e8e8e;
   }
   
   .publish-btn {
@@ -219,14 +214,14 @@
 }
 
 .tab-button:hover {
-  background-color: #e0e0e0; 
+  background-color: #ca7a7a; 
 }
 
 /* Focused state */
 .tab-button {
-  padding: 10px 20px;
+  padding: 5px 15px;
   font-size: 16px;
-  background-color: #f0f0f0;  /* Default background */
+  background-color: #c4c4c4;  /* Default background */
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
@@ -234,7 +229,8 @@
 }
 
 .tab-button:hover {
-  background-color: #e0e0e0;  /* Slightly darker background on hover */
+  background-color: #888585;
+  border: 30px; 
 }
 
 /* Focused state */
@@ -269,3 +265,6 @@
   transition: background-color 0.3s; /* Smooth transition for background color */
 }
 
+.cell.conflict {
+  background-color: red; /* Or any other color for conflict */
+}
