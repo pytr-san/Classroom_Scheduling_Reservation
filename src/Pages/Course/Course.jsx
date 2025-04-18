@@ -11,7 +11,11 @@ const Courses = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const navigate = useNavigate();
-  
+
+const handleAddCourse = (e) => {
+  navigate("/add/Course", {state:{}})
+};
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -35,7 +39,9 @@ const Courses = () => {
         <h2 className={styles.title}>ACCESS DEPARTMENT</h2>
         <p className={styles.subtitle}>A Combination of Computer Experts and Special Students</p>
       </div>
-      <button className={styles.addCourseButton}>
+      <button className={styles.addCourseButton}
+      onClick={handleAddCourse} 
+      >
         <Plus className="me-2" /> Add Course
       </button>
     </div>

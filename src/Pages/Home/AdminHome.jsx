@@ -43,6 +43,7 @@ const AdminHome = () => {
   const navigate = useNavigate();
 
   const handleScheduleSelect = (schedule) => {
+    e.preventDefault();
     // Extract course, year, and section from the schedule data
     // This is just an example - adjust according to your actual data structure
     const [course, section] = schedule.course.split('_');

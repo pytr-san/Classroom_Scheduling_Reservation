@@ -333,6 +333,7 @@ const ManageCourse = () => {
           ))}
         </div>
       ))}
+      
        {/* CONFIRM MODAL */}
        <ConfirmModal
         show={showModal}

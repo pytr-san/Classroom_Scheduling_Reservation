@@ -16,6 +16,36 @@ router.get("/course",authMiddleware, async (req, res) => {
     }
 });
 
+router.post('/add/course', async (req, res) => {
+    const { course_name, description } = req.body;
+
+    const db = await connectToDatabase();
+
+    const [result] = await db.query(`
+      INSERT INTO course ( course_name, description)
+      VALUES ( ?, ?)`,
+      [ course_name, description]
+    );
+  
+    res.json({ course_id: result.insertId });
+  });
+
+  //Inserting subjects from newly added course
+  router.post('/subjects', async (req, res) => {
+    const { course_id, semester, year_level, subject_name } = req.body;
+
+   const db = await connectToDatabase();
+   
+    await db.query(`
+      INSERT INTO subjects (course_id,  semester, year_level, subject_name  )
+      VALUES (?, ?, ?, ? )`,
+      [course_id, semester, year_level, subject_name ]
+    );
+  
+    res.sendStatus(200);
+  });
+  
+
 // PUT update subject names
 router.put("/course/:id/subjects/update-names", authMiddleware, async (req, res) => {
     const courseId = req.params.id;

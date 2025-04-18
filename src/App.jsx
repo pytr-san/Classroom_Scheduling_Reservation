@@ -16,7 +16,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
 import NewStudent from "./Pages/NewStudentPage.jsx";
 import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
-
+import CourseForm from "./Pages/Course/CourseForm.jsx"
 
 
 const ROLES = {
@@ -47,11 +47,14 @@ const ROLES = {
 
                     {/* Admin-Only Routes */}
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin]} />}>
-                            <Route path="/class-schedule/:course/:year/:section" element={<ClassSchedule />} />
-                            <Route path="/classroom/reservation" element={<ClassroomReservation/>} />
+                            <Route path="/class-schedule/:course/:year/:section" element={<ClassSchedule />} />                           
                             <Route path="/create-room-schedule" element={<ScheduleTemp />} />
+
                             <Route path="/classroom" element={<Classroom />} />
+                            <Route path="/classroom/reservation" element={<ClassroomReservation/>} />
+                            
                             <Route path="/course" element={<Course />} />
+                            <Route path="/add/course" element={<CourseForm />} />
                             <Route path="/course/:id/manage" element={<ManageCourse />} />
                                   
                     </Route>

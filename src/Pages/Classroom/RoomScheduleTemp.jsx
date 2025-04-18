@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
+import { Button } from "react-bootstrap";
 import axios from "axios";
 import "./RoomScheduleTemp.css";
 import AssignModal from "./AssignModal.jsx";
@@ -386,6 +387,9 @@ console.log("format:", selectedCourse);
   return (
     <div className="room-schedule-container">
       <div className="schedule-header">
+        <Button variant="outline-secondary" className="" onClick={() => navigate(-1)}>
+          <i className="bi bi-arrow-left fs-5"></i>
+        </Button>
         <h2>Room Schedule</h2>
         <div className="right-controls">
           <select><option>Examination</option></select>
