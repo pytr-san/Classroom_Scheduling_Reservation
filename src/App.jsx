@@ -1,28 +1,33 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
+
 import Home from "./Pages/Home/Home.jsx";
 import Classroom from "./Pages/Classroom/Classroom.jsx";
 import Course from "./Pages/Course/Course.jsx";
 import Settings from "./Pages/Settings/Settings.jsx";
 import Register from "./Pages/Register.jsx";
-import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Pages/Login.jsx";
 import ManageCourse from "./Pages/Course/ManageCourse.jsx";
+// import ErrorBoundary from "./components/ErrorBoundary";
 import axios from "axios";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth.jsx";
 import UnauthorizedPage from "./Unauthorized.jsx";
-import AdminAccess from "./components/AdminAccess.jsx";
 import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
 import NewStudent from "./Pages/NewStudentPage.jsx";
 import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
 import CourseForm from "./Pages/Course/CourseForm.jsx"
 
+import AdminChangePassword from "./Pages/Settings/AdminChangePassword.jsx";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+axios.defaults.withCredentials = true;
 
 const ROLES = {
   student: "student",
   admin: "admin",
-  faculty: "faculty"
+  faculty: "faculty",
 };
 
     function App() {

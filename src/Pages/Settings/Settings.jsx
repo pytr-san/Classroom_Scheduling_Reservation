@@ -1,10 +1,17 @@
-
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import "./settings.css"
 import axios from "axios";
 
+
 const Settings = () => {
-    const { auth, setAuth } = useAuth(); // ✅ Get user role
+    const { auth, setAuth } = useAuth();
+    const navigate = useNavigate();
+
+    const handlePasswordChange = () => {
+        const path = "/admin/change-password";
+        navigate(path);
+    };
     const user = auth?.user;
 
     const setLogout = async () => {
@@ -34,7 +41,7 @@ const Settings = () => {
                 <div className="admin">
                     <h2>🔑 Admin Settings</h2>
                     <p>Manage system settings, user accounts, and security policies.</p>
-                    <button>Change Password</button>
+                    <button onClick={handlePasswordChange}>Change Password</button>
                     <button>Manage Users</button>
                 </div>
 
@@ -45,7 +52,7 @@ const Settings = () => {
                 <div className="faculty">
                     <h2>📚 Faculty Settings</h2>
                     <p>Update course materials, modify profile, and change password.</p>
-                    <button>Change Password</button>
+                    <button onClick={handlePasswordChange}>Change Password</button>
                     <button>Update Profile</button>
                 </div>
             )}
@@ -54,7 +61,7 @@ const Settings = () => {
                 <div className="student">
                     <h2>🎓 Student Settings</h2>
                     <p>Update personal information and change password.</p>
-                    <button>Change Password</button>
+                    <button onClick={handlePasswordChange}>Change Password</button>
                     <button>Update Profile</button>
                 </div>
             )}
@@ -72,7 +79,6 @@ const Settings = () => {
 
     </div>
     );
-}
-
+};
 
 export default Settings;

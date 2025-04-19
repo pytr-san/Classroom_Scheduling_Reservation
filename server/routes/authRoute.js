@@ -163,5 +163,49 @@ router.get('/refresh', refreshTokenMiddleware, (req, res) => {
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
+// BAGONG CODE 
+router.put('/change-password', authMiddleware, async (req, res) => {
+    try {
+        const db = await connectToDatabase();
+        const { currentPassword, newPassword } = req.body;
 
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: "Current and new passwords are required" });
+        }
+
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const tableName = user.role === "admin" ? "admin" : user.role === "faculty" ? "faculty" : "student";
+        const idField = user.role === "admin" ? "admin_id" : user.role === "faculty" ? "faculty_id" : "student_id";
+
+        const [rows] = await db.execute(
+            `SELECT * FROM ${tableName} WHERE ${idField} = ?`,
+            [user.id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const dbUser = rows[0];
+        const validPassword = await bcrypt.compare(currentPassword, dbUser.password);
+        if (!validPassword) {
+            return res.status(401).json({ error: "Invalid current password" });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await db.execute(
+            `UPDATE ${tableName} SET password = ? WHERE ${idField} = ?`,
+            [hashedNewPassword, user.id]
+        );
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (err) {
+        console.error("Change password error:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
 export default router;
