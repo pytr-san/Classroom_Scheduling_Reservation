@@ -33,7 +33,7 @@ export default function Login() {
             });
 
             console.log("✅ Login successful:", response.data);
-           // const { user, token, role } = response.data;
+            
             const { user, token } = response.data;
             const role = user.role;
             

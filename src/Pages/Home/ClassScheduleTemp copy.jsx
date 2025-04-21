@@ -54,20 +54,20 @@ const ClassSchedule = () => {
   const schoolYears = ["2023-2024", "2024-2025"];
 
   // Load all schedules from localStorage on component mount
-  useEffect(() => {
-    const savedSchedules = localStorage.getItem("allSchedules");
-    if (savedSchedules) {
-      const parsedSchedules = JSON.parse(savedSchedules);
-      setAllSchedules(parsedSchedules);
-      setScheduleNames(Object.keys(parsedSchedules));
+  // useEffect(() => {
+  //   const savedSchedules = localStorage.getItem("allSchedules");
+  //   if (savedSchedules) {
+  //     const parsedSchedules = JSON.parse(savedSchedules);
+  //     setAllSchedules(parsedSchedules);
+  //     setScheduleNames(Object.keys(parsedSchedules));
       
-      // Load the first schedule by default if none is selected
-      if (!selectedScheduleKey && Object.keys(parsedSchedules).length > 0) {
-        const firstKey = Object.keys(parsedSchedules)[0];
-        loadSchedule(firstKey);
-      }
-    }
-  }, []);
+  //     // Load the first schedule by default if none is selected
+  //     if (!selectedScheduleKey && Object.keys(parsedSchedules).length > 0) {
+  //       const firstKey = Object.keys(parsedSchedules)[0];
+  //       loadSchedule(firstKey);
+  //     }
+  //   }
+  // }, []);
 
   // Detect conflicts whenever the schedule changes
   useEffect(() => {

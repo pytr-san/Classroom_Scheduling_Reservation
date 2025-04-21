@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import useAuth from "../../Hooks/useAuth";
 import AdminAccess from "../../components/AdminAccess";
 import AdminHome from "./AdminHome";
+import StudentDashboard from "./StudentDashboard.jsx";
+import FacultyDashboard from "./FacultyDashboard.jsx";
 
 const Home = () => {
     const { auth } = useAuth();
@@ -40,11 +42,11 @@ const Home = () => {
             )}
 
             {auth.user.role === "faculty" && (
-                <p>📘 Faculty Panel - View assigned courses and track schedules.</p>
+                <FacultyDashboard/>
             )}
 
             {auth.user.role === "student" && (
-                <p>🎓 Student Dashboard - Access enrolled courses and track schedules.</p>
+                < StudentDashboard/>
             )}
         </div>
     );

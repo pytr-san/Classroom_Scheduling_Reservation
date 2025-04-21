@@ -4,7 +4,7 @@ import copppLogo from "../../assets/coppp.png";
 import axios from "axios";
 import styles from "./Course.module.css"; // Import CSS module
 import { useNavigate } from "react-router-dom";
-
+import BulkUploader from '../../components/BulkUploader';
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -15,6 +15,8 @@ const Courses = () => {
 const handleAddCourse = (e) => {
   navigate("/add/Course", {state:{}})
 };
+
+
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -54,6 +56,11 @@ const handleAddCourse = (e) => {
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}>
             <span className={styles.courseName}>{course.course_name}</span>
+            <button
+              onClick={() => navigate("/course/upload", { state: { courseId: course.course_id, courseName: course.course_name } })}
+            >
+              Upload Schedules
+            </button>
             <Gear size={20} 
             className={styles.icon}
             onClick={() => navigate(`/course/${course.course_id}/manage`)} 
@@ -73,6 +80,7 @@ const handleAddCourse = (e) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             />
+
           </div>
         ))
       ) : (

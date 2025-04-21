@@ -63,26 +63,24 @@ router.post('/login', async (req, res) => {
 
         // 🟢 Optimized Query to Search in All Tables at Once
         const [users] = await db.query(
-            `SELECT admin_id AS id, name, email, password, 'admin' AS role FROM admin WHERE email = ? 
+            `SELECT admin_id AS id, NULL AS course_id, name, email, password, 'admin' AS role FROM admin WHERE email = ? 
              UNION 
-             SELECT student_id AS id, name, email, password, 'student' AS role FROM student WHERE email = ? 
+             SELECT student_id AS id, course_id, name, email, password, 'student' AS role FROM student WHERE email = ? 
              UNION 
-             SELECT faculty_id AS id, name, email, password, 'faculty' AS role FROM faculty WHERE email = ?`, 
+             SELECT faculty_id AS id, NULL AS course_id, name, email, password, 'faculty' AS role FROM faculty WHERE email = ?`, 
             [email, email, email]
         );
 
 
 
         if (users.length > 0) { 
-            user = users[0]; // ✅ Pick first matched user
-            console.log("✅ Extracted user:", user);
+            user = users[0]; 
         }
 
         // ❌ If No User Found
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
-
 
         // ❌ Handle Missing Password Field
         if (!user.password) {
@@ -99,7 +97,7 @@ router.post('/login', async (req, res) => {
         delete user.password;
 
         // ✅ Generate JWT Access Token (valid for 1 hour)
-        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role },
+        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id },
                                     process.env.JWT_SECRET, 
                                     { expiresIn: '1h' });   
 
@@ -116,7 +114,7 @@ router.post('/login', async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000,
             path: "/"
          });
-        
+         
          res.json({user, token});
 
     } catch (err) {

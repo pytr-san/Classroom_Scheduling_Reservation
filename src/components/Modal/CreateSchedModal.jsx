@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./CreateSchedModal.css";
 
-const Modal = ({ show, handleClose }) => {
+const Modal = ({ show, handleClose}) => {
     const [courseId, setCourseId] = useState(''); // Store the course_id, not the name
     const [courseName, setCourseName] = useState(''); // Store the course name for display
     const [year, setYear] = useState('');

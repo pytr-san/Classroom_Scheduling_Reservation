@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             setLoading(false); // If user and token exist, no need to refresh
         }
-    }, []); // Empty dependency array means this runs only once on mount
+    }, [auth.user, auth.token]); // Dependency array ensures refresh happens if auth state changes
 
     if (loading) {
         return <div>Loading...</div>; // Show loading until authentication state is resolved

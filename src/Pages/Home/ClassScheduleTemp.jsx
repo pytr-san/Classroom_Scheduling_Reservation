@@ -51,10 +51,27 @@ const ClassSchedule = () => {
   const courseId = location.state?.courseId || '';
   const year = location.state?.year || '';
   const section = location.state?.section || '';
-
   const [course, setCourse] = useState(courseId);
   const [yearLevel, setYearLevel] = useState(year);
 
+  //for Course section Rendering
+  // const [courses, setCourses] = useState({});
+  // useEffect(() => {
+  //   if (courseName && section) {
+  //     const key = courseName;
+  //     const value = `${section}`;
+
+  //     setCourses(prevCourses => {
+  //       const existing = prevCourses[key] || [];
+  //       const updated = existing.includes(value) ? existing : [...existing, value];
+  //       return {
+  //         ...prevCourses,
+  //         [key]: updated
+  //       };
+  //     });
+  //   }
+  // }, [courseName, section]);
+  
   useEffect(() => {
     const savedSchedules = localStorage.getItem("allSchedules");
     if (savedSchedules) {
@@ -82,11 +99,11 @@ const ClassSchedule = () => {
       .catch(err => console.error('Error fetching professors:', err));
 
     // Fetch subjects based on course and yearLevel
-    if (course && yearLevel) {
+    if (courseId && year) {
       axios.get('http://localhost:8000/api/subjects', {
         params: {
-          course: course,
-          yearLevel: yearLevel
+          courseId: courseId,
+          yearLevel: year
         },
         withCredentials: true
       })
@@ -104,7 +121,7 @@ const ClassSchedule = () => {
         setRooms(res.data);
       })
       .catch(err => console.error('Error fetching rooms:', err));
-  }, [course, yearLevel]);
+  }, [course, year]);
 
   const saveScheduleToDB = async () => {
     if (selectedSection === "Select Section") return alert("Please select a section.");
@@ -505,6 +522,7 @@ const ClassSchedule = () => {
         onHide={() => setShowCreateModal(false)}
         newCourse={newCourse}
         setNewCourse={setNewCourse}
+        handleClose={() => setShowCreateModal(false)}
         newSection={newSection}
         setNewSection={setNewSection}
         courses={courses}
@@ -587,22 +605,22 @@ const ScheduleTable = ({ times, selectedCells, mergedCells, cellStatus, cellDeta
                   {isAnchor && (
                     <div className="cell-content">
                     <DropdownButton title={cellDetails[key]?.professor?.name || "Select Professor"} variant="secondary" size="sm" onSelect={(value) => updateCellDetails(key, "professor", value)} className="mb-1">
-  {professors.map((prof, index) => (
-    <Dropdown.Item key={index} eventKey={prof.name}>{prof.name}</Dropdown.Item>
-  ))}
-</DropdownButton>
+                      {professors.map((prof, index) => (
+                        <Dropdown.Item key={index} eventKey={prof.name}>{prof.name}</Dropdown.Item> 
+                      ))}
+                    </DropdownButton>
 
-<DropdownButton title={cellDetails[key]?.subject?.title || "Select Subject"} variant="secondary" size="sm" onSelect={(value) => updateCellDetails(key, "subject", value)} className="mb-1">
-  {subjects.map((subj, index) => (
-    <Dropdown.Item key={index} eventKey={subj.title}>{subj.title}</Dropdown.Item>
-  ))}
-</DropdownButton>
+                    <DropdownButton title={cellDetails[key]?.subject?.subject_name || "Select Subject"} variant="secondary" size="sm" onSelect={(value) => updateCellDetails(key, "subject", value)} className="mb-1">
+                      {subjects.map((subj, index) => (
+                        <Dropdown.Item key={index} eventKey={subj.subject_id}>{subj.subject_name}</Dropdown.Item>
+                      ))}
+                    </DropdownButton>
 
-<DropdownButton title={cellDetails[key]?.room?.number || "Select Room"} variant="secondary" size="sm" onSelect={(value) => updateCellDetails(key, "room", value)}>
-  {rooms.map((room, index) => (
-    <Dropdown.Item key={index} eventKey={room.number}>{room.number}</Dropdown.Item>
-  ))}
-</DropdownButton>
+                    <DropdownButton title={cellDetails[key]?.room?.room_name|| "Select Room"} variant="secondary" size="sm" onSelect={(value) => updateCellDetails(key, "room", value)}>
+                      {rooms.map((room, index) => (
+                        <Dropdown.Item key={index} eventKey={room.room_id}>{room.room_name}</Dropdown.Item>
+                      ))}
+                    </DropdownButton>
 
                     </div>
                   )}

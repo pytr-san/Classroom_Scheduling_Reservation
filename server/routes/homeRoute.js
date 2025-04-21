@@ -1,7 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
 import {connectToDatabase} from '../db.js'
-import {connectToDatabase} from '../db.js'
 
 const router = express.Router();
 
@@ -9,7 +8,6 @@ const router = express.Router();
 router.get("/", authMiddleware, (req, res) => {
     res.json({ message: "Welcome to Home", user: req.user });
 });
-
 
 // Fetch professors from the database
 router.get('/api/professors', authMiddleware, async (req, res) => {
@@ -30,11 +28,13 @@ router.get('/api/professors', authMiddleware, async (req, res) => {
 // Fetch subjects from the database
 router.get('/api/subjects', authMiddleware , async (req, res) => {
     const { courseId, yearLevel } = req.query;
+    
   // Retrieve course and year from query parameters
     const db = await connectToDatabase();
     if (!courseId || !yearLevel) {
         return res.status(400).json({ message: 'Course and Year are required' });
     }
+
     try {
         const query = `
             SELECT subject_id, subject_name 
@@ -45,6 +45,7 @@ router.get('/api/subjects', authMiddleware , async (req, res) => {
         if (!rows.length) {
           return res.status(404).json({ message: 'No subjects found for this course and year' });
         }
+console.log("Rows", rows);
         res.json(rows);
         
     } catch (err) {
@@ -58,11 +59,11 @@ router.get('/api/subjects', authMiddleware , async (req, res) => {
 router.get('/api/rooms',authMiddleware , async (req, res) => {
     try {
         const db = await connectToDatabase();
-        const results = await db.query('SELECT room_id, room_name FROM classroom');
-        if (!results.length) {
+        const [rows] = await db.query('SELECT room_id, room_name FROM classroom');
+        if (!rows.length) {
             return res.status(404).json({ message: 'No rooms found' });
         }
-        res.json(results);
+        res.json(rows);
     } catch (err) {
         console.error('Error fetching rooms:', err);
         res.status(500).json({ error: 'Error fetching rooms' });

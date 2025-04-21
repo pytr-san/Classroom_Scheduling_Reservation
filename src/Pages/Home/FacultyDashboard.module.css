@@ -1,0 +1,51 @@
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #fdfdfd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .fileList {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .fileItem {
+    background-color: #ffffff;
+    margin: 0.5rem 0;
+    padding: 1rem;
+    border-left: 4px solid #4a90e2;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .fileItem:hover {
+    background-color: #f0f8ff;
+  }
+  
+  .fileLink {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .fileLink:hover {
+    text-decoration: underline;
+  }
+  
+  .courseLabel {
+    display: block;
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 0.25rem;
+  }
+  

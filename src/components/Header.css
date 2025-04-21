@@ -73,7 +73,7 @@
     justify-content: center; /* Center items vertically */  
     transition: transform 0.3s ease-in-out;
     transform: translateX(100%); /* Initially hidden */
-    z-index: 1000; /* Ensures it's above everything */
+    z-index: 1001; /* Ensures it's above everything */
   }
  
   .profile-modal.open {

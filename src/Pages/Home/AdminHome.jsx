@@ -35,6 +35,10 @@ const AdminHome = () => {
   const [modalShow, setModalShow] = useState(false);
   const [historyShow, setHistoryShow] = useState(false);
   
+  const handleCreate = () => {
+    navigate("/class-schedule/:course/:year/:section");
+  };
+
   const [schedules, setSchedules] = useState([
     { course: "BSCPE_BSIT, BSCS", date: "June 9, 2024 | 10:04AM" }, 
     { course: "BSCPE_BSIT, BSCS", date: "June 9, 2021 | 5:06AM" }
@@ -57,10 +61,10 @@ const AdminHome = () => {
       <div className="image-container">
         <img alt="Campus" src={bg} />
         <div className="button-container">
-          <button className="btn-create" onClick={() => setModalShow(true)}>Create New Schedule</button>
+          <button className="btn-create" onClick={handleCreate}>Create New Schedule</button>
           <button className="btn-edit" onClick={() => setHistoryShow(true)}>Edit Existing Schedule</button>
         </div>
-      </div>
+      </div>  
 
       <Modal show={modalShow} handleClose={() => setModalShow(false)} />
       <HistoryPanel 
