@@ -19,26 +19,37 @@
     margin-right: 5px;
   }
   
-  .filters,
-  .right-controls {
+  .filter {
     display: flex;
     gap: 6px;
   }
-  
+ .right-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .right-controls select {
+    min-width: 40px;
+  }
   .filters select,
   .right-controls select,
   .right-controls button {
-    padding: 5px 8px;
+    padding: 6px 12px;
     font-size: 12px;
     border-radius: 4px;
     border: 1px solid #ddd;
   }
-  
+
   .right-controls button {
+    padding: 8px 15px;
+    font-size: 12px;
     background-color: #007BFF;
     color: white;
+    width: 250px;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
+    margin-left: auto;
   }
   
   .right-controls button:hover {
@@ -84,6 +95,31 @@
   .schedule-table-wrapper {
     margin-bottom: 10px;
   }
+  .dropdown-container {
+    display: flex;
+    gap: 10px; /* Space between dropdowns */
+    margin-bottom: 10px; /* Space below dropdowns before the table */
+    align-items: center; /* Vertically center them if needed */
+  }
+  .dropdown-container select {
+    text-align: center;
+
+/* Ensures the selected value is centered in most browsers */
+  }
+
+  .print-friendly {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    color: #000000;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .exam-type, .semester-type {
+    text-align: center;
+  }
   
   .schedule-table {
     width: 100%;
@@ -125,28 +161,36 @@
     justify-content: space-between;
     align-items: center;
   }
-  
-  .nav-btn {
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f0f0f0;
-    cursor: pointer;
+  .spinner {
+    border: 2px solid #f3f3f3;       /* Light gray */
+    border-top: 2px solid #555;      /* Darker gray for spinning */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
   }
   
-  .nav-btn:hover {
-    background-color: #8e8e8e;
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
   
+
   .publish-btn {
-    padding: 6px 12px;
+    padding: 8px 20px;
     font-size: 12px;
     background-color: #007BFF;
     color: white;
+    width: 150px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-left: auto;
   }
+
   
   .publish-btn:hover {
     background-color: #0056b3;

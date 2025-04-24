@@ -38,6 +38,7 @@ const FileUploadPage = () => {
       <div className={styles.upload}>
       <h2>Upload Schedules for {courseName}</h2>
         <BulkUploader courseId={courseId} />
+
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import copppLogo from "../../assets/coppp.png";
 import axios from "axios";
 import styles from "./Course.module.css"; // Import CSS module
 import { useNavigate } from "react-router-dom";
-import BulkUploader from '../../components/BulkUploader';
+import { FiUpload } from "react-icons/fi";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -22,7 +22,6 @@ const handleAddCourse = (e) => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
-        console.log("Courses API Response:", response.data); // Debug
         setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -58,7 +57,9 @@ const handleAddCourse = (e) => {
             <span className={styles.courseName}>{course.course_name}</span>
             <button
               onClick={() => navigate("/course/upload", { state: { courseId: course.course_id, courseName: course.course_name } })}
+              className={styles.uploadcoursebtn} 
             >
+              <FiUpload size={18} />
               Upload Schedules
             </button>
             <Gear size={20} 

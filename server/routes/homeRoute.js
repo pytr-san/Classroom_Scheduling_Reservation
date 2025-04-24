@@ -45,7 +45,6 @@ router.get('/api/subjects', authMiddleware , async (req, res) => {
         if (!rows.length) {
           return res.status(404).json({ message: 'No subjects found for this course and year' });
         }
-console.log("Rows", rows);
         res.json(rows);
         
     } catch (err) {

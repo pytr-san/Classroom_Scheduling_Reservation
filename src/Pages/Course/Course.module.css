@@ -87,7 +87,24 @@
     color: gray;
   }
   
- 
+  .uploadcoursebtn {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-size: 15px;
+    padding: 8px 10px;
+    display: inline-flex;
+    margin-right: 20px;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .uploadcoursebtn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
   
  
   .courseCard {
@@ -108,12 +125,18 @@
   }
   
   .courseName {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
     font-weight: 600;
     font-size: 16px;
   }
   
-  .settingsIcon {
-    color: gray;
+  .icon {
+    color: gray; /* Icon color */
     cursor: pointer;
+    transition: color 0.3s ease;
   }
   

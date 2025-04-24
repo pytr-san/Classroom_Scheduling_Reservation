@@ -9,8 +9,7 @@ const AssignModal = ({ show, handleClose, onAssign, selectedMergedCell, subjects
   const [selectedProctor, setSelectedProctor] = useState('');
   const [selectedDay, setSelectedDay] = useState('Monday'); 
 
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-console.log("proctors:", proctors);
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   const handleSubmit = () => {
     if (!selectedSubject || !selectedProctor || !selectedDay) {

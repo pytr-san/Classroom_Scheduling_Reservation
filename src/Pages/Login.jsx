@@ -4,6 +4,7 @@ import axios from "axios";
 import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { toast } from 'react-hot-toast';
 
 export default function Login() {
     const userRef = useRef();
@@ -38,13 +39,20 @@ export default function Login() {
             const role = user.role;
             
             setAuth({ user, token, role}); // ✅ Stores user data globally
-            navigate("/");
-    
+            
+            toast.success('Login successful.')
+            setTimeout(() => {
+                navigate("/");
+            }, 1000);
         } catch (err) {
             if (err.response) {
-                setErrorMessage(err.response.data.error);
+                const message = err.response.data.message || err.response.data.error;
+                setErrorMessage(message);
+                toast.error(message);
             } else {
-                setErrorMessage("An unexpected error occurred. Please try again.");
+                const fallback = "An unexpected error occurred. Please try again.";
+                setErrorMessage(fallback);
+                toast.error(fallback); 
             }
         }
     };
@@ -57,6 +65,7 @@ export default function Login() {
 
             <div className={styles.rightSection}>
                 <div className={styles.formContainer}>
+                    <h4>Login</h4>
                     <form onSubmit={handleLogin}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Email</label>

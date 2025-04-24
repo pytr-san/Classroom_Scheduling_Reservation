@@ -36,11 +36,7 @@ app.use("/classrooms", classRoute);
 
 // Serve static files for viewing (uploads)
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '../uploads/pdfs')));
-app.get('/test-static', (req, res) => {
-    const testPath = path.join(__dirname, '../uploads/pdfs/1745171263335-BSIT - 2 - B (4).pdf');
-    res.sendFile(testPath);
-  });
-  
+
 // Routes
 app.use('/api', uploadRoute);
 

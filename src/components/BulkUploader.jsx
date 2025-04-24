@@ -1,21 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import axios from 'axios';
 import './BulkUpload.css';
-
-import { toast, Toaster } from 'react-hot-toast';
+import useAuth from "../Hooks/useAuth";
+import { toast } from 'react-hot-toast';
+import { Modal, Button, Table } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BulkUploader = ({ courseId }) => {
+  const { token } = useAuth();
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState(null);
+
+  const fetchFiles = async () => {
+    try {
+
+      const res = await axios.get(`http://localhost:8000/api/view-files?courseId=${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      setUploadedFiles(res.data);
+    } catch (err) {
+      toast.error('Failed to load files.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFiles();
+  }, [courseId]);
 
   const handleFileChange = (e) => {
     const selectedFiles = [...e.target.files];
-    const invalidFiles = selectedFiles.filter(file => file.type !== 'application/pdf');
-    if (invalidFiles.length > 0) {
-      toast.error('Only PDF files are allowed');
+    const validFiles = selectedFiles.filter(file => file.type === 'application/pdf');
+
+    const newFiles = validFiles.filter(
+      (file) => !files.some(f => f.name === file.name && f.size === file.size)
+    );
+
+    if (newFiles.length < validFiles.length) {
+      toast.error('Some files were already selected.');
     }
-    setFiles(selectedFiles);
+  
+    setFiles(prev => [...prev, ...newFiles]);
     setProgress(0);
   };
   
@@ -34,13 +68,15 @@ const BulkUploader = ({ courseId }) => {
     try {
       setUploading(true);
       const res = await axios.post('http://localhost:8000/api/bulk-upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
         onUploadProgress: (e) => {
           const percent = Math.round((e.loaded * 100) / e.total);
           setProgress(percent);
         },
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        withCredentials: true,
       });
 
       toast.success(res.data.message);
@@ -52,6 +88,30 @@ const BulkUploader = ({ courseId }) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleDeleteConfirm  = async () => {
+    try {
+
+      await axios.delete(`http://localhost:8000/api/delete-file/${selectedFileId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      toast.success('File deleted');
+      fetchFiles(); // Refresh list
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete file');
+    }
+    setShowModal(false);
+  };
+
+
+  const handleDeleteClick = (fileId) => {
+    setSelectedFileId(fileId);
+    setShowModal(true);
   };
 
   return (
@@ -101,7 +161,53 @@ const BulkUploader = ({ courseId }) => {
           {uploading ? 'Uploading...' : 'Upload Files'}
         </button>
 
-        
+        <h3 className="mt-4">Uploaded Files</h3>
+        {loading ? (
+          <p>Loading...</p>
+        ) : uploadedFiles.length === 0 ? (
+          <p className="text-muted">No files have been uploaded yet.</p>
+        ) : (
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Course</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {uploadedFiles.map(file => (
+                <tr key={file.id}>
+                  <td>{file.filename}</td>
+                  <td>{file.course_name}</td>
+                  <td>{new Date(file.created_at).toLocaleString()}</td>
+                  <td>
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteClick(file.id)}>
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+
+
+         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this file?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirm}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
       </div>
   );
 };

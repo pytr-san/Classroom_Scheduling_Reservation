@@ -53,7 +53,6 @@ const Settings = () => {
                     <h2>📚 Faculty Settings</h2>
                     <p>Update course materials, modify profile, and change password.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
-                    <button>Update Profile</button>
                 </div>
             )}
 
@@ -62,7 +61,7 @@ const Settings = () => {
                     <h2>🎓 Student Settings</h2>
                     <p>Update personal information and change password.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
-                    <button>Update Profile</button>
+
                 </div>
             )}
         </div>

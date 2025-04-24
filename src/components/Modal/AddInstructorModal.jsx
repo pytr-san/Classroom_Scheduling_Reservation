@@ -1,5 +1,5 @@
 import  { useState } from "react";
-import { Modal, Button } from "react-bootstrap"; // Assuming you're using react-bootstrap
+import { Modal, Button } from "react-bootstrap";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
 const AddInstructorModal = ({ show, onHide, onConfirm }) => {
@@ -20,7 +20,7 @@ const AddInstructorModal = ({ show, onHide, onConfirm }) => {
       <Modal.Body>
         <div className="mb-3">
           <label htmlFor="instructorName" className="form-label">
-            Instructor Name (first name...)
+            Instructor Name
           </label>
           <input
             type="text"
@@ -28,7 +28,7 @@ const AddInstructorModal = ({ show, onHide, onConfirm }) => {
             id="instructorName"
             value={instructorName}
             onChange={(e) => setInstructorName(e.target.value)}
-            placeholder="Enter instructor name"
+            placeholder="Enter instructor's full name"
           />
         </div>
       </Modal.Body>
@@ -37,7 +37,7 @@ const AddInstructorModal = ({ show, onHide, onConfirm }) => {
           <FaTimes /> Cancel
         </Button>
         <Button variant="primary" onClick={handleConfirm} disabled={instructorName.trim() === ""}>
-          <FaCheck /> Confirm
+          <FaCheck /> Add 
         </Button>
       </Modal.Footer>
     </Modal>

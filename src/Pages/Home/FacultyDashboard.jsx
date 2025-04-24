@@ -41,8 +41,33 @@ const FacultyFiles = () => {
 
     fetchFiles();
   }, []);
-
+  
+  const downloadFile = async (filename) => {
+    const encoded = encodeURIComponent(filename);
+    try {
+      const res = await fetch(`http://localhost:8000/api/download/${encoded}`, {
+        credentials: 'include',
+      });
+  
+      if (!res.ok) {
+        throw new Error('Download failed');
+      }
+  
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error downloading:", err);
+    }
+  };
+  
+  
   const groupedFiles = groupFilesByDate(files);
+
 
   if (loading) return <div className={styles.container}>Loading files...</div>;
   if (error) return <div className={styles.container}>{error}</div>;
@@ -58,8 +83,6 @@ const FacultyFiles = () => {
             <h3 className={styles.dateHeading}>{date}</h3>
             <ul className={styles.fileList}>
               {filesOnDate.map((file, index) => {
-                const encodedFilename = encodeURIComponent(file.filename);
-                const fileUrl = `http://localhost:8000/uploads/pdfs/${encodedFilename}`;
 
                 return (
                   <li key={index} className={styles.fileItem}>
@@ -75,13 +98,9 @@ const FacultyFiles = () => {
                     </div>
 
                     {/* Download link */}
-                    <a
-                      href={file.fileUrl.replace(/\\/g, '/')}
-                      className={styles.fileLink}
-                      download
-                    >
-                      Download {file.filename}
-                    </a>
+                    <button onClick={() => downloadFile(file.filename)}>Download</button>
+
+
 
                     <span className={styles.courseLabel}>
                       <strong> 📘 Course: </strong> {file.description}{' '}

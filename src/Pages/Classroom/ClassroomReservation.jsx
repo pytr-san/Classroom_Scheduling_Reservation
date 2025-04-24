@@ -5,6 +5,7 @@ import { FaUsers,  FaClipboardCheck, FaSearch, FaCamera, FaTicketAlt } from "rea
 import { useLocation, useNavigate } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import RoomDetailModal from "../../components/Modal/RoomDetailModal";  
+import toast from "react-hot-toast";
 
 const ClassroomReservation = () => {
   const navigate = useNavigate();
@@ -64,12 +65,21 @@ const ClassroomReservation = () => {
 
   const handleImageUpload = (index, event) => {
     const file = event.target.files[0];
+    
     if (file) {
+
+      if (!file.type.startsWith('image/')) {
+        toast.error('Invalid file type. Please upload an image.');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         const updatedRooms = [...rooms];
         updatedRooms[index].image = reader.result; // Store base64 image
         setRooms(updatedRooms);
+
+        toast.success('Photo uploaded successfully!');
       };
       reader.readAsDataURL(file);
     }
@@ -104,14 +114,6 @@ const ClassroomReservation = () => {
           
         </div>
 
-        {/* <div className="d-flex align-items-center gap-2 ms-auto">
-          <InputGroup className="search-bar">
-            <InputGroup.Text>
-              <FaSearch />
-            </InputGroup.Text>
-            <Form.Control type="text" placeholder="Search..." className="search-input" />
-          </InputGroup>
-        </div> */}
       </div>
 
       <div className="classroom-grid">

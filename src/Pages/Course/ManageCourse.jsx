@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import CreatableSelect from "react-select/creatable"; // ✅ Import react-select
+import CreatableSelect from "react-select/creatable";
 import styles from "./ManageCourse.module.css";
-import { FaTrash , FaArrowLeft, FaSyncAlt, FaCheck, FaTimes } from "react-icons/fa"; // Font Awesome Icon
+import { FaTrash , FaArrowLeft, FaSyncAlt, FaCheck, FaTimes } from "react-icons/fa";
 import ConfirmModal from "../../components/Modal/ConfirmInstructor";
 import AddInstructorModal from "../../components/Modal/AddInstructorModal";
 import useAuth from "../../Hooks/useAuth";
@@ -18,6 +18,7 @@ const ManageCourse = () => {
   const [courseName, setCourseName] = useState("");
   const [faculty, setFaculty] = useState([]);
   const [updatedSubjects, setUpdatedSubjects] = useState({});
+  const [originalSubjects, setOriginalSubjects] = useState([]);
   const [pendingInstructor, setPendingInstructor] = useState(null);
   const { auth } = useAuth();
   const [inputValues, setInputValues] = useState({});
@@ -40,7 +41,6 @@ const ManageCourse = () => {
 
       await axios.get(`http://localhost:8000/api/course/${id}/manage`, {withCredentials: true, }) 
       .then((response) => {
-        console.log("Subject list:",response.data)
         setSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
@@ -57,8 +57,8 @@ const ManageCourse = () => {
   useEffect(() => {
     axios.get(`http://localhost:8000/api/course/${id}/manage`, {withCredentials: true, }) 
       .then((response) => {
-        console.log("Subject list:",response.data)
         setSubjects(response.data.subjects || []);
+        setOriginalSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
       })
@@ -68,18 +68,16 @@ const ManageCourse = () => {
 
   const handleInstructorChange = (subject_id, facultyOption) => {
     if (facultyOption?.__isNew__) {
-       // Show check button if user starts typing a new instructor
       setPendingInstructor({ name: facultyOption.value, subject_id });
-      setInputValues((prev) => ({ ...prev, [subject_id]: facultyOption.value })); // Keep text in input
+      setInputValues((prev) => ({ ...prev, [subject_id]: facultyOption.value })); 
       handleShowModal();
     } else {
-      // Reset if an existing instructor is selected or cleared
       setPendingInstructor(null);
       setUpdatedSubjects((prev) => ({
         ...prev,
-        [subject_id]: facultyOption?.value || null,  // Save the selected faculty_id
+        [subject_id]: facultyOption?.value || null, 
       }));
-      setInputValues((prev) => ({ ...prev, [subject_id]: "" })); // Reset input only for this subject
+      setInputValues((prev) => ({ ...prev, [subject_id]: facultyOption?.label || "" })); 
     }
   };
   
@@ -94,7 +92,6 @@ const ManageCourse = () => {
     const { name, subject_id } = pendingInstructor;
   
     try {
-      // Add the instructor to the faculty and assign them to the subject
       const { data } = await axios.post("http://localhost:8000/api/faculty/add", { name, subject_id }, { withCredentials: true });
   
       const newFaculty = data.newFaculty;
@@ -110,11 +107,12 @@ const ManageCourse = () => {
         ...prevSubjects,
         [subject_id]: newFaculty.faculty_id, 
       }));
-  
+      
+      toast.success("Instructor added and Assigned successfully!");
       setPendingInstructor(null);
       handleCloseModal();
     } catch (error) {
-      console.error("Error adding instructor:", error);
+      toast.error(`Failed to add instructor: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -133,36 +131,34 @@ const ManageCourse = () => {
 
   const handleSaveChanges = () => {
     const updates = Object.entries(updatedSubjects)
+  
       .filter(([subject_id, faculty_id]) => subject_id && faculty_id)
       .map(([subject_id, faculty_id]) => ({
         subject_id: parseInt(subject_id),
         faculty_id: parseInt(faculty_id),
       }));
-  
+
     if (updates.length === 0) {
-      alert("No changes to save.");
+      toast.error("No instructors to save.");
 
     return;
     }
-  
+   
     axios.put(`http://localhost:8000/api/course/${id}/manage/update`, { updates }, { withCredentials: true })
       .then(() => {
-        alert("Changes saved!");
-        
-        // Fetch the updated subjects and faculty data
+        toast.success("Assigned Successfully!");
+
         axios.get(`http://localhost:8000/api/course/${id}/manage`, { withCredentials: true })
           .then((response) => {
-            // Update state with refreshed data
             setSubjects(response.data.subjects || []);
             setFaculty(response.data.faculty || []);
-            setUpdatedSubjects({});  // Reset the updated subjects state after saving
+            setUpdatedSubjects({}); 
           })
           .catch((error) => console.error("Error fetching refreshed subjects:", error));
       })
       .catch((error) => console.error("Error updating:", error));
   };
   
-  // Group the subjects by year level and semester
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const { year_level, semester } = subject;
     const semesterLabel = semester === "1st" ? "First Semester" : "Second Semester";
@@ -174,6 +170,7 @@ const ManageCourse = () => {
   
   const handleRefresh = () => {
     setUpdatedSubjects({}); // Clears the selected instructors
+    setSubjects(originalSubjects);
     setPendingInstructor(null);
   };
 
@@ -185,34 +182,57 @@ const ManageCourse = () => {
           : subject
       )
     );
+
+      // Track the original field change
+      setUpdatedSubjects(prev => ({
+        ...prev,
+        [subject_id]: {
+          ...(prev[subject_id] || {}),
+          [field]: value,
+        }
+      }));
   };
+
   const handleSaveSubjectNames = async () => {
     try {
-      const updatedNames = subjects.map(({ subject_id, subject_name }) => ({
+      const changedSubjects = subjects.filter(subject => {
+        const original = originalSubjects.find(s => s.subject_id === subject.subject_id);
+        return original && original.subject_name !== subject.subject_name;
+      });
+  
+      if (changedSubjects.length === 0) {
+        toast("No changes on subjects to save.", {
+          icon: 'ℹ️',
+        });
+        return;
+      }
+  
+      const payload = changedSubjects.map(({ subject_id, subject_name }) => ({
         subject_id,
         subject_name,
       }));
   
-      await axios.put(`http://localhost:8000/api/course/${id}/subjects/update-names`, updatedNames, {
+      await axios.put(`http://localhost:8000/api/course/${id}/subjects/update-names`, payload, {
         withCredentials: true,
       });
   
       toast.success("Successfully updated!");
+      setOriginalSubjects(subjects);
+      setUpdatedSubjects({});
     } catch (err) {
-      toast.error("Failed to update subject names.");
+      toast.error("Failed to update subjects");
       console.error(err);
     }
   };
+  
     
   const handleDeleteSubject = async (subject_id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this subject?");
-  if (!confirmDelete) return; // Exit early if user cancels
+  if (!confirmDelete) return;
 
     try {
-      // Make API request to delete the subject
       await axios.delete(`http://localhost:8000/api/course/${id}/${subject_id}`, { withCredentials: true });
-  
-      // Remove the deleted subject from the state to update the UI
+
       setSubjects(prevSubjects => prevSubjects.filter(subject => subject.subject_id !== subject_id));
   
       toast.success("Subject deleted successfully!");
@@ -281,8 +301,8 @@ const ManageCourse = () => {
                       />
                       <button 
                         className="btn btn-danger btn-sm "
-                        onClick={() => handleDeleteSubject(subject.subject_id)}  // Trigger delete on click
-                        aria-label="Delete Subject"  // Accessibility improvement
+                        onClick={() => handleDeleteSubject(subject.subject_id)}  
+                        aria-label="Delete Subject"  
                       >
                         <FaTrash />
                       </button>
@@ -290,9 +310,7 @@ const ManageCourse = () => {
                           <CreatableSelect
                             className="flex-grow-1"
                             isClearable
-                           // inputValue={inputValues[subject.subject_id] || ""} // Track input per subject
                             onInputChange={(value, actionMeta) => handleInputChange(value, actionMeta, subject.subject_id)}
-                            // value={inputValues[subject.subject_id] || ""} // Make sure input stays controlled
                             value={
                               faculty
                                 .map(f => ({ value: f.faculty_id, label: f.name }))
@@ -303,16 +321,14 @@ const ManageCourse = () => {
                             placeholder="Select or add instructor..."
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
-                                e.preventDefault(); // Prevent form submission or input clearing
+                                e.preventDefault(); 
                                 if (pendingInstructor) {
-                                  handleShowModal(); // Trigger modal if enter is pressed
+                                  handleShowModal(); 
                                 }
                               }
                             }}
                            
                           />
-
-                            {/* ✅ Show check and cancel buttons when user is typing a new instructor */}
                             {pendingInstructor && pendingInstructor.subject_id === subject.subject_id && (
                               <>
                                 <button className="btn btn-success btn-sm ms-2" onClick={handleShowModal}>
@@ -345,7 +361,7 @@ const ManageCourse = () => {
       <AddInstructorModal
         show={showAddInstructorModal}
         onHide={handleCloseAddInstructorModal}
-        onConfirm={addInstructor} // Pass the function to confirm adding an instructor
+        onConfirm={addInstructor} 
       />
     </div>
   );

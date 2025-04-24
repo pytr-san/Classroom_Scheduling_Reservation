@@ -5,6 +5,7 @@
     import { useNavigate } from "react-router-dom";
     import axios from "axios";
     import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
+    import toast from "react-hot-toast";
 
     const Classroom = () => {
 
@@ -26,11 +27,11 @@
             const fetchClassrooms = async () => {
                 try {
                     const response = await axios.get("http://localhost:8000/classrooms/list");
-                    console.log("Classroom data from API:", response.data);
                     setClassrooms(response.data);
                     
                 } catch (error) {
                     console.error("Error fetching classrooms:", error);
+                    toast.error('Failed to load classrooms.');
                 }finally {
                     setLoading(false);
                 }
@@ -186,7 +187,7 @@
                                 return Object.entries(groupedByFloor).map(([floor, rooms]) => (
                                     
                                     <li key={floor}>
-                                        <h5 className="text-info mt-3">{floor}</h5>
+                                        <h5 className="text-info mt-3">Located on: {floor}</h5>
                                         <ul className="ps-3">
                                             {rooms.map((room, index) => (
                                                 <li key={index}>

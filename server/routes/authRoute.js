@@ -82,15 +82,10 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
-        // ❌ Handle Missing Password Field
-        if (!user.password) {
-            return res.status(500).json({ error: "Server error: Missing password field" });
-        }
-
         // 🔒 Validate Password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(401).json({ error: "Invalid credentials" });
+            return res.status(401).json({ error: "Invalid email or password" });
         }
 
         // Remove password before sending response

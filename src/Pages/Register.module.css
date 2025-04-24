@@ -81,19 +81,27 @@
 /* Label Styling */
 .label {
     display: block;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-weight: 500;
+    margin-bottom: 5px;
     color: #fff;
-    font-size: 18px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
+.signup{
+    color: #66BB6A;
+}
 /* Input Group */
 .inputGroup {
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 }
 
+.hintText {
+    font-size: 0.6rem; 
+    color: #ffffff;
+    margin-top: 4px;
+  }
+  
 /* Input Wrapper */
 .inputWrapper {
     position: relative;
@@ -117,7 +125,7 @@
 /* Input Styling */
 .input {
     width: 100%;
-    padding: 14px 14px 14px 50px;
+    padding: 13px 13px 13px 50px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
     font-size: 16px;
@@ -147,7 +155,7 @@
 /* Register Button */
 .registerButton {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     background: linear-gradient(90deg, #38883a, #73c777);
     color: white;
     border: none;
@@ -220,7 +228,7 @@
   }
   
   .errorMessage{
-
+    font-size: 0.7rem; 
     color: red;
   }
   .loginText {

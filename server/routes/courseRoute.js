@@ -77,7 +77,7 @@ router.put("/course/:id/subjects/update-names", authMiddleware, async (req, res)
 // DELETE a subject
 router.delete("/course/:id/:subject_id", authMiddleware, async (req, res) => {
     const { subject_id } = req.params; // Extract subject_id from URL params
-console.log("ID",subject_id);
+
     try {
         const db = await connectToDatabase();
 
@@ -109,9 +109,6 @@ router.post('/add', authMiddleware, async (req, res) => {
     try {
       const connection = await connectToDatabase();
   
-      // Optional: Confirm connection is working
-      await connection.query("SELECT 1");
-  
       const [existing] = await connection.execute(
         'SELECT * FROM faculty WHERE name = ?',
         [name]
@@ -130,8 +127,6 @@ router.post('/add', authMiddleware, async (req, res) => {
         faculty_id: result.insertId,
         name
       };
-
-        console.log("instructor Id:",newInstructor );
   
       res.status(201).json({
             message: "Instructor added and assigned to subject successfully",
@@ -139,8 +134,7 @@ router.post('/add', authMiddleware, async (req, res) => {
       });
   
     } catch (error) {
-      console.error("❌ Error adding instructor:", error.message);
-      console.error(error);
+      console.error(" Error adding instructor:", error.message);
       res.status(500).json({ error: "Failed to add instructor" });
     }
   });
@@ -200,11 +194,11 @@ router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) =
         const updatePromises = updates.map(({ subject_id, faculty_id }) => {
             return db.execute(
                 "UPDATE subjects SET faculty_id = ? WHERE subject_id = ?", 
-                [faculty_id || null, subject_id]  // Ensures NULL instead of undefined
+                [faculty_id || null, subject_id]  
             );
         });
 
-        await Promise.all(updatePromises); // Run all updates in parallel
+        await Promise.all(updatePromises); 
         res.json({ message: "Instructors updated successfully" });
     } catch (err) {
         console.error("Database update error:", err);
@@ -215,7 +209,7 @@ router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) =
 
 // ✅ Add a New Instructor assined to a subject
 router.post("/faculty/add", authMiddleware, async (req, res) => {
-    const { name, subject_id } = req.body; // Make sure to get subject_id from the request body
+    const { name, subject_id } = req.body; 
 
     if (!name || !name.trim() || !subject_id) {
         return res.status(400).json({ error: "Instructor name and subject_id are required" });
@@ -246,7 +240,7 @@ router.post("/faculty/add", authMiddleware, async (req, res) => {
         }
 
         res.status(201).json({
-            message: "Instructor added and assigned to subject successfully",
+            message: "Instructor added and assigned successfully",
             newFaculty,
         });
     } catch (error) {

@@ -5,6 +5,7 @@ import styles from "./Register.module.css";
 import useAuth from "../Hooks/useAuth";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import accesslogo from "../assets/bg.png";
+import toast from "react-hot-toast";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -35,6 +36,8 @@ export default function Register() {
             newErrors.password = "Password is required.";
         } else if (data.password.length < 8) {
             newErrors.password = "Password must be at least 8 characters.";
+        }else if (!/[!@#$%^&*(),.?":{}|<>]/.test(data.password)) {
+            newErrors.password = "Password must include at least one special character (e.g., @, #, $).";
         }
         if (data.password !== data.reTypePassword) {
             newErrors.reTypePassword = "Passwords do not match.";
@@ -55,11 +58,18 @@ export default function Register() {
             const name = user?.name;
             
             if (role === "student") {
+                toast.success("Registration successful!");
                 setAuth({ user });
+                setTimeout(() => {
                 navigate("/register/newstudent", { state: { user } });
+                }, 2000); 
             } else {
-                navigate("/login", { state: { name } });
+                toast.success("Registration successful! Please log in.");
+                setTimeout(() => {
+                    navigate("/login", { state: { name } });
+                }, 2000); // Delay in milliseconds (e.g., 1500ms = 1.5 seconds)
             }
+            
         } catch (error) {
             setErrors({ server: error.response?.data?.error || "Something went wrong. Please try again." });
         }
@@ -88,6 +98,7 @@ export default function Register() {
             </div>
             <div className={styles.rightSection}>
                 <form onSubmit={handleRegister} className={styles.formContainer}>
+                    <h4 className={styles.signup}> SIGN UP FORM</h4>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Select Role</label>
                         {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
@@ -137,7 +148,7 @@ export default function Register() {
                     </div>
                     
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>PASSWORD</label>
+                        <label className={styles.label}>PASSWORD</label>                       
                         {errors.password && <p className={styles.errorMessage}>{errors.password}</p>}
                         <div className={styles.inputWrapper}>
                             <FaLock className={styles.inputIcon} />
@@ -150,6 +161,7 @@ export default function Register() {
                                 onChange={handleChange}
                             />
                         </div>
+                        <p className={styles.hintText}>8 characters or longer. At least one special character (e.g., @, #, $)</p>
                     </div>
                     
                     <div className={styles.inputGroup}>
