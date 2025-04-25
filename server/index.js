@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import homeRouter from "./routes/homeRoute.js";
 import adminRouter from "./routes/adminRoute.js";
 import uploadRoute from './routes/uploadRoute.js';
+import reservationRoute from "./routes/reservationRoutes.js"
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -33,7 +34,7 @@ app.use('/api', courseRouter);
 app.use("/", homeRouter);
 app.use("/api/admin", adminRouter);
 app.use("/classrooms", classRoute);  
-
+app.use("/api",reservationRoute);
 // Serve static files for viewing (uploads)
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '../uploads/pdfs')));
 

@@ -1,0 +1,84 @@
+/* EditReservationPage.css */
+
+/* Container for the entire page */
+.edit-reservation-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header styling */
+  .edit-reservation-container h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #343a40;
+  }
+  
+  /* Form styling */
+  .edit-reservation-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .edit-reservation-container .form-label {
+    font-size: 16px;
+    color: #495057;
+  }
+  
+  /* Input styling */
+  .edit-reservation-container .form-control {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Focus styling for inputs */
+  .edit-reservation-container .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Button styling */
+  .edit-reservation-container button {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  /* Button hover effect */
+  .edit-reservation-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Margin for the last button */
+  .edit-reservation-container button:last-of-type {
+    margin-top: 20px;
+  }
+  
+  /* Responsiveness for smaller screens */
+  @media (max-width: 576px) {
+    .edit-reservation-container {
+      padding: 20px;
+    }
+  
+    .edit-reservation-container h2 {
+      font-size: 20px;
+    }
+  
+    .edit-reservation-container button {
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+  }
+  

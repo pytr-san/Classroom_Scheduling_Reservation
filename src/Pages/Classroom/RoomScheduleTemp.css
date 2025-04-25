@@ -40,10 +40,13 @@
     border: 1px solid #ddd;
   }
 
+  .save-schedule-btn,.create-btn{
+    background-color: #00b04a;
+
+  }
   .right-controls button {
     padding: 8px 15px;
     font-size: 12px;
-    background-color: #007BFF;
     color: white;
     width: 250px;
     border: none;
@@ -51,9 +54,17 @@
     cursor: pointer;
     margin-left: auto;
   }
-  
-  .right-controls button:hover {
-    background-color: #0056b3;
+  .clear-schedule-btn{
+    background-color:  rgb(225, 83, 83);
+  }
+  .clear-schedule-btn:hover{
+    background-color:  rgb(179, 45, 45);
+  }
+ .create-btn:hover {
+    background-color: #06861c;
+  } 
+  .save-schedule-btn:hover {
+    background-color: #06861c;
   }
   
   .calendar-legend {

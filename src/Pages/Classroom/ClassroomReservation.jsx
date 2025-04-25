@@ -96,17 +96,19 @@ const ClassroomReservation = () => {
 
   return (
     <div className="container mt-4">
-      <header className="header">
-        <h1>
-          <i className="bi bi-file-earmark-check fs-1"></i>
-          Classroom Reservation
-        </h1>
-        <div className="d-flex justify-content-end">
-          <Button variant="outline-secondary" className="ms-auto" onClick={() => navigate(-1)}>
+      <header className="header" >
+        <div className="d-flex align-items-center">
+          <Button variant="outline-secondary" onClick={() => navigate(-1)} className="back-btn me-2" >
             <i className="bi bi-arrow-left fs-5"></i>
           </Button>
+          <h1 className="mb-0 d-flex align-items-center">
+            <i className="bi bi-file-earmark-check fs-1 me-2"></i>
+            Classroom Reservation
+          </h1>
         </div>
       </header>
+
+
 
       <div className="d-flex align-items-center gap-3 mt-3">
         <div className="sub-header">

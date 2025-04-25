@@ -437,14 +437,14 @@ const RoomScheduleTemp = () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     const canvas = await html2canvas(pdfContainerRef.current, {
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
       scrollY: -window.scrollY, // fixes scroll offset issues
       backgroundColor: "#ffffff", // ensure white background if needed
     });
 
     highlighted.forEach(el => el.classList.add('highlight-row'));
-    const imgData = canvas.toDataURL("image/png");
+    const imgData = canvas.toDataURL("image/jpeg", 0.7 );
 
     setPrintMode(false); 
     setDownloading(false);
@@ -452,7 +452,7 @@ const RoomScheduleTemp = () => {
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
   
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
     pdf.save(`${activeTab}.pdf`);
   };
   

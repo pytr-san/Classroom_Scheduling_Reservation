@@ -8,12 +8,12 @@ General container styling
   /* Header styling */
   .header {
     display: flex;
-    margin-left: 20px;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    
     margin-bottom: 20px;
   }
-  
+
   .sub-header {
     margin-left: 10px;
     font-size: 18px;

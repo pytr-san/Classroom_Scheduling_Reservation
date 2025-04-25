@@ -95,7 +95,12 @@
             //setShowModal(true);
             navigate("/create-room-schedule")
         }
-
+        const handleReservationPage = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                navigate("/classroom/reservations/table");
+            }, 500);
+        }
         return ( 
         
             <div className="container mt-4">
@@ -106,6 +111,7 @@
                     <h1 className="fw-bold mb-0">Floor Building - Classrooms</h1>
                 </div>
                 <div className="d-flex justify-content-end ">
+                    
                     <Button variant="outline-secondary" className="" onClick={() => navigate(-1)}>
                         <i className="bi bi-arrow-left fs-5"></i>
                     </Button>
@@ -220,6 +226,10 @@
                         <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleReserve}>
                             <i className="bi bi-plus-lg me-2"></i> Reserve a Room
                         </Button>
+                        <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleReservationPage}>
+                        <i className="fa-solid fa-list me-2"></i> Reservations
+                        </Button>
+
                     </div>
                 </section>
 
