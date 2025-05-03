@@ -5,12 +5,13 @@ import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { toast } from 'react-hot-toast';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
     const userRef = useRef();
     const navigate = useNavigate();
     const { setAuth } = useAuth();
-
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [data, setData] = useState({
         email: "",
@@ -37,22 +38,28 @@ export default function Login() {
             
             const { user, token } = response.data;
             const role = user.role;
-            
-            setAuth({ user, token, role}); // ✅ Stores user data globally
+            // localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("accessToken", token);
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("role", role);
+
+            setAuth({ token, user, role}); 
             
             toast.success('Login successful.')
             setTimeout(() => {
                 navigate("/");
             }, 1000);
         } catch (err) {
-            if (err.response) {
-                const message = err.response.data.message || err.response.data.error;
-                setErrorMessage(message);
-                toast.error(message);
+            const fallback = "An unexpected error occurred. Please try again.";
+    
+            if (err.response && err.response.data) {
+                const { error, message } = err.response.data;
+                const actualMessage = message || error || fallback;
+                setErrorMessage(actualMessage);
+                toast.error(actualMessage);
             } else {
-                const fallback = "An unexpected error occurred. Please try again.";
                 setErrorMessage(fallback);
-                toast.error(fallback); 
+                toast.error(fallback);
             }
         }
     };
@@ -88,13 +95,20 @@ export default function Login() {
                             <div className={styles.inputWrapper}>
                                 <FaLock className={styles.inputIcon} />
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
+                                    autoComplete="off"
                                     placeholder="Enter password"
                                     className={styles.input}
                                     value={data.password}
                                     onChange={(e) => setData({ ...data, password: e.target.value })}
                                     required
                                 />
+                                  <span
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className={styles.eyeToggle}
+                                    >
+                                        {showPassword ?  <FaEye /> : <FaEyeSlash />}
+                                    </span>
                             </div>
                         </div>
 

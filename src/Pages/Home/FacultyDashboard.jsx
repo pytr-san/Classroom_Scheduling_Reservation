@@ -42,28 +42,7 @@ const FacultyFiles = () => {
     fetchFiles();
   }, []);
   
-  const downloadFile = async (filename) => {
-    const encoded = encodeURIComponent(filename);
-    try {
-      const res = await fetch(`http://localhost:8000/api/download/${encoded}`, {
-        credentials: 'include',
-      });
-  
-      if (!res.ok) {
-        throw new Error('Download failed');
-      }
-  
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Error downloading:", err);
-    }
-  };
+
   
   
   const groupedFiles = groupFilesByDate(files);
@@ -74,7 +53,7 @@ const FacultyFiles = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Uploaded Courses SChedule</h2>
+      <h2 className={styles.title}>Access Course Schedules</h2>
       {files.length === 0 ? (
         <p>No files found.</p>
       ) : (
@@ -98,9 +77,13 @@ const FacultyFiles = () => {
                     </div>
 
                     {/* Download link */}
-                    <button onClick={() => downloadFile(file.filename)}>Download</button>
-
-
+                    <a
+                    href={file.fileUrl.replace(/\\/g, '/')}
+                    className={styles.downloadLink}
+                    download
+                  >
+                   View {file.filename}
+                  </a>
 
                     <span className={styles.courseLabel}>
                       <strong> 📘 Course: </strong> {file.description}{' '}

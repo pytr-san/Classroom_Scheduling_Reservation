@@ -81,7 +81,7 @@ const StudentFiles = () => {
                     className={styles.downloadLink}
                     download
                   >
-                    Download {file.filename}
+                   View {file.filename}
                   </a>
                   <span className={styles.courseLabel}>
                     <strong> 📘 Course: </strong> {file.description} <strong>({file.course_name || 'Unknown'})</strong>

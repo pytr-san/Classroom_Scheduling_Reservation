@@ -9,18 +9,28 @@ import { deleteFile } from '../controllers/deleteControllers.js';
 
 const router = express.Router();
 
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'uploads/pdfs');
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + '-' + file.originalname);
+//   },
+// });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/pdfs');
+    cb(null, path.join(__dirname, '../uploads/pdfs')); // <--- now points to server/uploads/pdfs
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
   },
 });
-
 const upload = multer({ 
   storage,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== 'application/pdf') {
       return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF files are allowed'), false);
@@ -30,11 +40,11 @@ const upload = multer({
 });
 
 // Bulk file upload route (POST request)
-router.post('/bulk-upload',authMiddleware , (req, res, next) => {
+router.post('/bulk-upload' , (req, res, next) => {
   upload.array('files', 10)(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(413).json({ message: 'File too large. Max size is 20MB.' });
+        return res.status(413).json({ message: 'File too large. Max size is 10MB.' });
       }
     } else if (err) {
       return res.status(500).json({ message: 'Upload failed. Please try again.' });
@@ -63,30 +73,8 @@ router.get('/view-files',authMiddleware, async (req, res) => {
 });
 
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-router.get('/download/:filename', authMiddleware, (req, res) => {
-  const { filename } = req.params;
-  // const filePath = path.join(__dirname, '../uploads/pdfs', filename);
-  const filePath = path.join(process.cwd(), 'uploads', 'pdfs', filename);
-
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send('File not found');
-  }
-
-  // Force download
-  res.download(filePath, filename, (err) => {
-    if (err) {
-      console.error('Error in download:', err);
-      res.status(500).send('Download error');
-    }
-  });
-});
-
 //deletes files route
-router.delete('/delete-file/:id', authMiddleware, deleteFile);
+router.delete('/delete-file/:id',  deleteFile);
 
 
 export default router;

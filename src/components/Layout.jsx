@@ -15,6 +15,10 @@ const Layout = () => {
         try {
             await axios.post("http://localhost:8000/auth/logout", { withCredentials: true });
             sessionStorage.removeItem("adminAccess"); 
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+            localStorage.removeItem("role");
+            
             setAuth(null);  // ✅ Clear auth state
             navigate("/login");  // Redirect to login page
         } catch (error) {

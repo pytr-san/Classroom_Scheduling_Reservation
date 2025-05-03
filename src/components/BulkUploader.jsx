@@ -7,7 +7,8 @@ import { Modal, Button, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BulkUploader = ({ courseId }) => {
-  const { token } = useAuth();
+  const { auth } = useAuth();
+  const token = auth?.token;
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -18,7 +19,7 @@ const BulkUploader = ({ courseId }) => {
 
   const fetchFiles = async () => {
     try {
-
+console.log("USer token:", token);
       const res = await axios.get(`http://localhost:8000/api/view-files?courseId=${courseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -26,8 +27,9 @@ const BulkUploader = ({ courseId }) => {
         withCredentials: true,
       });
       setUploadedFiles(res.data);
-    } catch (err) {
-      toast.error('Failed to load files.');
+    } catch (error) {
+      const errorMessage = error.res?.data?.error || 'Something went wrong';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -80,11 +82,30 @@ const BulkUploader = ({ courseId }) => {
       });
 
       toast.success(res.data.message);
-      setFiles([]); // Clear files after successful upload
-      setProgress(0); // Reset progress
+      setFiles([]); 
+      setProgress(0); 
     } catch (err) {
-      console.error(err);
-      toast.error('Upload failed.');
+      console.error('Upload Error:', err);
+
+      if (err.response) {
+        const errorMessage = err.response.data?.message || 'Something went wrong on the server.';
+        
+        if (err.response.status === 413) {
+          toast.error('File too large. Max size is 10MB.');
+        } else if (err.response.status === 401) {
+          toast.error('Unauthorized! Please log in again.');
+        } else if (err.response.status === 404) {
+          toast.error('Upload endpoint not found.');
+        } else if (err.response.status === 500) {
+          toast.error('Server error occurred. Please try again later.');
+        } else {
+          toast.error(errorMessage); 
+        }
+      } else if (err.request) {
+        toast.error('Network error. Please check your internet connection.');
+      } else {
+        toast.error('Error during file upload.');
+      }
     } finally {
       setUploading(false);
     }

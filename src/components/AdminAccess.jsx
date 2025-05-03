@@ -9,7 +9,6 @@ function AdminAccess({onAccessGranted }) {
   const [error, setError] = useState(false);
   const inputsRef = useRef([]);
 
-  const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN;
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -44,7 +43,7 @@ function AdminAccess({onAccessGranted }) {
   const handleSubmit = async (accessCode) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/admin/verify-pin",
+        "http://localhost:8000/api/verify-pin",
         { pin: accessCode },
         { withCredentials: true }
       );

@@ -14,7 +14,7 @@
     position: sticky;
     top: 70px; /* Adjust this based on your navbar height */
     background: white;
-    z-index: 999; /* Higher z-index to stay above other elements */
+    z-index: 998; /* Higher z-index to stay above other elements */
     padding: 10px;
     border-radius: 10px;
     padding: 10px 20px;
@@ -135,8 +135,29 @@
   }
   
   .icon {
-    color: gray; /* Icon color */
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-size: 15px;
+    padding: 8px 10px;
+    display: inline-flex;
+    margin-right: 20px;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: background-color 0.2s ease;
+  }
+  .icon:hover {
+    background-color: #cacaca;
+  }
+  .trashIcon {
+    cursor: pointer;
+    color: rgb(144, 142, 142);
+    transition: transform 0.2s ease;
+  }
+  
+  .trashIcon:hover {
+    color: crimson;
+    transform: scale(1.1);
   }
   

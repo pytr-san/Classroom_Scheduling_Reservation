@@ -12,7 +12,6 @@ import RequireAuth from "./components/RequireAuth.jsx";
 import UnauthorizedPage from "./Unauthorized.jsx";
 import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
-import NewStudent from "./Pages/NewStudentPage.jsx";
 import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
 import CourseForm from "./Pages/Course/CourseForm.jsx"
 import AdminChangePassword from "./Pages/Settings/AdminChangePassword.jsx";
@@ -20,6 +19,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import FileUploadPage from './Pages/Course/FileUploadPage.jsx';
 import ReservationPage from "./Pages/Classroom/ReservationPage.jsx";
 import EditReservationPage from "./Pages/Classroom/EditReservationPage.jsx";
+import ManageUsers from "./Pages/Settings/ManageUsers.jsx";
 
 axios.defaults.withCredentials = true;
 
@@ -39,15 +39,14 @@ const ROLES = {
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />               
-                <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                <Route path="/register/newstudent" element={<NewStudent />} />  
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />  
 
                 <Route path ="/" element={<Layout />}>
                     {/* Protected Routes (With Layout) */}
                     <Route element={<RequireAuth allowedRoles={[ROLES.admin, ROLES.student, ROLES.faculty]} />}> 
                             <Route path="/" element={<Home />} />                                                 
                             <Route path="/settings" element={<Settings />} />
-                            <Route path="/admin/change-password" element={<AdminChangePassword />} />
+                            <Route path="/user/change-password" element={<AdminChangePassword />} />
                     </Route>
 
                     {/* Admin-Only Routes */}
@@ -64,6 +63,8 @@ const ROLES = {
                             <Route path="/add/course" element={<CourseForm />} />
                             <Route path="/course/:id/manage" element={<ManageCourse />} />
                             <Route path="/course/upload" element={<FileUploadPage />} />      
+                            
+                            <Route path="/admin/manage-user" element={<ManageUsers />} />      
                     </Route>
                 </Route>
                 {/* Redirect unknown routes */}

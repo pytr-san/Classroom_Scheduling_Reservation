@@ -2,16 +2,39 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import "./settings.css"
 import axios from "axios";
-
+import AdminAccess from "../../components/AdminAccess";
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import AdminRegister from "./AdminRegister.jsx";
 
 const Settings = () => {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
+    const [hasAdminAccess, setHasAdminAccess] = useState(
+        sessionStorage.getItem("adminAccess") === "granted"
+    );
+
+    const onAccessGranted = () => {
+        sessionStorage.setItem("adminAccess", "granted"); // ✅ Store in session
+        setHasAdminAccess(true); // ✅ Update state
+    };
+
+    useEffect(() => {
+        if (sessionStorage.getItem("adminAccess") === "granted") {
+            setHasAdminAccess(true);
+        }
+    }, [auth]);
+
 
     const handlePasswordChange = () => {
-        const path = "/admin/change-password";
+        const path = "/user/change-password";
         navigate(path);
     };
+    const handleManageUser = () => {
+        const path = "/admin/manage-user";
+        navigate(path);
+    };
+
     const user = auth?.user;
 
     const setLogout = async () => {
@@ -31,20 +54,32 @@ const Settings = () => {
         setIsSidebarOpen((prev) => !prev);
     };
 
+    if (!auth.user) {
+        return <div>Loading user data...</div>;
+    }
+
     return (
 
     <div className="settings-page">
         <div className="settings-container">
      
             {auth?.role === "admin" && (
-              
+                              <>
+                {!hasAdminAccess ? (
+                    <AdminAccess onAccessGranted={onAccessGranted} />
+                ) : (
                 <div className="admin">
                     <h2>🔑 Admin Settings</h2>
                     <p>Manage system settings, user accounts, and security policies.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
-                    <button>Manage Users</button>
+                    <button onClick={handleManageUser}>Manage Users</button>
+                    
+                    <div style={{ border: "2px dashed red", marginTop: "20px" }}>
+                    <AdminRegister />
+                    </div>
                 </div>
-
+                    )}
+                    </>
                 
             )}
 

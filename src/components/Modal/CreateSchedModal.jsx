@@ -66,7 +66,7 @@ const Modal = ({ show, handleClose}) => {
           '1st Year': ['1A', '1B'],
           '2nd Year': ['2A', '2B'],
           '3rd Year': ['3A', '3B'],
-          '4th Year': ['4A']
+          '4th Year': ['4A', '4B']
         },
       },
       BSCPE: {
@@ -115,7 +115,7 @@ const Modal = ({ show, handleClose}) => {
                                     <option value="">Select a year</option>
                                     {selectedCourseData.years?.map((yr) => (
                                         <option key={yr} value={yr}>
-                                            {yr} Year
+                                            {yr} 
                                         </option>
                                     ))}
                                 </select>

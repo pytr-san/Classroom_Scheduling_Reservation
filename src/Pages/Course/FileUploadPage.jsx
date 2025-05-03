@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import BulkUploader from '../../components/BulkUploader';
-import styles from "./Course.module.css";
+import styles from "./AccessCourse.module.css";
 import copppLogo from "../../assets/coppp.png";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";

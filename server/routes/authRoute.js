@@ -4,7 +4,48 @@ import jwt from 'jsonwebtoken';
 import { connectToDatabase } from '../db.js';
 import authMiddleware from "../middleware/authMiddleware.js";
 import refreshTokenMiddleware from '../middleware/refreshTokenMiddleware.js';
+import dotenv from 'dotenv';
+import cron from 'node-cron';
+dotenv.config({ path: "./server/.env" });
+
 const router = express.Router();
+
+
+const INACTIVITY_PERIOD = 30; // days
+//for checking: Runs every 10seconds
+//cron.schedule('*/10 * * * * *', async () => { 
+cron.schedule('0 0 * * *', async () => {
+  console.log('Checking for inactive users...');
+  
+  try {
+    const db = await connectToDatabase();
+    const currentDate = new Date();
+    const inactivityThresholdDate = new Date(currentDate - INACTIVITY_PERIOD * 24 * 60 * 60 * 1000);
+
+    const [studentsToDeactivate] = await db.execute(
+      'SELECT * FROM student WHERE last_active < ? AND status = "active"',
+      [inactivityThresholdDate]
+    );
+
+    if (studentsToDeactivate.length > 0) {
+      const studentIds = studentsToDeactivate.map(student => student.student_id);
+      const placeholders = studentIds.map(() => '?').join(', ');
+
+      await db.execute(
+        `UPDATE student SET status = "inactive" WHERE student_id IN (${placeholders})`,
+        studentIds
+      );
+
+      console.log(`Deactivated ${studentsToDeactivate.length} students.`);
+    } else {
+      console.log('No students to deactivate.');
+    }
+  } catch (error) {
+    console.error('Error checking inactive users:', error);
+  }
+});
+
+
 
 // ✅ Register Faculty or Student
 router.post('/register', async (req, res) => {
@@ -44,7 +85,6 @@ router.post('/register', async (req, res) => {
             `INSERT INTO ${tableName} (name, email, password, role) VALUES (?, ?, ?, ?)`,
             [name, email, hashedPassword, role.toLowerCase()]
         );
-        console.log("User registered:", { name, email, role });
         res.status(201).json({ user: { name, email, role: role.toLowerCase() }, message: `${role.toLowerCase()} registered successfully` });
 
     } catch (err) {
@@ -54,6 +94,7 @@ router.post('/register', async (req, res) => {
 });
 
 
+const MAX_ATTEMPTS = 5;
 router.post('/login', async (req, res) => {
     try {
         const db = await connectToDatabase();
@@ -63,14 +104,13 @@ router.post('/login', async (req, res) => {
 
         // 🟢 Optimized Query to Search in All Tables at Once
         const [users] = await db.query(
-            `SELECT admin_id AS id, NULL AS course_id, name, email, password, 'admin' AS role FROM admin WHERE email = ? 
-             UNION 
-             SELECT student_id AS id, course_id, name, email, password, 'student' AS role FROM student WHERE email = ? 
-             UNION 
-             SELECT faculty_id AS id, NULL AS course_id, name, email, password, 'faculty' AS role FROM faculty WHERE email = ?`, 
+            `SELECT admin_id AS id, NULL AS course_id, name, email, password, is_active, status, role FROM admin WHERE email = ?
+            UNION 
+            SELECT student_id AS id, course_id, name, email, password, is_active, status, role FROM student WHERE email = ?
+            UNION 
+            SELECT faculty_id AS id, NULL AS course_id, name, email, password, is_active, status, role FROM faculty WHERE email = ?`, 
             [email, email, email]
         );
-
 
 
         if (users.length > 0) { 
@@ -79,16 +119,25 @@ router.post('/login', async (req, res) => {
 
         // ❌ If No User Found
         if (!user) {
-            return res.status(401).json({ message: "Invalid email or password" });
+            return res.status(401).json({ message: "User not found. Please check your email." });
         }
 
+        if (user.status === 'inactive') {
+            return res.status(403).json({ message: "Your account is inactive for too long. Please contact admin." });
+        }
+
+        if (!user.is_active) {
+            return res.status(403).json({ message: 'Your account is deactivated. Please contact admin.' });
+          }
+            // if (user.failed_attempts >= MAX_ATTEMPTS) {
+            //     return res.status(403).json({ message: 'Account locked. Too many failed login attempts.' });
+            //   }
         // 🔒 Validate Password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ message: "Incorrect password" });
         }
 
-        // Remove password before sending response
         delete user.password;
 
         // ✅ Generate JWT Access Token (valid for 1 hour)
@@ -96,25 +145,31 @@ router.post('/login', async (req, res) => {
                                     process.env.JWT_SECRET, 
                                     { expiresIn: '1h' });   
 
-        // ✅ Generate JWT Refresh Token (valid for 1 day)
+        //✅ Generate JWT Refresh Token (valid for 1 day)
         // const refreshToken = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, 
         //                                 process.env.JWT_REFRESH, 
         //                                 { expiresIn: '1d' });
 
+        const table = user.role;
+        await db.query(`UPDATE ${table} SET last_active = NOW() WHERE ${table}_id = ?`, [user.id]);
+
         // ✅ Store token in HTTP-only cookie
-        res.cookie("token", token,{
-            httpOnly: true,
-            secure: false,  // Set `true` in production with HTTPS
-            sameSite: "lax",//"none",
-            maxAge: 24 * 60 * 60 * 1000,
-            path: "/"
-         });
+        const isProduction = process.env.NODE_ENV === "production";
+
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: isProduction, // true in production (requires HTTPS)
+          sameSite: isProduction ? "none" : "lax",
+          maxAge: 24 * 60 * 60 * 1000,
+          path: "/"
+        });
          
          res.json({user, token});
 
     } catch (err) {
         console.error("❌ Login error:", err);
-        res.status(500).json({ error: "Server error" });
+        res.status(500).json({ message: "Internal server error. Please try again later." });
+
     }
 });
 
@@ -167,6 +222,7 @@ router.put('/change-password', authMiddleware, async (req, res) => {
         }
 
         const user = req.user;
+        console.log(user);
         if (!user) {
             return res.status(401).json({ error: "Unauthorized" });
         }

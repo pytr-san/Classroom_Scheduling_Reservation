@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { connectToDatabase } from '../db.js';
 import path from 'path';
 
@@ -51,11 +52,15 @@ export const viewAllFiles = async (req, res) => {
     FROM uploaded_files uf
     LEFT JOIN course c ON uf.course_id = c.course_id
   `);
-
+    if(files.length === 0){
+      res.status(404).json({ error: 'Error retrieving all files: No files uploaded' });
+    }
     const fileData = files.map(file => ({
       ...file,
       // Ensure you use the correct file path
-      fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
+      // fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
+      fileUrl: `${req.protocol}://${req.get('host')}/uploads/pdfs/${path.basename(file.file_path)}`
+
     }));
 
     res.status(200).json(fileData);
@@ -91,7 +96,9 @@ export const viewFilesByCourse = async (req, res) => {
 
     const fileData = files.map(file => ({
       ...file,
-      fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
+      // fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
+      fileUrl: `${req.protocol}://${req.get('host')}/uploads/pdfs/${path.basename(file.file_path)}`
+
 
     }));
 

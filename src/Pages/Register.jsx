@@ -6,24 +6,64 @@ import useAuth from "../Hooks/useAuth";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import accesslogo from "../assets/bg.png";
 import toast from "react-hot-toast";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Register() {
     const navigate = useNavigate();
     const { setAuth } = useAuth();
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [showReTypePassword, setShowReTypePassword] = useState(false);
+    const [facultyPasscodeFromApi, setFacultyPasscodeFromApi] = useState("");
     const [errors, setErrors] = useState({});
+    const [courses, setCourses] = useState([]);
+    const [sections, setSections] = useState([]);
+    
     const [data, setData] = useState({
         name: "",
         email: "",
         password: "",
         reTypePassword: "",
         role: "",
+        course: "",
+        year_level: "",
+        section: "",
+        facultyPasscode: "",
     });
 
+    const fetchFacultyPasscode = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/api/faculty-passcode");
+            setFacultyPasscodeFromApi(response.data.passcode);  
+        } catch (error) {
+            toast.error("Unable to fetch faculty passcode.");
+        }
+    };
+
+    useEffect(() => {
+        if (data.role === "Faculty") {
+            fetchFacultyPasscode();  
+        }
+    }, [data.role]);
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const res = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
+                setCourses(res.data);
+
+                const sec = await axios.get("http://localhost:8000/api/sections", { withCredentials: true });
+                setSections(sec.data);
+            } catch (err) {
+                console.error("Error fetching courses", err);
+            }
+        };
+        fetchCourses();
+    }, []);
+
+      
     const handleRegister = async (e) => {
         e.preventDefault();
         setErrors({});
-        
+   
         let newErrors = {};
 
         if (!data.name.trim()) newErrors.name = "Name is required.";
@@ -34,8 +74,10 @@ export default function Register() {
         }
         if (!data.password) {
             newErrors.password = "Password is required.";
-        } else if (data.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters.";
+        } else if (data.password.length < 16) {
+            newErrors.password = "Password must be at least 16 characters.";
+        }else if (!/[A-Z]/.test(data.password)) {
+            newErrors.password = "Password must include at least one uppercase letter.";
         }else if (!/[!@#$%^&*(),.?":{}|<>]/.test(data.password)) {
             newErrors.password = "Password must include at least one special character (e.g., @, #, $).";
         }
@@ -45,7 +87,16 @@ export default function Register() {
         if (!data.role) {
             newErrors.role = "Role selection is required.";
         }
+        if (data.role === "Faculty" && data.facultyPasscode !== facultyPasscodeFromApi) {
+            toast.error("Incorrect Passcode!");          
+            newErrors.facultyPasscode = "Invalid faculty passcode.";
+        } else if (data.role === "Student") {
+            if (!data.course) newErrors.course = "Course is required.";
+            if (!data.year_level) newErrors.year_level = "Year level is required.";
+            if (!data.section) newErrors.section = "Section is required.";
+        }
 
+        
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
@@ -54,20 +105,24 @@ export default function Register() {
         try {
             const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
             const { user } = response.data;
-            const role = user?.role;
-            const name = user?.name;
-            
-            if (role === "student") {
-                toast.success("Registration successful!");
-                setAuth({ user });
+
+            if (data.role === "Student") {
+
+                await axios.post(`http://localhost:8000/api/student/details?email=${user.email}`, {
+                    course_id: data.course,  // Pass course_id
+                    year_level: data.year_level,  // Pass year level
+                    section_id: data.section  // Pass section id
+                }, { withCredentials: true });
+    
+                toast.success("Student Registration successful! Please log in.");
                 setTimeout(() => {
-                navigate("/register/newstudent", { state: { user } });
-                }, 2000); 
+                    navigate("/login");
+                }, 2000);
             } else {
                 toast.success("Registration successful! Please log in.");
                 setTimeout(() => {
-                    navigate("/login", { state: { name } });
-                }, 2000); // Delay in milliseconds (e.g., 1500ms = 1.5 seconds)
+                    navigate("/login");
+                }, 2000);
             }
             
         } catch (error) {
@@ -77,11 +132,11 @@ export default function Register() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
         setData((prevData) => ({
             ...prevData,
-            [name]: value,
+            [name]: (name === 'course' || name === 'section') ? parseInt(value) : value,  // Ensure course and section are integers
         }));
-
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
             if (name in newErrors) delete newErrors[name];
@@ -115,6 +170,64 @@ export default function Register() {
                         </select>
                     </div>
                     
+                    {data.role === "Student" && (
+                        <>
+                            <div className={styles.inputGroup}>
+                                <label className={styles.label}>Course</label>
+                                {errors.course && <p className={styles.errorMessage}>{errors.course}</p>}
+                                <select
+                                    name="course"
+                                    value={data.course}
+                                    onChange={handleChange}
+                                    className={styles.input}
+                                >
+                                    <option value="">Select Course</option>
+                                    {courses.map(course => (
+                                        <option key={course.course_id} value={course.course_id}>
+                                            {course.course_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label className={styles.label}>Year Level</label>
+                                {errors.year_level && <p className={styles.errorMessage}>{errors.year_level}</p>}
+                                <select
+                                    name="year_level"
+                                    value={data.year_level}
+                                    onChange={handleChange}
+                                    className={styles.input}
+                                >
+                                    <option value="">Select Year</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                            <label className={styles.label}>Section</label>
+                            {errors.section && <p className={styles.errorMessage}>{errors.section}</p>}
+                            <select
+                                name="section"
+                                value={data.section}
+                                onChange={handleChange}
+                                className={styles.input}
+                            >
+                                <option value="">Select Section</option>
+                                {sections.map((section) => (
+                                    <option key={section.section_id} value={section.section_id}>
+                                        Section {section.section} 
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        </>
+                    )}
+
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>NAME</label>
                         {errors.name && <p className={styles.errorMessage}>{errors.name}</p>}
@@ -153,15 +266,22 @@ export default function Register() {
                         <div className={styles.inputWrapper}>
                             <FaLock className={styles.inputIcon} />
                             <input
-                                type="password"
+                               type={showPassword ? "text" : "password"}
+                               autoComplete="off"
                                 name="password"
                                 placeholder="Enter password"
                                 className={styles.input}
                                 value={data.password}
                                 onChange={handleChange}
                             />
+                              <span
+                                onClick={() => setShowPassword(!showPassword)}
+                                className={styles.eyeToggle}
+                            >
+                                {showPassword ?  <FaEye /> : <FaEyeSlash />}
+                            </span>
                         </div>
-                        <p className={styles.hintText}>8 characters or longer. At least one special character (e.g., @, #, $)</p>
+                        <p className={styles.hintText}>16 characters or longer. At least one special character(e.g., @, #, $) and one uppercase letter(e.g.,A-Z) </p>
                     </div>
                     
                     <div className={styles.inputGroup}>
@@ -170,16 +290,43 @@ export default function Register() {
                         <div className={styles.inputWrapper}>
                             <FaLock className={styles.inputIcon} />
                             <input
-                                type="password"
+                                type={showReTypePassword ? "text" : "password"}
+                                autoComplete="off"
                                 name="reTypePassword"
                                 placeholder="Re-type password"
                                 className={styles.input}
                                 value={data.reTypePassword}
                                 onChange={handleChange}
                             />
+                            <span
+                                onClick={() => setShowReTypePassword(!showReTypePassword)}
+                                className={styles.eyeToggle}
+                            >
+                                {showReTypePassword ? <FaEye /> : <FaEyeSlash />}
+                            </span>
                         </div>
                     </div>
                     
+
+                    {data.role === "Faculty" && (
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Faculty Passcode</label>
+                            {errors.facultyPasscode && <p className={styles.errorMessage}>{errors.facultyPasscode}</p>}
+                            <div className={styles.inputWrapper}>
+                                <FaLock className={styles.inputIcon} />
+                                <input
+                                    type="password"
+                                    name="facultyPasscode"
+                                    placeholder="Enter faculty passcode"
+                                    className={styles.input}
+                                    value={data.facultyPasscode}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <p className={styles.hintText}>(Contact access admin for the passcode)</p>
+                        </div>
+                    )}
+
                     <button type="submit" className={styles.registerButton}>
                         Sign up
                     </button>

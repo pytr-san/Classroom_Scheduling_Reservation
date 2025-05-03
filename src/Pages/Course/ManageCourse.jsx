@@ -49,8 +49,7 @@ const ManageCourse = () => {
 
       toast.success("Instructor added successfully!");
     } catch (error) {
-      toast.error("Failed to add instructor.");
-      throw error.response?.data?.error || "Error adding instructor.";
+      toast.error( error.response?.data?.error || "Error adding instructor.");
     }
   };
 
@@ -81,9 +80,17 @@ const ManageCourse = () => {
     }
   };
   
-  const handleCancelInstructor = () => {
+  // const handleCancelInstructor = () => {
+  //   setPendingInstructor(null);
+  //   setInputValues("");
+  // };
+  const handleCancelInstructor = (subject_id) => {
     setPendingInstructor(null);
-    setInputValues("");
+    setInputValues((prev) => {
+      const newInputValues = { ...prev };
+      delete newInputValues[subject_id]; // Clears the faculty input for this specific subject
+      return newInputValues;
+    });
   };
   
   const handleConfirmInstructor = async () => {
@@ -312,7 +319,9 @@ const ManageCourse = () => {
                             isClearable
                             onInputChange={(value, actionMeta) => handleInputChange(value, actionMeta, subject.subject_id)}
                             value={
-                              faculty
+                              inputValues[subject.subject_id]
+                              ? { value: inputValues[subject.subject_id], label: inputValues[subject.subject_id] }
+                              : faculty
                                 .map(f => ({ value: f.faculty_id, label: f.name }))
                                 .find(option => option.value === (updatedSubjects[subject.subject_id] ?? subject.faculty_id)) || null
                             }

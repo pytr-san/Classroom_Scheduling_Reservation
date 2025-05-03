@@ -24,7 +24,7 @@ const Home = () => {
 
     if (!auth.user) {
         return <div>Loading user data...</div>;
-    }``
+    }
 
     return (
         <div>

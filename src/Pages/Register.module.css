@@ -311,3 +311,14 @@
         padding: 12px;
     } */
 }
+
+
+.eyeToggle {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 20px; 
+}

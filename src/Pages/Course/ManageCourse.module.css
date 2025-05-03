@@ -43,7 +43,7 @@
     position: sticky;
     top: 70px; /* Adjust this based on your navbar height */
     background: white;
-    z-index: 1010; /* Higher z-index to stay above other elements */
+    z-index: 998; /* Higher z-index to stay above other elements */
     padding: 10px;
     border-radius: 10px;
     padding: 10px 20px;

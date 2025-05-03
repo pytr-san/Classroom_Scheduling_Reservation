@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 // GET all courses
-router.get("/course",authMiddleware, async (req, res) => {
+router.get("/course", async (req, res) => {
     try {
         const db = await connectToDatabase();
         const [results] = await db.execute("SELECT course_id, course_name FROM course"); // Using async/await
@@ -14,6 +14,18 @@ router.get("/course",authMiddleware, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: "Database error1" });
     }
+});
+
+//fetch Sections
+router.get('/sections', async (req, res) => {
+    const db = await connectToDatabase(); 
+    try {
+        const [sections] = await db.execute('SELECT * FROM sections');
+        res.status(200).json( sections ); 
+    } catch (err) {
+        console.error('Error fetching sections:', err);
+        res.status(500).json({ error: 'Failed to fetch sections' });
+    } 
 });
 
 router.post('/add/course', async (req, res) => {
@@ -47,7 +59,7 @@ router.post('/add/course', async (req, res) => {
   
 
 // PUT update subject names
-router.put("/course/:id/subjects/update-names", authMiddleware, async (req, res) => {
+router.put("/course/:id/subjects/update-names", async (req, res) => {
     const courseId = req.params.id;
     const updates = req.body; // Expecting: [{ subject_id, subject_name }, ...]
 
@@ -75,7 +87,7 @@ router.put("/course/:id/subjects/update-names", authMiddleware, async (req, res)
 });
 
 // DELETE a subject
-router.delete("/course/:id/:subject_id", authMiddleware, async (req, res) => {
+router.delete("/course/:id/:subject_id", async (req, res) => {
     const { subject_id } = req.params; // Extract subject_id from URL params
 
     try {
@@ -99,7 +111,7 @@ router.delete("/course/:id/:subject_id", authMiddleware, async (req, res) => {
 });
 
 // Add Instructor
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', async (req, res) => {
     const { name } = req.body;
   
     if (!name) {
@@ -142,7 +154,7 @@ router.post('/add', authMiddleware, async (req, res) => {
 
 
 // ✅ GET subjects & instructors for a course
-router.get("/course/:id/manage", authMiddleware, async (req, res) => {
+router.get("/course/:id/manage", async (req, res) => {
     const courseId = req.params.id;
 
     try {
@@ -182,7 +194,7 @@ router.get("/course/:id/manage", authMiddleware, async (req, res) => {
 });
 
 // ✅ UPDATE multiple subject instructors
-router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) => {
+router.put("/course/:courseId/manage/update", async (req, res) => {
     const { updates } = req.body;  // Expecting an array of updates
 
     if (!updates || !Array.isArray(updates) || updates.length === 0) {
@@ -208,7 +220,7 @@ router.put("/course/:courseId/manage/update", authMiddleware, async (req, res) =
 
 
 // ✅ Add a New Instructor assined to a subject
-router.post("/faculty/add", authMiddleware, async (req, res) => {
+router.post("/faculty/add", async (req, res) => {
     const { name, subject_id } = req.body; 
 
     if (!name || !name.trim() || !subject_id) {
@@ -249,5 +261,49 @@ router.post("/faculty/add", authMiddleware, async (req, res) => {
     }
 });
 
+ 
+router.post("/student/details", async (req, res) => {
+    const { course_id, year_level, section_id } = req.body;
+    const { email } = req.query;
+
+    if (!email || !course_id || !year_level || !section_id) {
+        return res.status(400).json({ error: "Missing student details" });
+    }
+
+    try {
+        const db = await connectToDatabase();
+        await db.execute(
+            "UPDATE student SET course_id = ?, year_level = ?, section_id = ? WHERE email = ?",
+            [course_id, year_level, section_id, email]
+        );
+        res.status(200).json({ message: "Student details saved" });
+    } catch (err) {
+        console.error("Error saving student details:", err);
+        res.status(500).json({ error: "Failed to save student details" });
+    }
+});
+
+router.delete('/course/:id', async (req, res) => {
+    const courseId = req.params.id;
   
+    try {
+        const db = await connectToDatabase();
+  
+      // Optional: Check if course exists first
+      const [rows] = await db.execute('SELECT * FROM course WHERE course_id = ?', [courseId]);
+      if (rows.length === 0) {
+        return res.status(404).json({ message: 'Course not found.' });
+      }
+  
+      // Perform the deletion
+      await db.execute('DELETE FROM course WHERE course_id = ?', [courseId]);
+  
+      res.status(200).json({ message: 'Course deleted successfully.' });
+    } catch (error) {
+      console.error('MySQL delete error:', error);
+      res.status(500).json({ error: 'Failed to delete course.' });
+    }
+  });
+
+
 export default router; // Use `export default` for ES modules

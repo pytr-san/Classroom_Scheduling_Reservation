@@ -83,7 +83,7 @@ const CourseForm = () => {
             { name: "2nd Semester", subjects: [{ name: "" }] },
           ]);
           setShowBatchForm(false);
-          toast.success("Course creation complete!");
+          toast.success("Course Subjects is filled!");
         }
       };
    
@@ -113,6 +113,7 @@ const saveCourseToDB = async (course) => {
     }
 
     toast.success("Course and subjects saved successfully!");
+    navigate("/Course");
   } catch (err) {
     console.error(err);
     toast.error("Failed to save course.");

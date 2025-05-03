@@ -457,7 +457,7 @@ const RoomScheduleTemp = () => {
   };
   
   const ClearSchedule = () => {
-    localStorage.clear();  // Clears everything in localStorage
+    localStorage.removeItem("schedules");
     setSchedules([]);    
     setSelectedSemester(null);
     setSelectedExam(null);  // Clear your local state as well

@@ -103,7 +103,7 @@ const ClassroomReservation = () => {
           </Button>
           <h1 className="mb-0 d-flex align-items-center">
             <i className="bi bi-file-earmark-check fs-1 me-2"></i>
-            Classroom Reservation
+            Room Preview 
           </h1>
         </div>
       </header>
@@ -112,8 +112,8 @@ const ClassroomReservation = () => {
 
       <div className="d-flex align-items-center gap-3 mt-3">
         <div className="sub-header">
-          <h2><span>{floorLabel} Classrooms</span></h2>
-          
+          <h2><span>{floorLabel} Rooms</span></h2>
+        
         </div>
 
       </div>

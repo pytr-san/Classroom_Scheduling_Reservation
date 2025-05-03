@@ -3,10 +3,40 @@ import axios from "axios";
 
 const AuthContext = createContext({});
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, handlelogout }) => {
     const [auth, setAuth] = useState({});
     const [loading, setLoading] = useState(true);
+   
     
+    useEffect(() => {
+        //on refresh reload the user session
+        const token = localStorage.getItem("accessToken");
+        const user = JSON.parse(localStorage.getItem("user"));
+        const role = localStorage.getItem("role");
+
+        if (token && user && role) {
+            setAuth({ token, user, role });
+        }
+        setLoading(false);
+
+        // Axios response interceptor
+        // const responseInterceptor = axios.interceptors.response.use(
+        //     response => response,
+        //     error => {
+        //         if (error.response && error.response.status === 401) {
+        //             console.log("⛔ Access token expired, logging out...");
+        //             if (typeof handlelogout === "function") {
+        //                 handlelogout(); // use the passed prop function
+        //             }
+        //         }
+        //         return Promise.reject(error);
+        //     }
+        // );
+        // return () => {
+        //     axios.interceptors.response.eject(responseInterceptor); // Cleanup on unmount
+        // };
+
+    }, []);
     // useEffect(() => {
 
     //     const refreshToken = async () => {
@@ -39,9 +69,9 @@ export const AuthProvider = ({ children }) => {
     //     }
     // }, [auth.user, auth.token]); // Dependency array ensures refresh happens if auth state changes
 
-    // if (loading) {
-    //     return <div>Loading...</div>; // Show loading until authentication state is resolved
-    // }
+    if (loading) {
+        return <div>Loading...</div>; // Show loading until authentication state is resolved
+    }
 
     return (
         <AuthContext.Provider  value={{ auth, setAuth }}>

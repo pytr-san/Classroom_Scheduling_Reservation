@@ -18,3 +18,13 @@ export const verifyAdminPin = (req, res) => {
         return res.status(401).json({ success: false, message: "Incorrect PIN" });
     }
 };
+
+export const getFacultyPasscode = (req, res) => {
+    const passcode = process.env.FACULTY_ACCESS_PASSCODE;
+
+    if (passcode) {
+        return res.json({ passcode });
+    } else {
+        return res.status(500).json({ error: "Passcode not found." });
+    }
+};

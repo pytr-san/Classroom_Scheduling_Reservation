@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import axios from "axios";
 import './AdminChangePass.css';
-
+import toast from "react-hot-toast";
+import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 
 const AdminChangePassword = () => {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
-    
+    const [showPassword, setShowPassword] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showReTypePassword, setShowReTypePassword] = useState(false);
+
     const [formData, setFormData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -36,11 +40,17 @@ const AdminChangePassword = () => {
             return;
         }
         
-        if (formData.newPassword.length < 8) {
-            setError("Password must be at least 8 characters long");
+        if (formData.newPassword.length < 16) {
+            setError("Password must be at least 16 characters long");
             return;
         }
 
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{16,}$/;
+
+        if (!passwordRegex.test(formData.newPassword)) {
+            setError("Password must contain at least one uppercase letter, one number, and one special character.");
+            return;
+        }
         try {
             setIsLoading(true);
             const response = await axios.put('/auth/change-password', 
@@ -54,7 +64,7 @@ const AdminChangePassword = () => {
                     }
                 }
             );
-            
+            toast.success("Password changed successfully!");
             setSuccess(true);
             // Optionally log out user after password change
             // setAuth({});
@@ -63,8 +73,10 @@ const AdminChangePassword = () => {
             if (!err?.response) {
                 setError('No Server Response');
             } else if (err.response?.status === 401) {
+                toast.error("Incorrect Password! Try again.");
                 setError('Current password is incorrect');
             } else {
+                
                 setError('Password change failed');
             }
         } finally {
@@ -75,7 +87,7 @@ const AdminChangePassword = () => {
     return (
         <div className="change-password-container">
             <button onClick={() => navigate(-1)} className="back-button">
-                &larr; Back to Settings
+            <FaArrowLeft size={20} className="me-1" /> Back to Settings
             </button>
             
             <h2>🔑 Password Change</h2>
@@ -92,39 +104,57 @@ const AdminChangePassword = () => {
                 <div className="form-group">
                     <label htmlFor="currentPassword">Current Password</label>
                     <input
-                        type="password"
+                        type={showCurrentPassword ? "text" : "password"}
                         id="currentPassword"
                         name="currentPassword"
                         value={formData.currentPassword}
                         onChange={handleChange}
                         required
                     />
+                     <span
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="eyeToggleshow"
+                    >
+                        {showCurrentPassword ?  <FaEye /> : <FaEyeSlash />}
+                     </span>
                 </div>
                 
                 <div className="form-group">
                     <label htmlFor="newPassword">New Password</label>
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         id="newPassword"
                         name="newPassword"
                         value={formData.newPassword}
                         onChange={handleChange}
                         required
-                        minLength="8"
+                        minLength="16"
                     />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="eyeToggleshow"
+                    >
+                        {showPassword ?  <FaEye /> : <FaEyeSlash />}
+                    </span>
                 </div>
                 
                 <div className="form-group">
                     <label htmlFor="confirmNewPassword">Confirm New Password</label>
                     <input
-                        type="password"
+                        type={showReTypePassword ? "text" : "password"}
                         id="confirmNewPassword"
                         name="confirmNewPassword"
                         value={formData.confirmNewPassword}
                         onChange={handleChange}
                         required
-                        minLength="8"
+                        minLength="16"
                     />
+                     <span
+                        onClick={() => setShowReTypePassword(!showReTypePassword)}
+                        className="eyeToggleshow"
+                    >
+                        {showReTypePassword ? <FaEye /> : <FaEyeSlash />}
+                    </span>
                 </div>
                 
                 <button 

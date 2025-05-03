@@ -5,7 +5,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // GET all reservations
-router.get('/reservations',authMiddleware, async (req, res) => {
+router.get('/reservations', async (req, res) => {
   try {
     const db = await connectToDatabase();
     const [rows] = await db.execute('SELECT * FROM reservations');
@@ -17,7 +17,7 @@ router.get('/reservations',authMiddleware, async (req, res) => {
 });
 
 // Backend route to get a specific reservation by ID
-router.get('/reservations/:id', authMiddleware, async (req, res) => {
+router.get('/reservations/:id', async (req, res) => {
     const { id } = req.params; // Get the reservation ID from the URL
   
     try {
@@ -37,7 +37,7 @@ router.get('/reservations/:id', authMiddleware, async (req, res) => {
   
 
 // POST new reservation
-router.post('/reservations',authMiddleware, async (req, res) => {
+router.post('/reservations', async (req, res) => {
   const { reservedBy, reservationDate, reservationStartTime, reservationEndTime, roomName } = req.body;
 
   try {
@@ -56,7 +56,7 @@ router.post('/reservations',authMiddleware, async (req, res) => {
 
 // PUT update reservation
 // Backend route to update reservation
-router.put('/reservations/:id', authMiddleware, async (req, res) => {
+router.put('/reservations/:id', async (req, res) => {
     const { id } = req.params;
     const { reservedBy, reservationDate, reservationStartTime, reservationEndTime, roomName } = req.body;
   
@@ -82,7 +82,7 @@ router.put('/reservations/:id', authMiddleware, async (req, res) => {
   
 
 // DELETE reservation
-router.delete('/reservations/:id', authMiddleware, async (req, res) => {
+router.delete('/reservations/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
