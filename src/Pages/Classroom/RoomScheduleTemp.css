@@ -1,6 +1,7 @@
 .room-schedule-container {
     max-width: 1200px;
     margin: 0 auto;
+    margin-top: 20px;
     padding: 10px;
     background-color: white;
     border-radius: 8px;
@@ -258,22 +259,22 @@
 
 
   /*TAB BUTTON*/
-.tab-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #f0f0f0;  
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s; /
-}
+  .tab-list {
+    display: flex;
+    flex-direction: row;  /* Horizontal layout */
+    gap: 5px;             /* Space between tabs */
+    margin-bottom: 15px;   /* Space below the tab bar */
+    flex-wrap: wrap;       /* Allows wrapping if there are too many tabs */
+  }
+  
 
-.tab-button:hover {
-  background-color: #ca7a7a; 
-}
+
 
 /* Focused state */
-.tab-button {
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 5px 15px;
   font-size: 16px;
   background-color: #c4c4c4;  /* Default background */
@@ -283,20 +284,20 @@
   transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
 }
 
-.tab-button:hover {
+.tab:hover {
   background-color: #888585;
   border: 30px; 
 }
 
 /* Focused state */
-.tab-button:focus {
+.tab:focus {
   outline: none;  /* Remove default browser outline */
   box-shadow: 0 0 5px rgba(198, 198, 198, 0.7); /* Orange glow when focused */
   border-color: #3ffe5fb5;  /* Border turns orange when focused */
 }
 
 /* Active state (when the tab is selected) */
-.tab-button.active {
+.tab.active {
   background-color: #00b04a;  
   color: white;  
   border-color: #000000;  
@@ -304,7 +305,7 @@
 }
 
 /* Optional: Active state with focus */
-.tab-button.active:focus {
+.tab.active:focus {
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* Bright white glow when focused and active */
   border-color: #000000; /* Keep the active border color */
 }

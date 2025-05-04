@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import toast from "react-hot-toast";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 const RoomScheduleTemp = () => {
   
@@ -29,6 +30,8 @@ const RoomScheduleTemp = () => {
   const [selectedSection, setSelectedSection] = useState("");
   const [roomHeaders, setRoomHeaders] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
+  const [courses, setCourses] = useState([]);
+
   // const [selectedDate,   ] = useState(new Date());
 
   // State for cell merging
@@ -43,6 +46,31 @@ const RoomScheduleTemp = () => {
   const [proctors, setProctors] = useState([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
 
+  useEffect(() => {
+    const fetchClassrooms = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/classrooms/list", { withCredentials: true });
+        setClassrooms(response.data);
+      } catch (error) {
+        console.error("Error fetching classrooms:", error);
+      }
+    };
+    fetchClassrooms();
+  }, []);
+
+  // Logic for handling mouse down, up, and enter for cell selection and merging
+  const handleMouseDown = (row, col, tabId, roomName) => {
+    setIsSelecting(true);
+    setStartCell({ row, col, tabId, room_name: roomName});
+    setEndCell(null);
+  };
+
+  const handleMouseEnter = (row, col) => {
+    if (isSelecting) {
+      setEndCell({ row, col });
+    }
+  };
+
     // Fetch subjects and proctors (example)
     useEffect(() => {
       // Fetch professors
@@ -51,6 +79,15 @@ const RoomScheduleTemp = () => {
           setProctors(res.data);
         })
         .catch(err => console.error('Error fetching professors:', err));
+
+        axios.get('http://localhost:8000/classrooms/get-all-courses')
+        .then(res => {
+          setCourses(res.data);
+        })
+        .catch(err => {
+          console.error('Failed to fetch courses:', err);
+          setError('Could not load courses');
+        });
       }, []);
 
 
@@ -70,16 +107,13 @@ const RoomScheduleTemp = () => {
         const [courseName, year, section] = activeTab.split(" - ");
       
         const formattedYear = yearNumberToString(year);
-        const courseNameToId = {
-          "BSIT": 1,
-          "BSCS": 2,
-          "BSCPE": 3,
-        };
-      
-        const courseId = courseNameToId[courseName];
+
+        const matchedCourse = courses.find(c => c.course_name === courseName);
+        if (!matchedCourse) return;
+        
+        const courseId = matchedCourse.course_id;
 
         if (!courseId) return;
-      
         axios.get('http://localhost:8000/api/subjects', {
           params: {
             courseId,
@@ -94,31 +128,31 @@ const RoomScheduleTemp = () => {
       }, [activeTab]);
       
       
-      useEffect(() => {
-        const stored = JSON.parse(localStorage.getItem("schedules")) || [];
+      // useEffect(() => {
+      //   const stored = JSON.parse(localStorage.getItem("schedules")) || [];
       
-        const restoredSchedules = stored.map((tab) => {
-          // Reconstruct selectedRooms from saved room names
-          const selectedRooms = tab.rooms.map((room) => ({
-            room_name: room.room_name
-          }));
+      //   const restoredSchedules = stored.map((tab) => {
+      //     // Reconstruct selectedRooms from saved room names
+      //     const selectedRooms = tab.rooms.map((room) => ({
+      //       room_name: room.room_name
+      //     }));
       
-          return {
-            selectedCourse: tab.course,
-            selectedYear: tab.year,
-            selectedSection: tab.section,
-            selectedRooms,
-            mergedCells: tab.mergedCells || {}, 
-          };
-        });
+      //     return {
+      //       selectedCourse: tab.course,
+      //       selectedYear: tab.year,
+      //       selectedSection: tab.section,
+      //       selectedRooms,
+      //       mergedCells: tab.mergedCells || {}, 
+      //     };
+      //   });
       
-        setSchedules(restoredSchedules);
+      //   setSchedules(restoredSchedules);
     
-      }, []);
+      // }, []);
 
       //save Schedule
       const saveScheduleByTab = () => {
-        // Check if schedules exist and are not empty
+
         if (!schedules || schedules.length === 0) {
           toast.error("No schedules to save.");
           return;
@@ -129,33 +163,33 @@ const RoomScheduleTemp = () => {
             course: schedule.selectedCourse,
             year: schedule.selectedYear,
             section: schedule.selectedSection,
-            rooms: [], // Array to store room data
-            mergedCells: {}, // Object to store merged cell data (keyed by row-col)
+            rooms: [],
+            mergedCells: {}, 
           };
     
-          // Loop through the rooms in each schedule
+
           schedule.selectedRooms.forEach((room, roomIndex) => {
             const roomData = {
               room_name: room.room_name,
-              time_slots: [], // Array to store time slots for the current room
+              time_slots: [], 
             };
     
-            // Loop through the time slots in the room
+
             timeSlots.forEach((timeSlot, rowIndex) => {
-              // Check if the current cell is merged
+         
               const mergedCell = isCellMerged(rowIndex, roomIndex, `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`);
               
               const cellKey = `${rowIndex}-${roomIndex}`;
               const cellData = {
                 timeSlot,
-                subject: mergedCell?.subject || '',  // Extract subject or default to empty string
-                proctor: mergedCell?.proctor || '',  // Extract proctor or default to empty string
-                isMerged: !!mergedCell,  // Boolean to indicate if the cell is merged
-                rowSpan: mergedCell?.rowSpan || 1,  // Default rowSpan to 1 if no merge
-                startRow: mergedCell?.startRow ?? rowIndex,  // Default to current row if no merge
+                subject: mergedCell?.subject || '',  
+                proctor: mergedCell?.proctor || '',  
+                isMerged: !!mergedCell,  
+                rowSpan: mergedCell?.rowSpan || 1,  
+                startRow: mergedCell?.startRow ?? rowIndex,  
+                day: mergedCell?.day || '',
               };
     
-              // If the cell is the starting cell of a merged block, store it in mergedCells
               if (mergedCell && mergedCell.startRow === rowIndex) {
                 tabData.mergedCells[cellKey] = {
                   row: rowIndex,
@@ -163,6 +197,7 @@ const RoomScheduleTemp = () => {
                   rowSpan: mergedCell.rowSpan,
                   subject: mergedCell.subject,
                   proctor: mergedCell.proctor,
+                  day: mergedCell.day,
                 };
               }
               
@@ -195,96 +230,77 @@ const RoomScheduleTemp = () => {
       //   };
       // };
       
+
+
+
+      useEffect(() => {
+          const savedSchedules = JSON.parse(localStorage.getItem("schedules")) || [];
+      
+        if (savedSchedules.length > 0) {
+          const restoredSchedules = savedSchedules.map((tab) => {
+            const restoredRooms = tab.rooms.map((room, colIndex) => {
+              const restoredTimeSlots = room.time_slots.map((timeSlot, rowIndex) => {
+                const cellKey = `${rowIndex}-${colIndex}`;
+                const mergedCell = tab.mergedCells?.[cellKey];
     
-
-  useEffect(() => {
-    const fetchClassrooms = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/classrooms/list", { withCredentials: true });
-        setClassrooms(response.data);
-      } catch (error) {
-        console.error("Error fetching classrooms:", error);
-      }
-    };
-    fetchClassrooms();
-  }, []);
-
-  // Logic for handling mouse down, up, and enter for cell selection and merging
-  const handleMouseDown = (row, col, tabId, roomName) => {
-    setIsSelecting(true);
-    setStartCell({ row, col, tabId, room_name: roomName});
-    setEndCell(null);
-  };
-
-  const handleMouseEnter = (row, col) => {
-    if (isSelecting) {
-      setEndCell({ row, col });
-    }
-  };
-
-
-
-  useEffect(() => {
-    const savedSchedules = JSON.parse(localStorage.getItem("schedules")) || [];
-  
-    if (savedSchedules.length > 0) {
-      const restoredSchedules = savedSchedules.map((tab) => {
-        const restoredRooms = tab.rooms.map((room) => {
-          const restoredTimeSlots = room.time_slots.map((timeSlot, rowIndex) => {
-            const cellKey = `${rowIndex}-${room.room_name}`;
-            const mergedCell = tab.mergedCells[cellKey] || {}; // Default to empty if not found
-  
-            console.log(`Checking merged cell for ${cellKey}:`, mergedCell);
-  
-            if (mergedCell.rowSpan) {
-              // If merged cell exists, apply merged data
+                if (mergedCell?.rowSpan) {
+                  return {
+                    ...timeSlot,
+                    isMerged: true,
+                    rowSpan: mergedCell.rowSpan,
+                    subject: mergedCell.subject,
+                    proctor: mergedCell.proctor,
+                    day: mergedCell.day,
+                    startRow: mergedCell.row,
+                  };
+                }
+    
+                return timeSlot;
+              });
+    
               return {
-                ...timeSlot,
-                isMerged: true,
-                rowSpan: mergedCell.rowSpan,
-                subject: mergedCell.subject,
-                proctor: mergedCell.proctor,
-                startRow: mergedCell.row, // Ensure you have this attribute properly defined
+                room_name: room.room_name,
+                time_slots: restoredTimeSlots,
               };
-            }
-  
-            return timeSlot; // Return time slot without modification if not merged
-          });
-  
-          return {
-            room_name: room.room_name,
-            time_slots: restoredTimeSlots,
-          };
-        });
-  
-        return {
-          selectedCourse: tab.course,
-          selectedYear: tab.year,
-          selectedSection: tab.section,
-          selectedRooms: restoredRooms,
-          mergedCells: tab.mergedCells,
-        };
-      });
-  
-      setSchedules(restoredSchedules);
-  
-      // Optionally set active tab
-      const firstTab = savedSchedules[0];
-      if (firstTab) {
-        const firstTabName = `${firstTab.course} - ${firstTab.year} - ${firstTab.section}`;
-        console.log("Setting active tab to:", firstTabName);
-        setActiveTab(firstTabName);
-      }
-    }
-  }, []);
+            });
     
-
-  
-
-  
-
-  
-  
+            return {
+              selectedCourse: tab.course,
+              selectedYear: tab.year,
+              selectedSection: tab.section,
+              selectedRooms: restoredRooms,
+              mergedCells: tab.mergedCells,
+            };
+          });
+    
+          setSchedules(restoredSchedules);
+    
+          // Set first tab
+          const firstTab = savedSchedules[0];
+          if (firstTab) {
+            const firstTabName = `${firstTab.course} - ${firstTab.year} - ${firstTab.section}`;
+            setActiveTab(firstTabName);
+          }
+    
+          // Restore mergedCells
+          const mergedMap = {};
+          savedSchedules.forEach((tab) => {
+            const tabId = `${tab.course} - ${tab.year} - ${tab.section}`;
+            mergedMap[tabId] = Object.entries(tab.mergedCells || {}).map(([key, cell]) => ({
+              startRow: cell.row,
+              col: cell.col,
+              rowSpan: cell.rowSpan,
+              subject: cell.subject,
+              proctor: cell.proctor,
+              day: cell.day,
+              room_name: tab.rooms[cell.col]?.room_name || "",
+              tabId,
+            }));
+          });
+          setMergedCells(mergedMap);
+        }
+      }, []);
+    
 
 
   const handleAssignSubject = (assignmentData) => {
@@ -327,7 +343,7 @@ const RoomScheduleTemp = () => {
           ? { ...cell, subject, proctor, day,room_name: cell.room_name || mergedCell.room_name }  // Assign values to the selected cell
           : cell
       );
-  
+
       return updated;
     });
   
@@ -337,7 +353,6 @@ const RoomScheduleTemp = () => {
 
   const handleMouseUp = () => {
     setIsSelecting(false);
-    console.log("startCell:", startCell);
     // Validate selection (if the selection is valid)
     if (!startCell || !endCell || startCell.col !== endCell.col) {
       return;
@@ -427,8 +442,20 @@ const RoomScheduleTemp = () => {
   
 
   const downloadPDF = async () => {
-    if (!tableRef.current || !activeTab) return;
-  
+
+    if (!tableRef.current || !activeTab || !pdfContainerRef.current) {
+      toast("No schedule data to download.",{
+        icon: <FaExclamationTriangle color="orange" />,
+      });
+      return;
+    }
+    if (!selectedExam || !selectedSemester) {
+      toast("Please select both Examination and Semester.", {
+        icon: <FaExclamationTriangle color="orange" />,
+      });
+      return;
+    }
+
     const highlighted = tableRef.current.querySelectorAll('.highlight-row');
     highlighted.forEach(el => el.classList.remove('highlight-row'));
 
@@ -457,15 +484,24 @@ const RoomScheduleTemp = () => {
   };
   
   const ClearSchedule = () => {
+    const existingSchedules = JSON.parse(localStorage.getItem("schedules")) || [];
+  
+    if (existingSchedules.length === 0) {
+      toast.error("There are no saved schedules to delete.");
+      return;
+    }
+    const confirmed = window.confirm("Are you sure you want to clear all schedules?");
+    if (!confirmed) return;
+  
     localStorage.removeItem("schedules");
-    setSchedules([]);    
+    setSchedules([]);
     setSelectedSemester(null);
-    setSelectedExam(null);  // Clear your local state as well
+    setSelectedExam(null);
     setMergedCells({});
     setSelectedMergedCell(null);
-    toast.success("Schedules cleared!"); //
+    toast.success("Schedules Deleted!");
   };
-
+  
 
   const timeSlots = [
     "7:00 am - 7:30 am", "7:30 am - 8:00 am", "8:00 am - 8:30 am", "8:30 am - 9:00 am", 
@@ -481,6 +517,37 @@ const RoomScheduleTemp = () => {
     setActiveTab(tabName);
   };
 
+  const handleDeleteTab = (tabToDelete) => {
+    // Delete tab from schedules
+    const updatedSchedules = schedules.filter(schedule => {
+      const name = `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`;
+      return name !== tabToDelete;
+    });
+  
+    // Update schedules
+    setSchedules(updatedSchedules);
+    localStorage.setItem("schedules", JSON.stringify(updatedSchedules));
+  
+    // If the deleted tab is the active one, set the active tab to the first one or null if no tabs left
+    if (tabToDelete === activeTab && updatedSchedules.length > 0) {
+      const firstTab = updatedSchedules[0];
+      const firstTabName = `${firstTab.selectedCourse} - ${firstTab.selectedYear} - ${firstTab.selectedSection}`;
+      setActiveTab(firstTabName);
+    } else if (updatedSchedules.length === 0) {
+      setActiveTab(null);
+    }
+  
+    // Clear merged cells related to the deleted tab
+    const updatedMergedCells = { ...mergedCells };
+    const tabToDeleteMergedCellsKey = `${tabToDelete}`;
+    delete updatedMergedCells[tabToDeleteMergedCellsKey]; // Remove merged cells for the deleted tab
+    setMergedCells(updatedMergedCells);
+  
+    // Save updated merged cells to localStorage (optional, depending on your logic)
+    localStorage.setItem("mergedCells", JSON.stringify(updatedMergedCells));
+  };
+  
+  
   return (
     <div className="room-schedule-container">
       <div className="schedule-header">
@@ -490,8 +557,8 @@ const RoomScheduleTemp = () => {
         <h2>Examination Schedule</h2>
         <div className="right-controls">
 
-          <button  onClick={saveScheduleByTab} className="save-schedule-btn">Save Schedule</button>
-          <button  onClick={ClearSchedule} className="clear-schedule-btn">Clear Schedule</button>
+          <button  onClick={saveScheduleByTab} className="save-schedule-btn">Save All</button>
+          <button  onClick={ClearSchedule} className="clear-schedule-btn">Delete All Schedules</button>
           <button className="create-btn" onClick={() => setShowModal(true)}>+ Create</button>
         </div>
       </div>
@@ -499,17 +566,39 @@ const RoomScheduleTemp = () => {
 
       <div className="schedule-body">
         {/* Vertical Tabs */}
-        <div className="tabs">
+        <div className="tab-list">
           {schedules.map((schedule, index) => {
             const tabName = `${schedule.selectedCourse} - ${schedule.selectedYear} - ${schedule.selectedSection}`;
+            const isActive = tabName === activeTab;
             return (
-              <button
+              <div
                 key={index}
-                className={`tab-button ${activeTab === tabName ? 'active' : ''}`}
-                onClick={() => handleTabClick(tabName)}
+                className={`tab ${isActive ? "active" : ""}`}
+                onClick={() => setActiveTab(tabName)}
               >
                 {tabName}
-              </button>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    handleDeleteTab(tabName);
+                  }}
+                  style={{
+                    marginLeft: "8px",
+                    color: "red",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    transition: "color 0.3s"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "darkred"; // Change color on hover
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "red"; // Revert color back on hover leave
+                  }}
+                >
+                 x
+                </span>
+              </div>
             );
           })}
         </div>
