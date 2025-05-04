@@ -23,13 +23,8 @@ const ManageUsers = () => {
       });
       const mappedUsers = response.data.map((user) => ({
         ...user,
-        id:
-          role === "student"
-            ? user.student_id
-            : role === "faculty"
-            ? user.faculty_id
-            : user.admin_id,
-        status: user.is_active ? "active" : "inactive", // also normalize status
+        id: role === "student" ? user.student_id : role === "faculty" ? user.faculty_id : user.admin_id,
+        status: user.is_active ? "active" : "inactive", // Normalize status
       }));
       setUsers(mappedUsers);
     } catch (error) {
@@ -37,7 +32,7 @@ const ManageUsers = () => {
       toast.error("Failed to fetch users.");
     }
   };
-  
+
   const handleToggleStatus = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     console.log("Toggling user ID:", userId, "to", newStatus);
@@ -45,9 +40,8 @@ const ManageUsers = () => {
     try {
       await axios.patch(`http://localhost:8000/api/users/${role}/${userId}/status`, {
         is_active: newStatus === "active" ? 1 : 0
-      }, {
-        withCredentials: true
-      });
+      }, { withCredentials: true });
+
       setUsers((prev) =>
         prev.map((user) =>
           user.id === userId ? { ...user, status: newStatus } : user
@@ -61,26 +55,26 @@ const ManageUsers = () => {
   };
 
   const filteredUsers = users.filter(
-    (user) =>
+    (user) => 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate(-1)} >
-      <FaArrowLeft size={20} className="me-1" /> Back
+      <button onClick={() => navigate(-1)}>
+        <FaArrowLeft size={20} className="me-1" /> Back
       </button>
 
       <h2 className={styles.title}>Manage Users</h2>
 
       <div className={styles.searchContainer}>
-      <select className={styles.dropdown} value={role} onChange={(e) => setRole(e.target.value)}  >
-        <option value="student">Students</option>
-        <option value="faculty">Faculty</option>
-        <option value="admin">Admins</option>
-      </select>
-     
+        <select className={styles.dropdown} value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="student">Students</option>
+          <option value="faculty">Faculty</option>
+          <option value="admin">Admins</option>
+        </select>
+
         <input
           type="text"
           className={styles.searchInput}
@@ -103,7 +97,7 @@ const ManageUsers = () => {
         <tbody>
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
-              <tr key={user.id}> {/* Unique key prop */}
+              <tr key={user.id}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.status}</td>
@@ -130,31 +124,9 @@ const ManageUsers = () => {
               </tr>
             ))
           ) : (
-            <tr><td colSpan="4">No users found</td></tr>
+            <tr><td colSpan="5">No users found</td></tr>
           )}
         </tbody>
-
-        {/* <tbody>
-          {users.length > 0 ? (
-            users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.full_name}</td>
-                <td>{user.email}</td>
-                <td>{user.status}</td>
-                <td>
-                  <button
-                    className={styles.toggleBtn}
-                    onClick={() => handleToggleStatus(user.id, user.status)}
-                  >
-                    {user.status === "active" ? "Deactivate" : "Activate"}
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr><td colSpan="4">No users found</td></tr>
-          )}
-        </tbody> */}
       </table>
     </div>
   );

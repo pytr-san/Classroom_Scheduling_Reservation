@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import "./ClassroomReservation.css";
-import { Button, InputGroup, Form } from "react-bootstrap";
-import { FaUsers,  FaClipboardCheck, FaSearch, FaCamera, FaTicketAlt } from "react-icons/fa";
+import { Button } from "react-bootstrap";
+import { FaUsers, FaCamera } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import RoomDetailModal from "../../components/Modal/RoomDetailModal";  
 import toast from "react-hot-toast";
 
 const ClassroomReservation = () => {
@@ -29,28 +28,6 @@ const ClassroomReservation = () => {
   });
 
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-
-  const handleShow = (room) => {
-    setSelectedRoom(room);
-    setShowModal(true);
-  };
-  
-  const handleClose = () => {
-    setShowModal(false);
-    setSelectedRoom(null);
-  };
-
-  const handleConfirm = () => {
-    alert("Reservation confirmed for " + selectedRoom.room_name);
-    handleClose(); 
-  };
-
-  const handleEdit = () => {
-    alert("Editing room: " + selectedRoom.room_name);
-    handleClose();
-  };
 
   // Persist rooms in localStorage whenever they change (per floor)
   useEffect(() => {
@@ -168,25 +145,10 @@ const ClassroomReservation = () => {
             </div>
             <p className="room-name">{room.room_name}</p>
 
-            {/* Buttons that appear on hover */}
-            <div className="button1-container">
-              {room.status !== 0 && (
-                <Button className="reservation-btn" onClick={() => handleShow(room)}>CREATE RESERVATION</Button>
-              )}
-            </div>
             {room.status === 0 && <span className="unavailable-text">Unavailable</span>}
           </div>
         ))}
       </div>
-
-      {/* Modal to display room details */}
-      <RoomDetailModal 
-        show={showModal}
-        handleClose={handleClose}
-        selectedRoom={selectedRoom}
-        handleConfirm={handleConfirm}
-        handleEdit={handleEdit}
-      />
     </div>
   );
 };

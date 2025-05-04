@@ -158,38 +158,11 @@ General container styling
     margin: 0;
   }
   
-  /* Hover Buttons */
-  .button1-container {
-    position: absolute;
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    display: none;
-    z-index: 1;
-  }
-  
-  .classroom-card:hover .button1-container {
-    display: block;
-    backdrop-filter: blur(8px); /* Apply blur effect when hovering */
-  }
-  
 
   .classroom-card:hover {
     transform: translateY(-5px); /* Adding hover effect for a smooth animation */
   }
 
-  /* Reservation Button */
-  .reservation-btn {
-    background-color: #28a745;
-    color: white;
-    font-size: 14px;
-    border-radius: 8px;
-    padding: 8px 12px;
-  }
-  
-  .reservation-btn:hover {
-    background-color: #218838;
-  }
   
   /* Unavailable room styling */
   .unavailable {
