@@ -44,6 +44,7 @@ const ManageCourse = () => {
         setSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
+        
       })
       .catch((error) => console.error("Error fetching subjects:", error));
 
@@ -60,6 +61,7 @@ const ManageCourse = () => {
         setOriginalSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
+        console.log("Subjects",response.data.subjects);
       })
       .catch((error) => console.error("Error fetching subjects:", error));
   }, [id]);
@@ -165,10 +167,20 @@ const ManageCourse = () => {
       })
       .catch((error) => console.error("Error updating:", error));
   };
+  console.log(subjects.map(s => s.semester));
+
+  // const groupedSubjects = subjects.reduce((acc, subject) => {
+  //   const { year_level, semester } = subject;
+  //   const semesterLabel = semester === "1st" ? "First Semester" : "Second Semester";
   
+  //   if (!acc[year_level]) acc[year_level] = { "First Semester": [], "Second Semester": [] };
+  //   acc[year_level][semesterLabel].push(subject);
+  //   return acc;
+  // }, {});
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const { year_level, semester } = subject;
-    const semesterLabel = semester === "1st" ? "First Semester" : "Second Semester";
+    const normalized = semester?.toLowerCase();
+    const semesterLabel = normalized?.includes("1") ? "First Semester" : "Second Semester";
   
     if (!acc[year_level]) acc[year_level] = { "First Semester": [], "Second Semester": [] };
     acc[year_level][semesterLabel].push(subject);

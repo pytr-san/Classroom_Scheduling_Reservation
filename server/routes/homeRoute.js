@@ -160,7 +160,6 @@ router.get('/api/subjects', async (req, res) => {
           WHERE course_id = ? AND year_level = ?
       `;
       const [rows] = await db.query(query, [courseId, yearLevel]);
-      console.log("subjects",rows);
       if (!rows.length) {
         return res.status(404).json({ message: 'No subjects found for this course and year' });
       }

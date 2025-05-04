@@ -55,7 +55,7 @@ const FacultyFiles = () => {
     <div className={styles.container}>
       <h2 className={styles.title}>Access Course Schedules</h2>
       {files.length === 0 ? (
-        <p>No files found.</p>
+        <p>No uploaded files are available at the moment.</p>
       ) : (
         Object.entries(groupedFiles).map(([date, filesOnDate]) => (
           <div key={date}>

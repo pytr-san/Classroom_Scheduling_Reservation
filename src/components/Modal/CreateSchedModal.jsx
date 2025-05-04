@@ -20,6 +20,7 @@ const Modal = ({ show, handleClose}) => {
                     withCredentials: true,
                 });
                 setCourses(response.data); // Store courses
+                
             } catch (err) {
                 console.error('Error fetching courses:', err);
                 setError('Failed to fetch courses');

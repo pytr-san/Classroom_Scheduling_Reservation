@@ -21,9 +21,9 @@ const CourseForm = () => {
     const [showBatchForm, setShowBatchForm] = useState(true);
 
     const handleSubjectChange = (semesterIndex, subjectIndex, field, value) => {
-        if (field === 'name') {
-          value = value.replace(/\b\w/g, (char) => char.toUpperCase());
-        }
+        // if (field === 'name') {
+        //   value = value.replace(/\b\w/g, (char) => char.toUpperCase());
+        // }
         const updated = [...semesters];
         updated[semesterIndex].subjects[subjectIndex][field] = value;
         setSemesters(updated);

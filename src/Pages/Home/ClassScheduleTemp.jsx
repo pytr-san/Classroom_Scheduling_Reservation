@@ -474,6 +474,7 @@ const ClassSchedule = () => {
             />
             <SectionNavigation
                 savedSchedules={savedSchedules}
+                setSavedSchedules={setSavedSchedules}
                 setSelectedSection={setSelectedSection}
                 selectedSection={selectedSection}
             />
@@ -538,29 +539,50 @@ const ClassSchedule = () => {
     );
 };
 
-const SectionNavigation = ({ savedSchedules, setSelectedSection, selectedSection }) => (
-    <Row className="mt-3">
-        <Col>
-            <h5>Saved Schedules</h5>
-            <div className="d-flex Mathf-wrap">
-                {Object.keys(savedSchedules).length === 0 ? (
-                    <p>No saved schedules yet.</p>
-                ) : (
-                    Object.keys(savedSchedules).map((section) => (
-                        <Button
-                            key={section}
-                            variant={selectedSection === section ? "primary" : "outline-secondary"}
-                            className="m-1"
-                            onClick={() => setSelectedSection(section)}
-                        >
-                            {section}
-                        </Button>
-                    ))
-                )}
-            </div>
-        </Col>
-    </Row>
-);
+const SectionNavigation = ({ savedSchedules, setSavedSchedules, setSelectedSection, selectedSection }) => {
+    const handleDelete = (section) => {
+        const updatedSchedules = { ...savedSchedules };
+        delete updatedSchedules[section];
+        setSavedSchedules(updatedSchedules);
+        localStorage.setItem('allSchedules', JSON.stringify(updatedSchedules));
+
+        // Reset selected section if it's the one deleted
+        if (selectedSection === section) {
+            setSelectedSection(null);
+        }
+
+        alert(`Deleted schedule for ${section}`);
+    };
+
+    return (
+        <Row className="mt-3">
+            <Col>
+                <h5>Saved Schedules</h5>
+                <div className="d-flex flex-wrap">
+                    {Object.keys(savedSchedules).length === 0 ? (
+                        <p>No saved schedules yet.</p>
+                    ) : (
+                        Object.keys(savedSchedules).map((section) => (
+                            <div key={section} className="d-flex align-items-center m-1">
+                                <Button
+                                    variant={selectedSection === section ? "primary" : "outline-secondary"}
+                                    onClick={() => setSelectedSection(section)}
+                                    className="me-2"
+                                >
+                                    {section}
+                                </Button>
+                                <Button variant="danger" size="sm" onClick={() => handleDelete(section)}>
+                                    &times;
+                                </Button>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </Col>
+        </Row>
+    );
+};
+
 
 const Header = ({
     setShowCreateModal,
