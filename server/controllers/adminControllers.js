@@ -1,7 +1,8 @@
 
 import dotenv from "dotenv";
 
-dotenv.config({path: "./server/.env" }); // Load environment variables
+dotenv.config(); 
+//dotenv.config({path: "./server/.env" }); // Load environment variables
 
 export const verifyAdminPin = (req, res) => {
     const { pin } = req.body;

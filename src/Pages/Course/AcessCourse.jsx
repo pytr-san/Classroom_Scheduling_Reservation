@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Gear, Plus } from "react-bootstrap-icons";
 import copppLogo from "../../assets/coppp.png";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import styles from "./AccessCourse.module.css"; 
 import { useNavigate } from "react-router-dom";
 import { FiUpload } from "react-icons/fi";
@@ -24,7 +24,7 @@ const handleAddCourse = (e) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
+        const response = await axiosInstance.get("/api/course");
         setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -39,9 +39,7 @@ const handleAddCourse = (e) => {
     if (!confirmDelete) return;
   
     try {
-      const response = await axios.delete(`http://localhost:8000/api/course/${courseId}`, {
-        withCredentials: true,
-      });
+      const response = await axiosInstance.delete(`/api/course/${courseId}`);
       toast.success(response.data.message);
       setCourses((prev) => prev.filter((course) => course.course_id !== courseId));
     } catch (error) {

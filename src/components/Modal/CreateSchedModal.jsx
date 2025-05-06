@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import  axiosInstance  from '../../axios.jsx';
 import "./CreateSchedModal.css";
 
 const Modal = ({ show, handleClose}) => {
@@ -16,7 +16,7 @@ const Modal = ({ show, handleClose}) => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/course', {
+                const response = await  axiosInstance.get('/api/course', {
                     withCredentials: true,
                 });
                 setCourses(response.data); // Store courses

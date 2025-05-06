@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import styles from "./ManageUsers.module.css";
 import { format } from 'date-fns';
 import toast from "react-hot-toast";
@@ -18,9 +18,7 @@ const ManageUsers = () => {
 
   const fetchUsers = async (role) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/users/${role}`, {
-        withCredentials: true,
-      });
+      const response = await axiosInstance.get(`/api/users/${role}`);
       const mappedUsers = response.data.map((user) => ({
         ...user,
         id: role === "student" ? user.student_id : role === "faculty" ? user.faculty_id : user.admin_id,
@@ -38,9 +36,9 @@ const ManageUsers = () => {
     console.log("Toggling user ID:", userId, "to", newStatus);
 
     try {
-      await axios.patch(`http://localhost:8000/api/users/${role}/${userId}/status`, {
+      await axiosInstance.patch(`/api/users/${role}/${userId}/status`, {
         is_active: newStatus === "active" ? 1 : 0
-      }, { withCredentials: true });
+      });
 
       setUsers((prev) =>
         prev.map((user) =>

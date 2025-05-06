@@ -3,7 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./RoomSelectionModal.css";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 
 const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
   
@@ -11,12 +11,11 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
+        const response = await axiosInstance.get("/api/course");
         setCourses(response.data); // Assuming API returns an array of course names
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -65,14 +64,14 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
     onConfirm(newSchedule); 
     handleClose();
 
-    setSelectedRooms([]); // Reset selected rooms to clear the checkboxes
-    setSelectedCourse(""); // Reset selected course
-    setSelectedYear(""); // Reset selected year
+    setSelectedRooms([]); 
+    setSelectedCourse(""); 
+    setSelectedYear(""); 
     setSelectedSection(""); 
   };
   useEffect(() => {
     if (!show) {
-      // Reset the selected rooms when modal is closed
+
       setSelectedRooms([]);
       setSelectedCourse("");
       setSelectedYear("");
@@ -110,7 +109,6 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
             <option value="">Section</option>
             <option>A</option>
             <option>B</option>
-            <option>C</option>
           </Form.Select>
 
         </div>
@@ -123,7 +121,7 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
           {Object.entries(groupedByFloor).map(([floorName, rooms], index) => (
             <div key={index} className="room-floor">
               <strong>{floorName}</strong>
-              {rooms.map((room, i) => (
+              {rooms.map((room) => (
                 <Form.Check
                   key={room.room_id}
                   type="checkbox"

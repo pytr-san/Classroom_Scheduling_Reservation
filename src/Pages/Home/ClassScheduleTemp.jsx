@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import "./schedule.css";
 import "./table.css";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import { useLocation } from 'react-router-dom';
 
 const ClassSchedule = () => {
@@ -56,12 +56,12 @@ const ClassSchedule = () => {
     console.log('Fetching subjects with:', { courseId, year });
     
     useEffect(() => {
-        axios.get('http://localhost:8000/api/professors', { withCredentials: true })
+        axiosInstance.get('/api/professors')
             .then(res => setProfessors(res.data))
             .catch(err => console.error('Error fetching professors:', err));
     
         if (courseId && year) {
-            axios.get('http://localhost:8000/api/subjects', {
+            axiosInstance.get('/api/subjects', {
                 params: { courseId, yearLevel: year },
                 withCredentials: true
             })         
@@ -69,7 +69,7 @@ const ClassSchedule = () => {
                 .catch(err => console.error('Error fetching subjects:', err));            
         }
 
-        axios.get('http://localhost:8000/api/rooms', { withCredentials: true })
+        axiosInstance.get('/api/rooms')
             .then(res => setRooms(res.data))
             .catch(err => console.error('Error fetching rooms:', err));
     }, [course, year]);
@@ -330,7 +330,7 @@ const ClassSchedule = () => {
                 return updatedStatus;
             });
         } else {
-            setarrastrStatus(prevStatus => ({
+            setCellStatus(prevStatus => ({
                 ...prevStatus,
                 [key]: status
             }));

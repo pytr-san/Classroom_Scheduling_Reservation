@@ -11,7 +11,7 @@ router.post("/verify-pin", verifyAdminPin);
 router.get("/faculty-passcode", getFacultyPasscode);
 
 
-router.post('/register-admin', async (req, res) => {
+router.post('/register-admin',authMiddleware, async (req, res) => {
     try {
         const db = await connectToDatabase();
         const { name, email, password, role } = req.body;
@@ -80,7 +80,7 @@ router.get('/users/:role',authMiddleware , async (req, res) => {
   
 
 
-    router.patch('/users/:role/:id/status', async (req, res) => {
+    router.patch('/users/:role/:id/status',authMiddleware, async (req, res) => {
         const { role, id } = req.params;
         const { is_active } = req.body;
       

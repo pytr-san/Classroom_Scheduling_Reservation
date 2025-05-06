@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import "./settings.css"
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import AdminAccess from "../../components/AdminAccess";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -42,7 +42,7 @@ const Settings = () => {
         if (!confirmLogout) return;
 
         try {
-            await axios.post("http://localhost:8000/auth/logout", { withCredentials: true });
+            await axiosInstance.post("/auth/logout");
             sessionStorage.removeItem("adminAccess"); 
             setAuth(null);  // ✅ Clear auth state
             navigate("/login");  // Redirect to login page

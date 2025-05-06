@@ -1,4 +1,4 @@
-import { error } from 'console';
+
 import { connectToDatabase } from '../db.js';
 import path from 'path';
 

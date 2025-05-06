@@ -1,5 +1,5 @@
 import React, { useState, useEffect  } from 'react';
-import axios from 'axios';
+import  axiosInstance  from './../axios.jsx';
 import './BulkUpload.css';
 import useAuth from "../Hooks/useAuth";
 import { toast } from 'react-hot-toast';
@@ -20,12 +20,10 @@ const BulkUploader = ({ courseId }) => {
   const fetchFiles = async () => {
     try {
 console.log("USer token:", token);
-      const res = await axios.get(`http://localhost:8000/api/view-files?courseId=${courseId}`, {
+      const res = await axiosInstance.get(`/api/view-files?courseId=${courseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      });
+        }});
       setUploadedFiles(res.data);
     } catch (error) {
       const errorMessage = error.res?.data?.error || 'Something went wrong';
@@ -69,7 +67,7 @@ console.log("USer token:", token);
 
     try {
       setUploading(true);
-      const res = await axios.post('http://localhost:8000/api/bulk-upload', formData, {
+      const res = await axiosInstance.post('/api/bulk-upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -77,8 +75,7 @@ console.log("USer token:", token);
         onUploadProgress: (e) => {
           const percent = Math.round((e.loaded * 100) / e.total);
           setProgress(percent);
-        },
-        withCredentials: true,
+        }
       });
 
       toast.success(res.data.message);
@@ -114,11 +111,10 @@ console.log("USer token:", token);
   const handleDeleteConfirm  = async () => {
     try {
 
-      await axios.delete(`http://localhost:8000/api/delete-file/${selectedFileId}`, {
+      await axiosInstance.delete(`/api/delete-file/${selectedFileId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
+        }
       });
       toast.success('File deleted');
       fetchFiles(); // Refresh list

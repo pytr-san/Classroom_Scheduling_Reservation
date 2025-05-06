@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import  axiosInstance  from '../../axios.jsx';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import "./AdminRegister.css";
@@ -28,7 +28,7 @@ const AdminRegister = () => {
     setErrorMessage('');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/register-admin', formData);
+      const response = await axiosInstance.post('/api/register-admin', formData);
 
       console.log(response.data.message);
       toast.success(response.data.message);

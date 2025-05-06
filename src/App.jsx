@@ -19,7 +19,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import FileUploadPage from './Pages/Course/FileUploadPage.jsx';
 import ManageUsers from "./Pages/Settings/ManageUsers.jsx";
 
-axios.defaults.withCredentials = true;
 
 const ROLES = {
   student: "student",

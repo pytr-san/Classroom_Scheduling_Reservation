@@ -1,6 +1,6 @@
 import {  useState } from "react";
 import toast from 'react-hot-toast';
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import "./CourseForm.css";
 import { useNavigate } from "react-router-dom";
 import { FaTrash , FaArrowLeft} from "react-icons/fa"; 
@@ -91,10 +91,10 @@ const CourseForm = () => {
 const saveCourseToDB = async (course) => {
   try {
     // 1. Save course info (no course_id)
-    const courseRes = await axios.post('http://localhost:8000/api/add/course', {
+    const courseRes = await axiosInstance.post('/api/add/course', {
       course_name: course.courseName,
       description: course.courseDescription
-    }, { withCredentials: true });
+    });
 
     const courseId = courseRes.data.course_id; // Get inserted ID
 
@@ -102,12 +102,12 @@ const saveCourseToDB = async (course) => {
     for (const batch of course.batches) {
       for (const semester of batch.semesters) {
         for (const subject of semester.subjects) {
-          await axios.post('http://localhost:8000/api/subjects', {
+          await axiosInstance.post('/api/subjects', {
             course_id: courseId,
             semester: semester.name,
             year_level: batch.yearLevel,
             subject_name: subject.name,
-          }, { withCredentials: true });
+          });
         }
       }
     }

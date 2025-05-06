@@ -4,7 +4,6 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import { handleBulkUpload, viewFilesByCourse, viewAllFiles } from '../controllers/uploadController.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import fs from 'fs';
 import { deleteFile } from '../controllers/deleteControllers.js';
 
 const router = express.Router();
@@ -46,7 +45,7 @@ router.post('/bulk-upload' , (req, res, next) => {
 });
 
 
-router.get('/view-files',authMiddleware, async (req, res) => {
+router.get('/view-files', authMiddleware, async (req, res) => {
   const userId = req.user.id; 
   const userRole = req.user.role; 
   const { courseId } = req.query; 
@@ -54,7 +53,7 @@ router.get('/view-files',authMiddleware, async (req, res) => {
   if (userRole === 'faculty') {
 
     return viewAllFiles(req, res);
-  } else if (userRole === 'student' && courseId || userRole === 'admin' && courseId) {
+  } else if ((userRole === 'student' || userRole === 'admin') && courseId)  {
 
     return viewFilesByCourse(req, res, courseId);
   } else {

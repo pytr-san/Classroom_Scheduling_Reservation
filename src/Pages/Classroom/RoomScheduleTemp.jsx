@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
 import { Button } from "react-bootstrap";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import "./RoomScheduleTemp.css";
 import AssignModal from "./AssignModal.jsx";
 import jsPDF from "jspdf";
@@ -49,7 +49,7 @@ const RoomScheduleTemp = () => {
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/classrooms/list", { withCredentials: true });
+        const response = await axiosInstance.get("/classrooms/list");
         setClassrooms(response.data);
       } catch (error) {
         console.error("Error fetching classrooms:", error);
@@ -74,13 +74,13 @@ const RoomScheduleTemp = () => {
     // Fetch subjects and proctors (example)
     useEffect(() => {
       // Fetch professors
-      axios.get('http://localhost:8000/api/professors', { withCredentials: true })
+      axiosInstance.get('/api/professors')
         .then(res => {
           setProctors(res.data);
         })
         .catch(err => console.error('Error fetching professors:', err));
 
-        axios.get('http://localhost:8000/classrooms/get-all-courses')
+        axiosInstance.get('/classrooms/get-all-courses')
         .then(res => {
           setCourses(res.data);
         })
@@ -114,12 +114,11 @@ const RoomScheduleTemp = () => {
         const courseId = matchedCourse.course_id;
 
         if (!courseId) return;
-        axios.get('http://localhost:8000/api/subjects', {
+        axiosInstance.get('/api/subjects', {
           params: {
             courseId,
             yearLevel: formattedYear,
-          },
-          withCredentials: true,
+          }
         })
         .then((res) => {
           setSubjects(res.data);
@@ -127,28 +126,6 @@ const RoomScheduleTemp = () => {
         .catch((err) => console.error('Error fetching subjects:', err));
       }, [activeTab]);
       
-      
-      // useEffect(() => {
-      //   const stored = JSON.parse(localStorage.getItem("schedules")) || [];
-      
-      //   const restoredSchedules = stored.map((tab) => {
-      //     // Reconstruct selectedRooms from saved room names
-      //     const selectedRooms = tab.rooms.map((room) => ({
-      //       room_name: room.room_name
-      //     }));
-      
-      //     return {
-      //       selectedCourse: tab.course,
-      //       selectedYear: tab.year,
-      //       selectedSection: tab.section,
-      //       selectedRooms,
-      //       mergedCells: tab.mergedCells || {}, 
-      //     };
-      //   });
-      
-      //   setSchedules(restoredSchedules);
-    
-      // }, []);
 
       //save Schedule
       const saveScheduleByTab = () => {
@@ -215,23 +192,6 @@ const RoomScheduleTemp = () => {
       };
     
       
-      
-      
-      // Helper function to get the active tab (You can implement this based on your application logic)
-      // const getActiveTab = () => {
-
-      //   if (!activeTab) return {};
-      
-      //   const [course, year, section] = activeTab.split(" - ");
-      //   return {
-      //     course,
-      //     year,
-      //     section
-      //   };
-      // };
-      
-
-
 
       useEffect(() => {
           const savedSchedules = JSON.parse(localStorage.getItem("schedules")) || [];
@@ -688,8 +648,8 @@ const RoomScheduleTemp = () => {
                                         flexDirection: "column",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        backgroundColor: "#707372",
-                                        color:"white",
+                                        backgroundColor: "#a4cbe6",
+                                        color:"black",
                                         border: "1px solid #ccc",
                                         width: "100%",
                                       

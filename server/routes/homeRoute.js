@@ -133,7 +133,7 @@ router.get("/", authMiddleware, (req, res) => {
 router.get('/api/professors', async (req, res) => {
   try {
     const db = await connectToDatabase();
-    const [rows] = await db.query('SELECT faculty_id, name FROM faculty');
+    const [rows] = await db.query('SELECT instructor_id, name FROM instructors');
 
     if (!rows.length) {
       return res.status(404).json({ message: 'No professors found' });

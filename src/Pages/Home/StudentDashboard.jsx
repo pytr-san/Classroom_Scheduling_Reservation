@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import  axiosInstance  from '../../axios.jsx';
 import styles from './StudentDashboard.module.css'; // Ensure this points to the correct CSS file
 import { formatDistanceToNow, format, isToday, isYesterday, parseISO } from 'date-fns';
 import useAuth from '../../Hooks/useAuth';
@@ -32,7 +32,7 @@ const StudentFiles = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/view-files', {
+        const response = await axiosInstance.get('/api/view-files', {
           params: { courseId },
         });
         setFiles(response.data);

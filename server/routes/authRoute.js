@@ -6,7 +6,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import refreshTokenMiddleware from '../middleware/refreshTokenMiddleware.js';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
-dotenv.config({ path: "./server/.env" });
+dotenv.config();
 
 const router = express.Router();
 
@@ -122,6 +122,14 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "User not found. Please check your email." });
         }
 
+        // 🔒 Validate Password
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(401).json({ message: "Incorrect password" });
+        }
+
+        delete user.password;
+        
         if (user.status === 'inactive') {
             return res.status(403).json({ message: "Your account is inactive for too long. Please contact admin." });
         }
@@ -132,18 +140,12 @@ router.post('/login', async (req, res) => {
             // if (user.failed_attempts >= MAX_ATTEMPTS) {
             //     return res.status(403).json({ message: 'Account locked. Too many failed login attempts.' });
             //   }
-        // 🔒 Validate Password
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) {
-            return res.status(401).json({ message: "Incorrect password" });
-        }
-
-        delete user.password;
+            
 
         // ✅ Generate JWT Access Token (valid for 1 hour)
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id },
                                     process.env.JWT_SECRET, 
-                                    { expiresIn: '1h' });   
+                                    { expiresIn: '1h' });       
 
         //✅ Generate JWT Refresh Token (valid for 1 day)
         // const refreshToken = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, 

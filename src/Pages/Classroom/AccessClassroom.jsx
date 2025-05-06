@@ -3,7 +3,7 @@ import { Button, Form, InputGroup } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import "./AccessClassroom.css";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
 import toast from "react-hot-toast";
 
@@ -26,9 +26,8 @@ const AccessClassroom = () => {
     useEffect(() => {
         const fetchClassrooms = async () => {
             try {
-                const response = await axios.get("http://localhost:8000/classrooms/list");
-                setClassrooms(response.data);
-                
+                const response = await axiosInstance.get("/classrooms/list");
+                setClassrooms(response.data);                 
             } catch (error) {
                 console.error("Error fetching classrooms:", error);
                 toast.error('Failed to load classrooms.');

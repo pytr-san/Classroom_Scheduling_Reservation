@@ -1,13 +1,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import CreatableSelect from "react-select/creatable";
 import styles from "./ManageCourse.module.css";
 import { FaTrash , FaArrowLeft, FaSyncAlt, FaCheck, FaTimes } from "react-icons/fa";
 import ConfirmModal from "../../components/Modal/ConfirmInstructor";
 import AddInstructorModal from "../../components/Modal/AddInstructorModal";
-import useAuth from "../../Hooks/useAuth";
 import toast from 'react-hot-toast';
 
 const ManageCourse = () => {
@@ -20,7 +19,6 @@ const ManageCourse = () => {
   const [updatedSubjects, setUpdatedSubjects] = useState({});
   const [originalSubjects, setOriginalSubjects] = useState([]);
   const [pendingInstructor, setPendingInstructor] = useState(null);
-  const { auth } = useAuth();
   const [inputValues, setInputValues] = useState({});
   const [refreshing, setRefreshing] = useState(false);
 
@@ -38,9 +36,9 @@ const ManageCourse = () => {
 
   const addInstructor = async (instructorName) => {
     try {
-      await axios.post("http://localhost:8000/api/add", { name: instructorName }, { withCredentials: true });
+      await axiosInstance.post("/api/add", { name: instructorName });
 
-      await axios.get(`http://localhost:8000/api/course/${id}/manage`, {withCredentials: true, }) 
+      await axiosInstance.get(`/api/course/${id}/manage`, {withCredentials: true, }) 
       .then((response) => {
         setSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
@@ -56,7 +54,7 @@ const ManageCourse = () => {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/course/${id}/manage`, {withCredentials: true, }) 
+    axiosInstance.get(`/api/course/${id}/manage`, {withCredentials: true, }) 
       .then((response) => {
         setSubjects(response.data.subjects || []);
         setOriginalSubjects(response.data.subjects || []);
@@ -99,7 +97,7 @@ const ManageCourse = () => {
     const { name, subject_id } = pendingInstructor;
   
     try {
-      const { data } = await axios.post("http://localhost:8000/api/faculty/add", { name, subject_id }, { withCredentials: true });
+      const { data } = await axiosInstance.post("/api/faculty/add", { name, subject_id });
   
       const newFaculty = data.newFaculty;
   
@@ -151,11 +149,11 @@ const ManageCourse = () => {
     return;
     }
    
-    axios.put(`http://localhost:8000/api/course/${id}/manage/update`, { updates }, { withCredentials: true })
+    axiosInstance.put(`/api/course/${id}/manage/update`, { updates })
       .then(() => {
         toast.success("Assigned Successfully!");
 
-        axios.get(`http://localhost:8000/api/course/${id}/manage`, { withCredentials: true })
+        axiosInstance.get(`/api/course/${id}/manage`)
           .then((response) => {
             setSubjects(response.data.subjects || []);
             setFaculty(response.data.faculty || []);
@@ -229,9 +227,7 @@ const ManageCourse = () => {
         subject_name,
       }));
   
-      await axios.put(`http://localhost:8000/api/course/${id}/subjects/update-names`, payload, {
-        withCredentials: true,
-      });
+      await axiosInstance.put(`/api/course/${id}/subjects/update-names`, payload);
   
       toast.success("Successfully updated!");
       setOriginalSubjects(subjects);
@@ -248,7 +244,7 @@ const ManageCourse = () => {
   if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/course/${id}/${subject_id}`, { withCredentials: true });
+      await axiosInstance.delete(`/api/course/${id}/${subject_id}`);
 
       setSubjects(prevSubjects => prevSubjects.filter(subject => subject.subject_id !== subject_id));
   

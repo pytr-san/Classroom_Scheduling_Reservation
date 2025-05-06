@@ -4,7 +4,7 @@ import Header from "./Header";
 import {useState } from "react";
 import useAuth from "../Hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import  axiosInstance  from './../axios.jsx';
 
 const Layout = () => {
     const { auth, setAuth } = useAuth();
@@ -13,7 +13,7 @@ const Layout = () => {
 
     const handleLogout = async () => {
         try {
-            await axios.post("http://localhost:8000/auth/logout", { withCredentials: true });
+            await axiosInstance.post("/auth/logout");
             sessionStorage.removeItem("adminAccess"); 
             localStorage.removeItem("accessToken");
             localStorage.removeItem("user");

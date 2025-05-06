@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import  axiosInstance  from './../axios.jsx';
 
 const AuthContext = createContext({});
 
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children, handlelogout }) => {
     //     const refreshToken = async () => {
     //         try {
     //             // Only refresh the token if there's no valid token or user in the state
-    //             const res = await axios.get('http://localhost:8000/auth/refresh', { withCredentials: true });
+    //             const res = await axiosInstance.get('/auth/refresh');
     //         if (newToken) {
     //                 // If the refresh was successful, update the auth state with the new token
     //                 console.log("New Token:", newToken);  // Log the new token

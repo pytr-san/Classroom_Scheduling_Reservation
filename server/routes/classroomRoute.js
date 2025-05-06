@@ -19,7 +19,7 @@ router.get('/get-all-courses', async (req, res) => {
     try {
       const db = await connectToDatabase();
       const [courses] = await db.execute('SELECT course_id, course_name FROM course');
-      res.json(courses); // e.g. [{ course_id: 1, course_name: 'BSIT' }, ...]
+      res.json(courses); 
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Error fetching courses' });

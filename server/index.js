@@ -10,7 +10,7 @@ import uploadRoute from './routes/uploadRoute.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-dotenv.config({ path: "./server/.env" });
+dotenv.config();
 
 const app = express();
 
@@ -31,7 +31,7 @@ const corsOptions = {
   origin: isProduction ? "https://your-frontend-domain.com" : "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", 'PATCH', "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization",'no-refresh']
 };
 
 app.use(cors(corsOptions));
@@ -48,6 +48,16 @@ app.use("/classrooms", classRoute);
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '/uploads/pdfs')));
 
 app.use('/api', uploadRoute);
+
+if (isProduction) {
+  const distPath = path.join(__dirname, '../dist');
+  app.use(express.static(distPath));
+
+  // Fallback to index.html for client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 8000;
 app.listen(process.env.PORT, () => {

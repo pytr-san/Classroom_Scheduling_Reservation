@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import  axiosInstance  from './../axios.jsx';
 import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
 import { FaEnvelope, FaLock } from "react-icons/fa";
-import { toast } from 'react-hot-toast';
+import  toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
@@ -30,9 +30,11 @@ export default function Login() {
         e.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:8000/auth/login", data, {
-                withCredentials: true,
-            });
+            const response = await axiosInstance.post("/auth/login", data, {
+                headers: {
+                  "no-refresh": true,
+                },
+              });
 
             console.log("✅ Login successful:", response.data);
             
@@ -67,12 +69,12 @@ export default function Login() {
     return (
         <div className={styles.container}>
             <div className={styles.leftSection}>
-                <h1 className={styles.title}>Classroom Scheduling and Reservation System</h1>
+                <h1 className={styles.title}>Classroom Scheduling System</h1>
             </div>
 
             <div className={styles.rightSection}>
                 <div className={styles.formContainer}>
-                    <h4>Login</h4>
+                    <h4 className={styles.login}>Login</h4>
                     <form onSubmit={handleLogin}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Email</label>
@@ -118,7 +120,7 @@ export default function Login() {
                         </a>
                     </form>
 
-                    {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+                    {/* {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>} */}
 
                     <div className={styles.signUpContainer}>
                     <button

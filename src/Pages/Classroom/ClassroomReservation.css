@@ -15,7 +15,7 @@
   }
 
   .sub-header {
-    margin-left: 10px;
+    margin-left: 90px;
     font-size: 18px;
     font-weight: bold;
   }
@@ -155,7 +155,7 @@
   
 
   .classroom-card:hover {
-    transform: translateY(-5px); /* Adding hover effect for a smooth animation */
+    transform: translateY(-5px); 
   }
 
   
@@ -167,16 +167,21 @@
   }
 
   .unavailable-text {
-    color: #dc3545; /* Red color for "Unavailable" */
+    color: #dc3545;
     font-weight: bold;
     
-    margin-bottom: 5px; /* Add spacing between the button and text */
-    display: block; /* Make sure it takes up space */
-    text-align: center; /* Center the text below the button */
+    margin-top: 20px;
+    display: block;
+    text-align: center; 
+    
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    transform: translateX(-50%);
   }
 
   .unavailable p {
-    color: #000000;  /* Change to the color you want */
+    color: #000000;
   }
   .unavailable .capacity{
     background: transparent;
@@ -184,6 +189,6 @@
   }
   
   p {
-    color: #c1c1c1; /* Set the color */
+    color: #c1c1c1; 
 
   }

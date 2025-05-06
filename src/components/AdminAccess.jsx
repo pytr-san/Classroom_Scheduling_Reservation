@@ -1,7 +1,7 @@
 import React, { useState,useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; 
 import "./AdminAccess.css"; 
-import axios from "axios";
+import  axiosInstance  from './../axios.jsx';
 import bgAccess from "../assets/bghomepage.jpg";
 
 function AdminAccess({onAccessGranted }) {
@@ -42,11 +42,7 @@ function AdminAccess({onAccessGranted }) {
 
   const handleSubmit = async (accessCode) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/verify-pin",
-        { pin: accessCode },
-        { withCredentials: true }
-      );
+      const response = await axiosInstance.post("/api/verify-pin",{ pin: accessCode });
       if (response.data.success) {
         onAccessGranted();
       } else {
@@ -60,16 +56,6 @@ function AdminAccess({onAccessGranted }) {
       inputsRef.current[0].focus();
     }
   };
-  // const handleSubmit = () => {
-  //   const accessCode = code.join("");
-  //   if (accessCode === "123456") { 
-  //     navigate("/classroom"); 
-  //   } else {
-  //     setError(true);
-  //     setCode(["", "", "", "", "", ""]);
-  //     inputsRef.current[0].focus();
-  //   }
-  // };
 
   return (
     <div className="access-container"

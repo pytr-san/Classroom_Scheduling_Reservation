@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
-import axios from "axios";
+import  axiosInstance  from '../../axios.jsx';
 import './AdminChangePass.css';
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
@@ -53,7 +53,7 @@ const AdminChangePassword = () => {
         }
         try {
             setIsLoading(true);
-            const response = await axios.put('/auth/change-password', 
+            const response = await axiosInstance.put('/auth/change-password', 
                 {
                     currentPassword: formData.currentPassword,
                     newPassword: formData.newPassword
@@ -66,9 +66,7 @@ const AdminChangePassword = () => {
             );
             toast.success("Password changed successfully!");
             setSuccess(true);
-            // Optionally log out user after password change
-            // setAuth({});
-            // navigate('/login');
+
         } catch (err) {
             if (!err?.response) {
                 setError('No Server Response');

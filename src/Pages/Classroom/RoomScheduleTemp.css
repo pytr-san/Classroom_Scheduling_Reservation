@@ -109,14 +109,13 @@
   }
   .dropdown-container {
     display: flex;
-    gap: 10px; /* Space between dropdowns */
-    margin-bottom: 10px; /* Space below dropdowns before the table */
-    align-items: center; /* Vertically center them if needed */
+    gap: 10px; 
+    margin-bottom: 10px; 
+    align-items: center; 
   }
   .dropdown-container select {
     text-align: center;
 
-/* Ensures the selected value is centered in most browsers */
   }
 
   .print-friendly {
@@ -174,8 +173,8 @@
     align-items: center;
   }
   .spinner {
-    border: 2px solid #f3f3f3;       /* Light gray */
-    border-top: 2px solid #555;      /* Darker gray for spinning */
+    border: 2px solid #f3f3f3;      
+    border-top: 2px solid #555;      
     border-radius: 50%;
     width: 16px;
     height: 16px;
@@ -253,35 +252,27 @@
   
   
 
-
-
-
-
-
   /*TAB BUTTON*/
   .tab-list {
     display: flex;
-    flex-direction: row;  /* Horizontal layout */
-    gap: 5px;             /* Space between tabs */
-    margin-bottom: 15px;   /* Space below the tab bar */
-    flex-wrap: wrap;       /* Allows wrapping if there are too many tabs */
+    flex-direction: row; 
+    gap: 5px;             
+    margin-bottom: 15px;   
+    flex-wrap: wrap;       
   }
   
 
-
-
-/* Focused state */
 .tab {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 5px 15px;
   font-size: 16px;
-  background-color: #c4c4c4;  /* Default background */
+  background-color: #c4c4c4;  
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .tab:hover {
@@ -289,14 +280,14 @@
   border: 30px; 
 }
 
-/* Focused state */
+
 .tab:focus {
-  outline: none;  /* Remove default browser outline */
-  box-shadow: 0 0 5px rgba(198, 198, 198, 0.7); /* Orange glow when focused */
-  border-color: #3ffe5fb5;  /* Border turns orange when focused */
+  outline: none;  
+  box-shadow: 0 0 5px rgba(198, 198, 198, 0.7); 
+  border-color: #3ffe5fb5;  
 }
 
-/* Active state (when the tab is selected) */
+
 .tab.active {
   background-color: #00b04a;  
   color: white;  
@@ -304,23 +295,23 @@
   font-weight: bold; 
 }
 
-/* Optional: Active state with focus */
+
 .tab.active:focus {
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* Bright white glow when focused and active */
-  border-color: #000000; /* Keep the active border color */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); 
+  border-color: #000000;
 }
 
 .highlight-header-row th {
-  background-color: #b7b7b7; /* Light green */
+  background-color: #b7b7b7; 
   color: #000000;
   transition: background-color 0.3s;
 }
 
 .highlight-row {
-  background-color: #d0f0d8; /* Light blue background for better visibility */
-  transition: background-color 0.3s; /* Smooth transition for background color */
+  background-color: #d0f0d8; 
+  transition: background-color 0.3s; 
 }
 
 .cell.conflict {
-  background-color: red; /* Or any other color for conflict */
+  background-color: red; 
 }

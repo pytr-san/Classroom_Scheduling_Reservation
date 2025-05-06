@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import  axiosInstance  from './../axios.jsx';
 import styles from "./Register.module.css";
 import useAuth from "../Hooks/useAuth";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
@@ -32,7 +32,7 @@ export default function Register() {
 
     const fetchFacultyPasscode = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/api/faculty-passcode");
+            const response = await axiosInstance.get("/api/faculty-passcode");
             setFacultyPasscodeFromApi(response.data.passcode);  
         } catch (error) {
             toast.error("Unable to fetch faculty passcode.");
@@ -47,10 +47,10 @@ export default function Register() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/course", { withCredentials: true });
+                const res = await axiosInstance.get("/api/course");
                 setCourses(res.data);
 
-                const sec = await axios.get("http://localhost:8000/api/sections", { withCredentials: true });
+                const sec = await axiosInstance.get("/api/sections");
                 setSections(sec.data);
             } catch (err) {
                 console.error("Error fetching courses", err);
@@ -103,16 +103,20 @@ export default function Register() {
         }
 
         try {
-            const response = await axios.post("http://localhost:8000/auth/register", data, { withCredentials: true });
+            const response = await axiosInstance.post("/auth/register", data, {
+                headers: {
+                  "no-refresh": true,
+                },
+              });
             const { user } = response.data;
 
             if (data.role === "Student") {
 
-                await axios.post(`http://localhost:8000/api/student/details?email=${user.email}`, {
+                await axiosInstance.post(`/api/student/details?email=${user.email}`, {
                     course_id: data.course,  // Pass course_id
                     year_level: data.year_level,  // Pass year level
                     section_id: data.section  // Pass section id
-                }, { withCredentials: true });
+                });
     
                 toast.success("Student Registration successful! Please log in.");
                 setTimeout(() => {
@@ -133,9 +137,11 @@ export default function Register() {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
+        const updatedValue = name === 'email' ? value.toLowerCase() : value;
+
         setData((prevData) => ({
             ...prevData,
-            [name]: (name === 'course' || name === 'section') ? parseInt(value) : value,  // Ensure course and section are integers
+            [name]: (name === 'course' || name === 'section') ? parseInt(updatedValue) : updatedValue,  // Ensure course and section are integers
         }));
         setErrors((prevErrors) => {
             const newErrors = { ...prevErrors };
@@ -148,7 +154,7 @@ export default function Register() {
     return (
         <div className={styles.container}>
             <div className={styles.leftSection}>
-                <h1 className={styles.title}>Classroom Scheduling and Reservation System</h1>
+                <h1 className={styles.title}>Classroom Scheduling System</h1>
                 <img src={accesslogo} alt="Access Logo" className={styles.logo} />
             </div>
             <div className={styles.rightSection}>
