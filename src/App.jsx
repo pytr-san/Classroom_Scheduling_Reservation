@@ -17,8 +17,6 @@ import CourseForm from "./Pages/Course/CourseForm.jsx"
 import AdminChangePassword from "./Pages/Settings/AdminChangePassword.jsx";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import FileUploadPage from './Pages/Course/FileUploadPage.jsx';
-import ReservationPage from "./Pages/Classroom/ReservationPage.jsx";
-import EditReservationPage from "./Pages/Classroom/EditReservationPage.jsx";
 import ManageUsers from "./Pages/Settings/ManageUsers.jsx";
 
 axios.defaults.withCredentials = true;
@@ -56,8 +54,6 @@ const ROLES = {
 
                             <Route path="/classroom" element={<Classroom />} />
                             <Route path="/classroom/reservation" element={<ClassroomReservation/>} />
-                            <Route path="/classroom/reservations/table" element={<ReservationPage/>} />
-                            <Route path="/classroom/edit-reservation/:id" element={<EditReservationPage/>} />
                             
                             <Route path="/course" element={<Course />} />
                             <Route path="/add/course" element={<CourseForm />} />

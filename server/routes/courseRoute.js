@@ -122,7 +122,7 @@ router.post('/add', async (req, res) => {
       const connection = await connectToDatabase();
   
       const [existing] = await connection.execute(
-        'SELECT * FROM faculty WHERE name = ?',
+        'SELECT * FROM instructors WHERE name = ?',
         [name]
       );
   
@@ -131,7 +131,7 @@ router.post('/add', async (req, res) => {
       }
   
       const [result] = await connection.execute(
-        'INSERT INTO faculty (name) VALUES (?)',
+        'INSERT INTO instructors (name) VALUES (?)',
         [name]
       );
   
@@ -165,18 +165,18 @@ router.get("/course/:id/manage", async (req, res) => {
                 subjects.subject_name, 
                 subjects.year_level, 
                 subjects.semester, 
-                faculty.faculty_id, 
-                faculty.name AS instructor_name, 
+                instructors.instructor_id, 
+                instructors.name AS instructor_name, 
                 course.course_name
             FROM subjects
             INNER JOIN course ON subjects.course_id = course.course_id
-            LEFT JOIN faculty ON subjects.faculty_id = faculty.faculty_id
+            LEFT JOIN instructors ON subjects.instructor_id = instructors.instructor_id
             WHERE course.course_id = ?
             ORDER BY subjects.year_level, subjects.semester`, 
             [courseId]
         );
 
-        const [faculty] = await db.execute("SELECT faculty_id, name FROM faculty"); // ✅ Fetch all faculty
+        const [faculty] = await db.execute("SELECT instructor_id, name FROM instructors"); // ✅ Fetch all faculty
 
         if (results.length > 0) {
             return res.json({ 
@@ -203,10 +203,10 @@ router.put("/course/:courseId/manage/update", async (req, res) => {
 
     try {
         const db = await connectToDatabase();
-        const updatePromises = updates.map(({ subject_id, faculty_id }) => {
+        const updatePromises = updates.map(({ subject_id, instructor_id }) => {
             return db.execute(
-                "UPDATE subjects SET faculty_id = ? WHERE subject_id = ?", 
-                [faculty_id || null, subject_id]  
+                "UPDATE subjects SET instructor_id = ? WHERE subject_id = ?", 
+                [instructor_id || null, subject_id]  
             );
         });
 
@@ -232,7 +232,7 @@ router.post("/faculty/add", async (req, res) => {
 
         // ✅ Insert new instructor into faculty table
         const [result] = await db.execute(
-            "INSERT INTO faculty (name) VALUES (?)",
+            "INSERT INTO instructors (name) VALUES (?)",
             [name]
         );
 
@@ -243,7 +243,7 @@ router.post("/faculty/add", async (req, res) => {
 
         // ✅ Add instructor to the subject by inserting into the subjects table
         const [subjectResult] = await db.execute(
-            "UPDATE subjects SET faculty_id = ? WHERE subject_id = ?",
+            "UPDATE subjects SET instructor_id = ? WHERE subject_id = ?",
             [newFaculty.faculty_id, subject_id]
         );
 

@@ -135,7 +135,7 @@ const saveCourseToDB = async (course) => {
                 <input
                   type="text"
                   value={courseName}
-                  onChange={(e) => setCourseName(e.target.value)}
+                  onChange={(e) => setCourseName(e.target.value.trim().toUpperCase())}
                 />
               </label>
               <label>

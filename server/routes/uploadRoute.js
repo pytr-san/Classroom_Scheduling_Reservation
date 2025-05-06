@@ -9,20 +9,12 @@ import { deleteFile } from '../controllers/deleteControllers.js';
 
 const router = express.Router();
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'uploads/pdfs');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, Date.now() + '-' + file.originalname);
-//   },
-// });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads/pdfs')); // <--- now points to server/uploads/pdfs
+    cb(null, path.join(__dirname, '../uploads/pdfs')); 
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -39,7 +31,6 @@ const upload = multer({
   },
 });
 
-// Bulk file upload route (POST request)
 router.post('/bulk-upload' , (req, res, next) => {
   upload.array('files', 10)(req, res, function (err) {
     if (err instanceof multer.MulterError) {
@@ -50,31 +41,27 @@ router.post('/bulk-upload' , (req, res, next) => {
       return res.status(500).json({ message: 'Upload failed. Please try again.' });
     }
 
-    // Handle bulk upload by storing files and associating with courseId
     handleBulkUpload(req, res);
   });
 });
 
-// Route for viewing files, role-based access 
+
 router.get('/view-files',authMiddleware, async (req, res) => {
-  const userId = req.user.id; // Assume user info is added to the request via middleware
-  const userRole = req.user.role; // Assume user role is passed in the request
-  const { courseId } = req.query; // Get the courseId from the query string (for students)
+  const userId = req.user.id; 
+  const userRole = req.user.role; 
+  const { courseId } = req.query; 
 
   if (userRole === 'faculty') {
-    // Faculty can view all files
+
     return viewAllFiles(req, res);
   } else if (userRole === 'student' && courseId || userRole === 'admin' && courseId) {
-    // Students can view only files associated with their courseId
+
     return viewFilesByCourse(req, res, courseId);
   } else {
     return res.status(403).json({ message: 'Unauthorized access' });
   }
 });
 
-
-//deletes files route
 router.delete('/delete-file/:id',  deleteFile);
-
 
 export default router;

@@ -22,6 +22,7 @@ const ManageCourse = () => {
   const [pendingInstructor, setPendingInstructor] = useState(null);
   const { auth } = useAuth();
   const [inputValues, setInputValues] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
   const [showAddInstructorModal, setShowAddInstructorModal] = useState(false); 
   const handleShowAddInstructorModal = () => setShowAddInstructorModal(true);
@@ -61,7 +62,7 @@ const ManageCourse = () => {
         setOriginalSubjects(response.data.subjects || []);
         setCourseName(response.data.course_name || "Unknown Course");
         setFaculty(response.data.faculty || []);
-        console.log("Subjects",response.data.subjects);
+  
       })
       .catch((error) => console.error("Error fetching subjects:", error));
   }, [id]);
@@ -82,15 +83,12 @@ const ManageCourse = () => {
     }
   };
   
-  // const handleCancelInstructor = () => {
-  //   setPendingInstructor(null);
-  //   setInputValues("");
-  // };
+
   const handleCancelInstructor = (subject_id) => {
     setPendingInstructor(null);
     setInputValues((prev) => {
       const newInputValues = { ...prev };
-      delete newInputValues[subject_id]; // Clears the faculty input for this specific subject
+      delete newInputValues[subject_id]; 
       return newInputValues;
     });
   };
@@ -141,10 +139,10 @@ const ManageCourse = () => {
   const handleSaveChanges = () => {
     const updates = Object.entries(updatedSubjects)
   
-      .filter(([subject_id, faculty_id]) => subject_id && faculty_id)
-      .map(([subject_id, faculty_id]) => ({
+      .filter(([subject_id, instructor_id]) => subject_id && instructor_id)
+      .map(([subject_id, instructor_id]) => ({
         subject_id: parseInt(subject_id),
-        faculty_id: parseInt(faculty_id),
+        instructor_id: parseInt(instructor_id),
       }));
 
     if (updates.length === 0) {
@@ -167,16 +165,8 @@ const ManageCourse = () => {
       })
       .catch((error) => console.error("Error updating:", error));
   };
-  console.log(subjects.map(s => s.semester));
 
-  // const groupedSubjects = subjects.reduce((acc, subject) => {
-  //   const { year_level, semester } = subject;
-  //   const semesterLabel = semester === "1st" ? "First Semester" : "Second Semester";
-  
-  //   if (!acc[year_level]) acc[year_level] = { "First Semester": [], "Second Semester": [] };
-  //   acc[year_level][semesterLabel].push(subject);
-  //   return acc;
-  // }, {});
+
   const groupedSubjects = subjects.reduce((acc, subject) => {
     const { year_level, semester } = subject;
     const normalized = semester?.toLowerCase();
@@ -187,10 +177,18 @@ const ManageCourse = () => {
     return acc;
   }, {});
   
-  const handleRefresh = () => {
-    setUpdatedSubjects({}); // Clears the selected instructors
-    setSubjects(originalSubjects);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+  
+    await new Promise(resolve => setTimeout(resolve, 500));
+  
+    setUpdatedSubjects({});
+    setSubjects(subjects);
     setPendingInstructor(null);
+    setInputValues({});
+    setShowModal(false);
+  
+    setRefreshing(false);
   };
 
   const handleSubjectFieldChange = (subject_id, field, value) => {
@@ -267,9 +265,7 @@ const ManageCourse = () => {
         <button className="btn btn-secondary  rounded " onClick={() => navigate(-1)}> 
         <FaArrowLeft size={20} className="me-1" /> Back</button>
         <h2 className={`${styles.title} flex-grow-1 text-center m-0`}>{courseName}</h2>
-        <button className="btn btn-secondary  rounded  d-flex align-items-center me-2" onClick={handleRefresh}>
-          <FaSyncAlt size={20} className="me-1" /> Refresh
-        </button>
+
         <div className="d-flex gap-2">
           <button
             className={`${styles.buttonAdd}`}
@@ -280,14 +276,25 @@ const ManageCourse = () => {
           <button
             className={`${styles.buttonSmall}`}
             onClick={handleSaveChanges}
-          >
-            Save Instructors
+          >  
+            Confirm Assignments
           </button>
           <button
             className={`${styles.buttonSmall}`}
             onClick={handleSaveSubjectNames}
           >
             Save Subjects
+          </button>
+          <button
+            className="btn btn-secondary rounded d-flex align-items-center me-2"
+            onClick={handleRefresh}
+            disabled={refreshing} // optional to prevent double click
+          >
+          <FaSyncAlt
+            size={20}
+            className={`me-1 ${refreshing ? "spin" : ""}`}
+          />
+            {refreshing ? "Refreshing..." : "Refresh"}
           </button>
 
         </div>
@@ -334,10 +341,10 @@ const ManageCourse = () => {
                               inputValues[subject.subject_id]
                               ? { value: inputValues[subject.subject_id], label: inputValues[subject.subject_id] }
                               : faculty
-                                .map(f => ({ value: f.faculty_id, label: f.name }))
-                                .find(option => option.value === (updatedSubjects[subject.subject_id] ?? subject.faculty_id)) || null
+                                .map(f => ({ value: f.instructor_id, label: f.name }))
+                                .find(option => option.value === (updatedSubjects[subject.subject_id] ?? subject.instructor_id)) || null
                             }
-                            options={faculty.map(f => ({ value: f.faculty_id, label: f.name }))}
+                            options={faculty.map(f => ({ value: f.instructor_id, label: f.name }))}
                             onChange={(selectedOption) => handleInstructorChange(subject.subject_id, selectedOption)}                         
                             placeholder="Select or add instructor..."
                             onKeyDown={(e) => {

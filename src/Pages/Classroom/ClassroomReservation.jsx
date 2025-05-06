@@ -18,20 +18,17 @@ const ClassroomReservation = () => {
     return s[(v - 20) % 10] || s[v] || s[0];
   };
 
-  // Initialize rooms state and load from localStorage by floor
   const [rooms, setRooms] = useState(() => {
-    const storedRooms = JSON.parse(localStorage.getItem(`rooms-${currentFloor}`)); // Store rooms by floor
+    const storedRooms = JSON.parse(localStorage.getItem(`rooms-${currentFloor}`)); 
     if (storedRooms && storedRooms.length) {
       return storedRooms;
     }
-    return classrooms || []; // Use classrooms passed from the previous page
+    return classrooms || []; 
   });
 
 
-
-  // Persist rooms in localStorage whenever they change (per floor)
   useEffect(() => {
-    localStorage.setItem(`rooms-${currentFloor}`, JSON.stringify(rooms)); // Save by floor
+    localStorage.setItem(`rooms-${currentFloor}`, JSON.stringify(rooms));
   }, [rooms, currentFloor]);
 
   const handleUnavailableToggle = (index) => {
@@ -53,7 +50,7 @@ const ClassroomReservation = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const updatedRooms = [...rooms];
-        updatedRooms[index].image = reader.result; // Store base64 image
+        updatedRooms[index].image = reader.result; 
         setRooms(updatedRooms);
 
         toast.success('Photo uploaded successfully!');
@@ -61,8 +58,6 @@ const ClassroomReservation = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  
 
   const getFloorLabel = (floor) => `${floor}${getOrdinalSuffix(floor)} Floor`;
   const floorLabel = getFloorLabel(currentFloor);
@@ -85,8 +80,6 @@ const ClassroomReservation = () => {
         </div>
       </header>
 
-
-
       <div className="d-flex align-items-center gap-3 mt-3">
         <div className="sub-header">
           <h2><span>{floorLabel} Rooms</span></h2>
@@ -99,15 +92,12 @@ const ClassroomReservation = () => {
         {(filteredRooms.length > 0 ? filteredRooms : rooms).map((room, index) => (
           <div key={index} className={`classroom-card ${room.status === 0 ? "unavailable" : ""}`}>
             
-            {/* ✅ Capacity in the top-left */}
             <div className="capacity">
               <FaUsers className="user-icon" /> {room.capacity || "N/A"}
             </div>
 
-            {/* ✅ Top-right container for checkbox & camera button */}
             <div className="top-right-container">
 
-              {/* ✅ Camera Icon as a Button */}
               <button
                 className="camera-button"
                 onClick={() => document.getElementById(`file-upload-${index}`).click()}
@@ -115,7 +105,6 @@ const ClassroomReservation = () => {
                 <FaCamera className="camera-icon" />
               </button>
 
-              {/* Hidden File Input */}
               <input
                 id={`file-upload-${index}`}
                 type="file"
@@ -123,8 +112,7 @@ const ClassroomReservation = () => {
                 style={{ display: "none" }}
                 onChange={(e) => handleImageUpload(index, e)}
               />
-                            {/* Unavailable checkbox */}
-                            <label className="unavailable-checkbox">
+                <label className="unavailable-checkbox">
                 <input
                   type="checkbox"
                   checked={room.status === 0}
@@ -133,7 +121,6 @@ const ClassroomReservation = () => {
               </label>
             </div>
 
-            {/* ✅ Room image or upload option */}
             <div className="classroom-content">
               {room.image ? (
                 <div className="classroom-image">

@@ -1,4 +1,4 @@
-General container styling
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -20,36 +20,36 @@ General container styling
     font-weight: bold;
   }
   
-  /* Search bar styling */
+
   .search-bar {
     max-width: 300px;
   }
   
-  /* Classroom grid layout */
   .classroom-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    height: 65vh;
+    grid-template-columns: repeat(auto-fill, 300px); /* fixed 300px wide cards */
     gap: 40px;
+    justify-content: center; /* center the grid */
     margin-top: 20px;
+    height: auto; /* optional: let grid height grow naturally */
   }
   
-  /* Classroom card styling */
   .classroom-card {
+    width: 300px; /* fix width */
+    height: 300px; /* fix height (adjust as needed) */
     position: relative;
     background: linear-gradient(to bottom, #000000, #efefef98);
     border-radius: 12px;
     padding: 20px;
-    
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
     overflow: hidden;
   }
+  
   .classroom-card:hover {
-    transform: translateY(-5px); /* Adding hover effect for a smooth animation */
+    transform: translateY(-5px); 
   }
   
-  /* Add blur effect using a pseudo-element */
   .classroom-card::after {
     content: "";
     position: absolute;
@@ -57,46 +57,40 @@ General container styling
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.6); /* Semi-transparent overlay */
-    backdrop-filter: blur(8px); /* Apply the blur */
-    opacity: 0; /* Initially hide the blur effect */
-    transition: opacity 0.3s ease-in-out; /* Smooth transition */
-    pointer-events: none; /* Ensure the blur doesn't block interactions */
+    background: rgba(255, 255, 255, 0.6); 
+    backdrop-filter: blur(8px);
+    opacity: 0; 
+    transition: opacity 0.3s ease-in-out; 
+    pointer-events: none; 
     z-index: -1; 
   }
   
   .classroom-card:hover::after {
-    opacity: 1; /* Show the blur effect when hovering */
+    opacity: 1; 
   }
   .classroom-card:hover {
     transform: translateY(-5px);
   }
   
-  /* Top-left: Capacity */
   .capacity {
     position: absolute;
     top: 10px;
     left: 10px;
-    /* background: #919191; */
     color: white;
-    /* padding: 5px 10px;
-    border-radius: 5px; */
     font-size: 14px;
     font-weight: bold;
   }
   
-  /* Top-right: Unavailable checkbox & Camera button */
   .top-right-container {
     position: absolute;
     top: 1px;
     right: 5px;
     display: flex;
-    flex-direction: column; /* Arrange items vertically */
+    flex-direction: column;
     align-items: center;
     gap: 10px;
   }
   
-  /* Unavailable checkbox */
   .unavailable-checkbox {
     display: flex;
     align-items: center;
@@ -133,21 +127,22 @@ General container styling
   
   /* Room content */
   .classroom-content {
+    margin-top: 35px;
     text-align: center;
-    flex-grow: 1; /* Allow content to take available space */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
   
   .classroom-image img {
-    max-width: 100%;
-    height: 130px;
+    width: 100%;
+    height: 180px; /* adjust to your preferred height */
     object-fit: cover;
     border-radius: 8px;
+    display: block;
   }
   
-/* Room name positioned at the bottom-left */
 .room-name {
     position: absolute;
     bottom: 20px;

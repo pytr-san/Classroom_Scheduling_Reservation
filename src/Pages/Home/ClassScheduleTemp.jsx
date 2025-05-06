@@ -54,6 +54,7 @@ const ClassSchedule = () => {
     const [subjects, setSubjects] = useState([]);
     const [rooms, setRooms] = useState([]);
     console.log('Fetching subjects with:', { courseId, year });
+    
     useEffect(() => {
         axios.get('http://localhost:8000/api/professors', { withCredentials: true })
             .then(res => setProfessors(res.data))

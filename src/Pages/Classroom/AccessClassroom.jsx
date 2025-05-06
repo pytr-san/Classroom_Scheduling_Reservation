@@ -165,7 +165,7 @@ const AccessClassroom = () => {
 
         {/* Main Content */}
         <div className="card text-white bg-dark mt-4 p-4">
-            <section className="classroom-info">
+            <section className="classroom-info1">
                 <h2 className="fw-bold">Tia Maria Building, {getFloorLabel(currentFloor)}.</h2>
                 <h4 className="mt-3" style={{ color: "white" }}>Classroom list:</h4>
                 <ul className="list-unstyled">

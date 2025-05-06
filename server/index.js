@@ -44,10 +44,9 @@ app.use('/api', courseRouter);
 app.use("/", homeRouter);
 app.use("/api", adminRouter);
 app.use("/classrooms", classRoute);  
-// Serve static files for viewing (uploads)
+
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '/uploads/pdfs')));
 
-// Routes
 app.use('/api', uploadRoute);
 
 const PORT = process.env.PORT || 8000;
