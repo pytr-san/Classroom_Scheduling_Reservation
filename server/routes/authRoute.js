@@ -6,10 +6,13 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import refreshTokenMiddleware from '../middleware/refreshTokenMiddleware.js';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
+import { forgotPassword, resetPassword } from '../controllers/forgotPassController.js';
 dotenv.config();
 
 const router = express.Router();
 
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 const INACTIVITY_PERIOD = 30; // days
 //for checking: Runs every 10seconds

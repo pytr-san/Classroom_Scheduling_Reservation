@@ -1,0 +1,66 @@
+.forgotPassContainer {
+    max-width: 400px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .forgotPassContainer .forgotForm {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .forgotPassContainer .forgotForm h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .forgotPassContainer .inputGroupFp {
+    margin-bottom: 1rem;
+  }
+  
+  .forgotPassContainer .inputGroupFp label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .forgotPassContainer .inputGroupFp input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .forgotPassContainer button[type="submit"] {
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .forgotPassContainer button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+  
+  .forgotPassContainer .successMessage {
+    color: green;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .forgotPassContainer .errorMessage {
+    color: red;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  

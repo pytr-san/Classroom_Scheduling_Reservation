@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import axios from "axios";
 import Home from "./Pages/Home/Home.jsx";
 import Classroom from "./Pages/Classroom/Classroom.jsx";
 import Course from "./Pages/Course/Course.jsx";
@@ -12,13 +11,13 @@ import RequireAuth from "./components/RequireAuth.jsx";
 import UnauthorizedPage from "./Unauthorized.jsx";
 import ClassSchedule from "./Pages/Home/ClassScheduleTemp.jsx";
 import ClassroomReservation from "./Pages/Classroom/ClassroomReservation.jsx";
-import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx"
-import CourseForm from "./Pages/Course/CourseForm.jsx"
+import ScheduleTemp from "./Pages/Classroom/RoomScheduleTemp.jsx";
+import CourseForm from "./Pages/Course/CourseForm.jsx";
 import AdminChangePassword from "./Pages/Settings/AdminChangePassword.jsx";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import FileUploadPage from './Pages/Course/FileUploadPage.jsx';
 import ManageUsers from "./Pages/Settings/ManageUsers.jsx";
-
+import ForgotPassword from "./Pages/forgotPass.jsx";
 
 const ROLES = {
   student: "student",
@@ -37,6 +36,8 @@ const ROLES = {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />               
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />  
+                <Route path="/forgotpassword" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ForgotPassword />} />  
 
                 <Route path ="/" element={<Layout />}>
                     {/* Protected Routes (With Layout) */}

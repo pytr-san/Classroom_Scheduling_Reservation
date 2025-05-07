@@ -1,23 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Table, Button, Dropdown, DropdownButton, Tooltip, OverlayTrigger, Modal, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarAlt, faCheck, faTimes, faDownload, faUndo, faSave, faPrint, faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import "./schedule.css";
 import "./table.css";
 import  axiosInstance  from '../../axios.jsx';
-import { useLocation } from 'react-router-dom';
 
 const ClassSchedule = () => {
-    const location = useLocation();
-    const courseName = location.state?.courseName || '';
-    const courseId = location.state?.courseId || '';
-    const year = location.state?.year || '';
-    const section = location.state?.section || '';
-
-    const [course, setCourse] = useState(courseId);
-    const [yearLevel, setYearLevel] = useState(year);
+   
     const [selectedSection, setSelectedSection] = useState("Select Section");
     const [selectedCells, setSelectedCells] = useState(new Set());
     const [mergedCells, setMergedCells] = useState({});
@@ -26,22 +18,87 @@ const ClassSchedule = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newCourse, setNewCourse] = useState("BSIT");
     const [newSection, setNewSection] = useState("");
-    
     const [courses, setCourses] = useState({
-        BSIT: ["1A", "1B", "2A", "2B", "3A", "3B", "4A"],
-        BSCPE: ["1", "2", "3", "4"],
-        BSCS: ["1", "2", "A", "4"],
+        BSIT: ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"],
+        BSCPE: ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"],
+        BSCS: ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"],
     });
+
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [selectedCellKey, setSelectedCellKey] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState("");
     const [selectedSemester, setSelectedSemester] = useState("Semester 1");
     const [selectedSchoolYear, setSelectedSchoolYear] = useState("2023-2024");
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const scheduleTableRef = useRef(null);
-
-    // State for saved schedules and conflicts
     const [savedSchedules, setSavedSchedules] = useState({});
     const [conflicts, setConflicts] = useState([]);
+    const [professors, setProfessors] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+    const [rooms, setRooms] = useState([]);
+
+    const [yearLevel, setYearLevel] = useState('');
+    const [courseId, setCourseId] = useState(''); // Store the course_id, not the name
+    const [courseName, setCourseName] = useState(''); 
+    const [year, setYear] = useState('');
+    const [course, setCourse] = useState([]);
+
+    // Fetch courses from the backend
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await  axiosInstance.get('/api/course');
+                setCourse(response.data); // Store courses
+                
+            } catch (err) {
+                console.error('Error fetching courses:', err);
+                setError('Failed to fetch courses');
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
+    const handleCourseChange = (event) => {
+        const selectedCourse = course.find(course => course.course_name === event.target.value);
+        setCourseName(event.target.value);
+        setCourseId(selectedCourse?.course_id || ''); // Store the course_id
+        setYear('');
+    };
+
+    const handleYearChange = (event) => {
+        setYear(event.target.value);
+    };
+
+    
+    const handleFilter = () => {
+        if (courseName && courseId && year ) {
+          console.log(courseName, courseId, year);
+          setCourseId(courseId);
+          setCourseName(courseName);
+          setYearLevel(year);
+  
+          setShowFilterModal(false);
+        } else {
+            alert('Please select Course and year level');
+        }
+    };
+
+    // Hardcoded course data for years and sections
+    const courseData = {
+      BSIT: {
+        years: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+      },
+      BSCPE: {
+        years: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+      },
+      BSCS: {
+        years: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+      },
+    };
+
+    const selectedCourseData = courseData[courseName] || {};
+
 
     const times = [
         "7:00 - 8:00", "8:00 - 9:00", "9:00 - 10:00", "10:00 - 11:00",
@@ -49,32 +106,33 @@ const ClassSchedule = () => {
         "3:00 - 4:00", "4:00 - 5:00", "5:00 - 6:00", "6:00 - 7:00"
     ];
 
-    // Fetch initial data
-    const [professors, setProfessors] = useState([]);
-    const [subjects, setSubjects] = useState([]);
-    const [rooms, setRooms] = useState([]);
-    console.log('Fetching subjects with:', { courseId, year });
-    
     useEffect(() => {
         axiosInstance.get('/api/professors')
             .then(res => setProfessors(res.data))
             .catch(err => console.error('Error fetching professors:', err));
-    
-        if (courseId && year) {
+
+        if (courseId && yearLevel) {
             axiosInstance.get('/api/subjects', {
-                params: { courseId, yearLevel: year },
-                withCredentials: true
-            })         
-                .then(res => setSubjects(res.data))
-                .catch(err => console.error('Error fetching subjects:', err));            
+                params: { courseId: courseId, yearLevel: yearLevel }})
+                .then(res => {
+                    if (res.data && Array.isArray(res.data)) {
+                        setSubjects(res.data);
+                    } else {
+                        setSubjects([]);
+                        console.warn('No subjects found for the initial course and year level.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching subjects:', err);
+                    setSubjects([]);
+                });
         }
 
         axiosInstance.get('/api/rooms')
             .then(res => setRooms(res.data))
             .catch(err => console.error('Error fetching rooms:', err));
-    }, [course, year]);
+    }, [courseId, yearLevel]);
 
-    // Load saved schedules
     useEffect(() => {
         const saved = localStorage.getItem('allSchedules');
         if (saved) {
@@ -82,7 +140,6 @@ const ClassSchedule = () => {
         }
     }, []);
 
-    // Load schedule for selected section
     useEffect(() => {
         if (selectedSection !== "Select Section" && savedSchedules[selectedSection]) {
             const { mergedCells, cellStatus, cellDetails, selectedSemester, selectedSchoolYear } = savedSchedules[selectedSection];
@@ -98,19 +155,16 @@ const ClassSchedule = () => {
         }
     }, [selectedSection, savedSchedules]);
 
-    // Conflict detection for saved schedules
     useEffect(() => {
         const detectConflicts = () => {
             const newConflicts = [];
-    
+
             for (const [sectionA, scheduleA] of Object.entries(savedSchedules)) {
                 for (const [sectionB, scheduleB] of Object.entries(savedSchedules)) {
                     if (sectionA !== sectionB) {
                         for (const [keyA, detailsA] of Object.entries(scheduleA.cellDetails)) {
                             for (const [keyB, detailsB] of Object.entries(scheduleB.cellDetails)) {
-                                // Check if same time slot and same professor
                                 if (keyA === keyB && detailsA.professor?.name === detailsB.professor?.name) {
-                                    // Conflict only if different subjects and different rooms
                                     if (
                                         detailsA.subject?.subject_name !== detailsB.subject?.subject_name &&
                                         detailsA.room?.room_name !== detailsB.room?.room_name
@@ -124,7 +178,7 @@ const ClassSchedule = () => {
                                             roomA: detailsA.room?.room_name,
                                             roomB: detailsB.room?.room_name,
                                             time: times[parseInt(keyA.split('-')[0])],
-                                            cellKey: keyA 
+                                            cellKey: keyA
                                         });
                                     }
                                 }
@@ -133,15 +187,16 @@ const ClassSchedule = () => {
                     }
                 }
             }
-    
+
             setConflicts(newConflicts);
         };
-    
+
         detectConflicts();
     }, [savedSchedules]);
 
     const semesters = ["Semester 1", "Semester 2"];
     const schoolYears = ["2023-2024", "2024-2025"];
+    const yearLevels = ["1", "2", "3", "4"];
 
     const toggleCellSelection = (key) => {
         setSelectedCells(prev => {
@@ -155,75 +210,93 @@ const ClassSchedule = () => {
         });
     };
 
-    const confirmMerge = () => {
-        if (selectedCells.size < 2) {
-            alert("Select at least two cells to merge.");
-            return;
-        }
-
-        const cellsArray = Array.from(selectedCells);
-        const cellIndices = cellsArray.map(key => {
-            const [row, col] = key.split('-').map(Number);
-            return { key, row, col };
-        });
-
-        const minRow = Math.min(...cellIndices.map(cell => cell.row));
-        const maxRow = Math.max(...cellIndices.map(cell => cell.row));
-        const minCol = Math.min(...cellIndices.map(cell => cell.col));
-        const maxCol = Math.max(...cellIndices.map(cell => cell.col));
-
-        const expectedCellCount = (maxRow - minRow + 1) * (maxCol - minCol + 1);
-        if (cellsArray.length !== expectedCellCount) {
-            alert("Please select a contiguous rectangular block of cells to merge.");
-            setSelectedCells(new Set());
-            return;
-        }
-
-        for (let row = minRow; row <= maxRow; row++) {
-            for (let col = minCol; col <= maxCol; col++) {
-                const key = `${row}-${col}`;
-                if (!selectedCells.has(key)) {
-                    alert("Please select a contiguous rectangular block of cells to merge.");
-                    setSelectedCells(new Set());
-                    return;
-                }
-            }
-        }
-
-        const rowSpan = maxRow - minRow + 1;
-        const colSpan = maxCol - minCol + 1;
-        const anchorCell = `${minRow}-${minCol}`;
-
-        setMergedCells(prev => ({
-            ...prev,
-            [anchorCell]: {
-                cells: cellsArray,
-                rowSpan,
-                colSpan,
-                minRow,
-                maxRow,
-                minCol,
-                maxCol
-            }
-        }));
-
-        cellsArray.forEach(cell => {
+    const confirmAction = () => {
+        if (selectedCells.size === 1) {
+            const key = Array.from(selectedCells)[0];
             setCellStatus(prev => ({
                 ...prev,
-                [cell]: 'Merged'
+                [key]: 'Single'
             }));
-        });
 
-        setCellDetails(prev => ({
-            ...prev,
-            [anchorCell]: prev[anchorCell] || {
-                professor: professors[0] || { name: '' },
-                subject: subjects[0] || { subject_name: '' },
-                room: rooms[0] || { room_name: '' }
+            setCellDetails(prev => ({
+                ...prev,
+                [key]: prev[key] || {
+                    professor: professors[0] || { name: '' },
+                    subject: subjects[0] || { subject_name: '' },
+                    room: rooms[0] || { room_name: '' }
+                }
+            }));
+            
+            // Keep the cell selected after creation
+            setSelectedCells(new Set([key]));
+        } else if (selectedCells.size > 1) {
+            const cellsArray = Array.from(selectedCells);
+            const cellIndices = cellsArray.map(key => {
+                const [row, col] = key.split('-').map(Number);
+                return { key, row, col };
+            });
+
+            const minRow = Math.min(...cellIndices.map(cell => cell.row));
+            const maxRow = Math.max(...cellIndices.map(cell => cell.row));
+            const minCol = Math.min(...cellIndices.map(cell => cell.col));
+            const maxCol = Math.max(...cellIndices.map(cell => cell.col));
+
+            const expectedCellCount = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+            if (cellsArray.length !== expectedCellCount) {
+                alert("Please select a contiguous rectangular block of cells to merge.");
+                setSelectedCells(new Set());
+                return;
             }
-        }));
 
-        setSelectedCells(new Set());
+            for (let row = minRow; row <= maxRow; row++) {
+                for (let col = minCol; col <= maxCol; col++) {
+                    const key = `${row}-${col}`;
+                    if (!selectedCells.has(key)) {
+                        alert("Please select a contiguous rectangular block of cells to merge.");
+                        setSelectedCells(new Set());
+                        return;
+                    }
+                }
+            }
+
+            const rowSpan = maxRow - minRow + 1;
+            const colSpan = maxCol - minCol + 1;
+            const anchorCell = `${minRow}-${minCol}`;
+
+            setMergedCells(prev => ({
+                ...prev,
+                [anchorCell]: {
+                    cells: cellsArray,
+                    rowSpan,
+                    colSpan,
+                    minRow,
+                    maxRow,
+                    minCol,
+                    maxCol
+                }
+            }));
+
+            cellsArray.forEach(cell => {
+                setCellStatus(prev => ({
+                    ...prev,
+                    [cell]: 'Merged'
+                }));
+            });
+
+            setCellDetails(prev => ({
+                ...prev,
+                [anchorCell]: prev[anchorCell] || {
+                    professor: professors[0] || { name: '' },
+                    subject: subjects[0] || { subject_name: '' },
+                    room: rooms[0] || { room_name: '' }
+                }
+            }));
+
+            // Keep the anchor cell selected after merge
+            setSelectedCells(new Set([anchorCell]));
+        } else {
+            alert("Please select at least one cell to create or merge.");
+        }
     };
 
     const cancelMerge = () => {
@@ -286,7 +359,7 @@ const ClassSchedule = () => {
     const handleDownloadSchedule = () => {
         if (scheduleTableRef.current) {
             html2canvas(scheduleTableRef.current, { scale: 2 }).then((canvas) => {
-                const imgData = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/jpeg');
                 const pdf = new jsPDF({
                     orientation: 'landscape',
                     unit: 'px',
@@ -305,7 +378,7 @@ const ClassSchedule = () => {
                 const xOffset = (pdfWidth - scaledWidth) / 2;
                 const yOffset = (pdfHeight - scaledHeight) / 2;
 
-                pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+                pdf.addImage(imgData, 'JPEG', xOffset, yOffset, scaledWidth, scaledHeight);
                 pdf.save('class_schedule.pdf');
             });
         }
@@ -379,6 +452,7 @@ const ClassSchedule = () => {
         setShowStatusModal(false);
     };
 
+
     return (
         <Container className="main mt-4">
             <Header
@@ -389,9 +463,10 @@ const ClassSchedule = () => {
                 setSelectedSchoolYear={setSelectedSchoolYear}
                 semesters={semesters}
                 schoolYears={schoolYears}
+                setShowFilterModal={setShowFilterModal}
+                courseName={courseName}
             />
 
-            {/* Display conflicts at the top */}
             {conflicts.length > 0 && (
                 <Row className="mb-3 conflict-section">
                     <Col>
@@ -461,7 +536,7 @@ const ClassSchedule = () => {
                     </div>
                     <ActionButtons
                         selectedCells={selectedCells}
-                        confirmMerge={confirmMerge}
+                        confirmAction={confirmAction}
                         cancelMerge={cancelMerge}
                         unmergeCells={unmergeCells}
                     />
@@ -480,7 +555,6 @@ const ClassSchedule = () => {
                 selectedSection={selectedSection}
             />
 
-            {/* Create Section Modal */}
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Create New Section</Modal.Title>
@@ -519,7 +593,6 @@ const ClassSchedule = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Status Change Confirmation Modal */}
             <Modal show={showStatusModal} onHide={() => setShowStatusModal(false)} size="sm">
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Status</Modal.Title>
@@ -536,6 +609,54 @@ const ClassSchedule = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+{/* filter modal*/}
+            <Modal show={showFilterModal} onHide={() => setShowFilterModal(false)} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Filter subjects by Course and year level</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                <Form.Group className="mb-3">
+                    <Form.Label>Course</Form.Label>
+                    <Form.Select value={courseName} onChange={handleCourseChange}>
+                    <option value="">Select a course</option>
+                    {course.map((courseData) => (
+                        <option key={courseData.course_id} value={courseData.course_name}>
+                        {courseData.course_name}
+                        </option>
+                    ))}
+                    </Form.Select>
+                </Form.Group>
+
+                {courseName && (
+                    <>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Year</Form.Label>
+                        <Form.Select value={year} onChange={handleYearChange}>
+                        <option value="">Select a year</option>
+                        {selectedCourseData.years?.map((yr) => (
+                            <option key={yr} value={yr}>
+                            {yr}
+                            </option>
+                        ))}
+                        </Form.Select>
+                    </Form.Group>
+
+                    </>
+                )}
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowFilterModal(false)}>
+                Cancel
+                </Button>
+                <Button variant="primary" onClick={handleFilter}>
+                Filter
+                </Button>
+            </Modal.Footer>
+            </Modal>
+
         </Container>
     );
 };
@@ -546,12 +667,9 @@ const SectionNavigation = ({ savedSchedules, setSavedSchedules, setSelectedSecti
         delete updatedSchedules[section];
         setSavedSchedules(updatedSchedules);
         localStorage.setItem('allSchedules', JSON.stringify(updatedSchedules));
-
-        // Reset selected section if it's the one deleted
         if (selectedSection === section) {
-            setSelectedSection(null);
+            setSelectedSection("Select Section");
         }
-
         alert(`Deleted schedule for ${section}`);
     };
 
@@ -584,7 +702,6 @@ const SectionNavigation = ({ savedSchedules, setSavedSchedules, setSelectedSecti
     );
 };
 
-
 const Header = ({
     setShowCreateModal,
     selectedSemester,
@@ -592,7 +709,9 @@ const Header = ({
     selectedSchoolYear,
     setSelectedSchoolYear,
     semesters,
-    schoolYears
+    schoolYears,
+    setShowFilterModal,
+    courseName
 }) => (
     <Row className="mb-3 d-flex justify-content-between align-items-center">
         <Col className="d-flex align-items-center">
@@ -632,9 +751,12 @@ const Header = ({
                     </Dropdown.Item>
                 ))}
             </DropdownButton>
-            <Button variant="success" onClick={() => setShowCreateModal(true)}>
+            <Button variant="success" onClick={() => setShowCreateModal(true)} className="me-2">
                 <FontAwesomeIcon icon={faPlus} className="me-2" /> Create
             </Button>
+            <Button variant="info" onClick={() => setShowFilterModal(true)}>
+    <FontAwesomeIcon icon={faFilter} className="me-2" /> Filter Subjects {courseName}
+    </Button>
         </Col>
     </Row>
 );
@@ -687,6 +809,71 @@ const ScheduleTable = ({
     rooms,
     conflicts
 }) => {
+    const renderDropdowns = (key) => {
+        return (
+            <div className="cell-content">
+                <DropdownButton
+                    title={cellDetails[key]?.professor?.name || "Select Professor"}
+                    variant="secondary"
+                    size="sm"
+                    className="mb-1"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {professors.map((prof, index) => (
+                        <Dropdown.Item
+                            key={index}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                updateCellDetails(key, "professor", prof);
+                            }}
+                        >
+                            {prof.name}
+                        </Dropdown.Item>
+                    ))}
+                </DropdownButton>
+
+                <DropdownButton
+                    title={cellDetails[key]?.subject?.subject_name || "Select Subject"}
+                    variant="secondary"
+                    size="sm"
+                    className="mb-1"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {subjects.map((subj, index) => (
+                        <Dropdown.Item
+                            key={index}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                updateCellDetails(key, "subject", subj);
+                            }}
+                        >
+                            {subj.subject_name}
+                        </Dropdown.Item>
+                    ))}
+                </DropdownButton>
+
+                <DropdownButton
+                    title={cellDetails[key]?.room?.room_name || "Select Room"}
+                    variant="secondary"
+                    size="sm"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {rooms.map((room, index) => (
+                        <Dropdown.Item
+                            key={index}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                updateCellDetails(key, "room", room);
+                            }}
+                        >
+                            {room.room_name}
+                        </Dropdown.Item>
+                    ))}
+                </DropdownButton>
+            </div>
+        );
+    };
+
     return (
         <div className="table-container">
             <Table bordered size="sm" className="text-center custom-schedule-table">
@@ -735,7 +922,6 @@ const ScheduleTable = ({
                                     return null;
                                 }
 
-                                // Check if cell is part of a conflict
                                 const isConflicted = conflicts.some((conflict) => {
                                     const conflictTimeIndex = times.indexOf(conflict.time);
                                     return (
@@ -769,56 +955,7 @@ const ScheduleTable = ({
                                         }}
                                         onDoubleClick={() => handleStatusChange(key, "Online")}
                                     >
-                                        {isAnchor && (
-                                            <div className="cell-content">
-                                                <DropdownButton
-                                                    title={cellDetails[key]?.professor?.name || "Select Professor"}
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    className="mb-1"
-                                                >
-                                                    {professors.map((prof, index) => (
-                                                        <Dropdown.Item
-                                                            key={index}
-                                                            onClick={() => updateCellDetails(key, "professor", prof)}
-                                                        >
-                                                            {prof.name}
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </DropdownButton>
-
-                                                <DropdownButton
-                                                    title={cellDetails[key]?.subject?.subject_name || "Select Subject"}
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    className="mb-1"
-                                                >
-                                                    {subjects.map((subj, index) => (
-                                                        <Dropdown.Item
-                                                            key={index}
-                                                            onClick={() => updateCellDetails(key, "subject", subj)}
-                                                        >
-                                                            {subj.subject_name}
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </DropdownButton>
-
-                                                <DropdownButton
-                                                    title={cellDetails[key]?.room?.room_name || "Select Room"}
-                                                    variant="secondary"
-                                                    size="sm"
-                                                >
-                                                    {rooms.map((room, index) => (
-                                                        <Dropdown.Item
-                                                            key={index}
-                                                            onClick={() => updateCellDetails(key, "room", room)}
-                                                        >
-                                                            {room.room_name}
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </DropdownButton>
-                                            </div>
-                                        )}
+                                        {(cellStatus[key] || selectedCells.has(key)) && renderDropdowns(key)}
                                     </td>
                                 );
                             })}
@@ -830,13 +967,13 @@ const ScheduleTable = ({
     );
 };
 
-const ActionButtons = ({ selectedCells, confirmMerge, cancelMerge, unmergeCells }) => (
+const ActionButtons = ({ selectedCells, confirmAction, cancelMerge, unmergeCells }) => (
     <>
-        {selectedCells.size > 1 && (
+        {selectedCells.size > 0 && (
             <div className="mt-2">
-                <OverlayTrigger placement="top" overlay={<Tooltip>Merge selected cells</Tooltip>}>
-                    <Button variant="success" className="me-2" onClick={confirmMerge}>
-                        <FontAwesomeIcon icon={faCheck} className="me-2" /> Merge
+                <OverlayTrigger placement="top" overlay={<Tooltip>Create/Merge selected cells</Tooltip>}>
+                    <Button variant="success" className="me-2" onClick={confirmAction}>
+                        <FontAwesomeIcon icon={faCheck} className="me-2" /> Create/Merge
                     </Button>
                 </OverlayTrigger>
                 <OverlayTrigger placement="top" overlay={<Tooltip>Unmerge selected cells</Tooltip>}>

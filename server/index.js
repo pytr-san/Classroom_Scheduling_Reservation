@@ -55,7 +55,7 @@ if (isProduction) {
 
   // Fallback to index.html for client-side routing
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    res.sendFile(path.join(distPath, '../dist/index.html'));
   });
 }
 

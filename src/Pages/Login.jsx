@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link  } from "react-router-dom";
 import  axiosInstance  from './../axios.jsx';
 import styles from "./Login.module.css";
 import useAuth from "../Hooks/useAuth";
@@ -115,9 +115,9 @@ export default function Login() {
                         </div>
 
                         <button type="submit" className={styles.loginButton}>Login</button>
-                        <a href="/forgot-password" className={styles.forgotPasswordLink}>
+                        <Link to="/forgotpassword" className={styles.forgotPasswordLink}>
                             Forgot Password?
-                        </a>
+                        </Link>
                     </form>
 
                     {/* {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>} */}
