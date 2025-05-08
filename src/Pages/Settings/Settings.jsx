@@ -50,14 +50,41 @@ const Settings = () => {
             console.error("Logout failed:", error);
         }
     };
-    const toggleSidebar = () => {
-        setIsSidebarOpen((prev) => !prev);
-    };
+    // const toggleSidebar = () => {
+    //     setIsSidebarOpen((prev) => !prev);
+    // };
 
     if (!auth.user) {
         return <div>Loading user data...</div>;
     }
 
+    const handleDeleteAccount = async () => {
+        const confirmation = prompt('⚠️ This action is irreversible.\nType "Confirm Delete" to permanently delete your account.');
+
+        if (confirmation !== "Confirm Delete") {
+            toast.error("Account deletion cancelled. You must type 'Confirm Delete' exactly.");
+            return;
+        }
+        try {
+          await axiosInstance.delete("/auth/delete-account", {
+            data: { email: user?.email, role: auth?.role },
+          });
+      
+          toast.success("Account deleted successfully.");
+          sessionStorage.removeItem("adminAccess");
+          localStorage.clear();
+          setAuth(null);
+
+          setTimeout(() => {
+            navigate("/login");
+          }, 5000);
+
+        } catch (error) {
+          console.error("Account deletion failed:", error);
+          toast.error("Failed to delete account. Try again later.");
+        }
+      };
+      
     return (
 
     <div className="settings-page">
@@ -108,6 +135,7 @@ const Settings = () => {
                 <p><strong>Name:</strong> {user?.name || ""}</p>
                 <p><strong>Email:</strong> {user?.email || ""}</p>
                 <button className="btnlogout" onClick={setLogout}>Sign out</button>
+                <button className="btndelete" onClick={handleDeleteAccount}> Delete Account </button>
             </div>
         </div>
 

@@ -111,9 +111,7 @@ const AccessClassroom = () => {
             </div>
             <div className="d-flex justify-content-end ">
                 
-                <Button variant="outline-secondary" className="" onClick={() => navigate(-1)}>
-                    <i className="bi bi-arrow-left fs-5"></i>
-                </Button>
+
             </div>
         </div>
 

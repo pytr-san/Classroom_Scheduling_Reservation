@@ -511,9 +511,12 @@ const RoomScheduleTemp = () => {
   return (
     <div className="room-schedule-container">
       <div className="schedule-header">
-        <Button variant="outline-secondary" className="" onClick={() => navigate(-1)}>
+      <Button variant="outline-secondary" 
+        className="px-4"
+       style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }} 
+        onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left fs-5"></i>
-        </Button>
+      </Button>
         <h2>Examination Schedule</h2>
         <div className="right-controls">
 

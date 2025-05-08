@@ -7,6 +7,8 @@ import refreshTokenMiddleware from '../middleware/refreshTokenMiddleware.js';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import { forgotPassword, resetPassword } from '../controllers/forgotPassController.js';
+import { body, validationResult } from 'express-validator';
+
 dotenv.config();
 
 const router = express.Router();
@@ -14,12 +16,11 @@ const router = express.Router();
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 
-const INACTIVITY_PERIOD = 30; // days
+const INACTIVITY_PERIOD = 60; // days
 //for checking: Runs every 10seconds
 //cron.schedule('*/10 * * * * *', async () => { 
 cron.schedule('0 0 * * *', async () => {
-  console.log('Checking for inactive users...');
-  
+ 
   try {
     const db = await connectToDatabase();
     const currentDate = new Date();
@@ -98,20 +99,40 @@ router.post('/register', async (req, res) => {
 
 
 const MAX_ATTEMPTS = 5;
-router.post('/login', async (req, res) => {
+const COOLDOWN_MINUTES = 120;
+router.post(  '/login',
+[
+
+  body('email')
+    .trim()
+    .isEmail().withMessage('Invalid email address.')
+    .normalizeEmail()
+    .escape(),
+
+  body('password')
+    .trim()
+    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters.')
+],
+async (req, res) => {
+ 
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      error: errors.array()[0].msg,
+    });
+  }
     try {
         const db = await connectToDatabase();
         const { email, password } = req.body;
 
         let user = null;
 
-        // 🟢 Optimized Query to Search in All Tables at Once
         const [users] = await db.query(
-            `SELECT admin_id AS id, NULL AS course_id, name, email, password, is_active, status, role FROM admin WHERE email = ?
+            `SELECT admin_id AS id, NULL AS course_id, name, email, password, is_active, status, role, failed_attempts, last_failed_login FROM admin WHERE email = ?
             UNION 
-            SELECT student_id AS id, course_id, name, email, password, is_active, status, role FROM student WHERE email = ?
+            SELECT student_id AS id, course_id, name, email, password, is_active, status, role, failed_attempts, last_failed_login FROM student WHERE email = ?
             UNION 
-            SELECT faculty_id AS id, NULL AS course_id, name, email, password, is_active, status, role FROM faculty WHERE email = ?`, 
+            SELECT faculty_id AS id, NULL AS course_id, name, email, password, is_active, status, role, failed_attempts, last_failed_login FROM faculty WHERE email = ?`, 
             [email, email, email]
         );
 
@@ -120,16 +141,57 @@ router.post('/login', async (req, res) => {
             user = users[0]; 
         }
 
-        // ❌ If No User Found
         if (!user) {
             return res.status(401).json({ message: "User not found. Please check your email." });
         }
 
-        // 🔒 Validate Password
+        const table = user.role;
+
+            if (user.failed_attempts >= MAX_ATTEMPTS) {
+
+                if (!user.last_failed_login) {
+                    return res.status(403).json({
+                    message: "Account locked. Please try again later or contact admin."
+                    });
+                }
+                
+                const lastFailed = new Date(user.last_failed_login);
+                const now = new Date();
+                const minutesSinceLastFail = (now - lastFailed) / 60000;
+                
+                if (minutesSinceLastFail >= COOLDOWN_MINUTES) {
+                    // Reset failed attempts
+                    await db.query(
+                    `UPDATE ${table} SET failed_attempts = 0, last_failed_login = NULL WHERE ${table}_id = ?`,
+                    [user.id]
+                    );
+                    user.failed_attempts = 0;
+                    user.last_failed_login = null;
+                } else {
+                    const remainingMinutes = Math.ceil(COOLDOWN_MINUTES - minutesSinceLastFail);
+                    const hours = Math.floor(remainingMinutes / 60);
+                    const minutes = remainingMinutes % 60;
+                    return res.status(403).json({
+                        message: `Account locked. Try again in ${hours} hour(s) and ${minutes} minute(s).`
+                      });
+                }
+            }
+
+        // 🔐 Check password
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
+            await db.query(
+                `UPDATE ${table} SET failed_attempts = failed_attempts + 1, last_failed_login = NOW() WHERE email = ?`,
+                [email]
+            );
             return res.status(401).json({ message: "Incorrect password" });
         }
+
+        // ✅ On successful login, reset attempts
+        await db.query(
+            `UPDATE ${table} SET failed_attempts = 0, last_failed_login = NULL, last_active = NOW() WHERE ${table}_id = ?`,
+            [user.id]
+        );
 
         delete user.password;
         
@@ -155,7 +217,7 @@ router.post('/login', async (req, res) => {
         //                                 process.env.JWT_REFRESH, 
         //                                 { expiresIn: '1d' });
 
-        const table = user.role;
+       // const table = user.role;
         await db.query(`UPDATE ${table} SET last_active = NOW() WHERE ${table}_id = ?`, [user.id]);
 
         // ✅ Store token in HTTP-only cookie
@@ -262,4 +324,49 @@ router.put('/change-password', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
+
+
+router.delete("/delete-account",authMiddleware , async (req, res) => {
+    const { email, role } = req.body;
+    const db = await connectToDatabase();
+
+    if (!email || !role) {
+      return res.status(400).json({ message: "Email and role are required." });
+    }
+  
+    let tableName;
+  
+    switch (role) {
+      case "admin":
+        tableName = "admin";
+        break;
+      case "faculty":
+        tableName = "faculty";
+        break;
+      case "student":
+        tableName = "student";
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid role." });
+    }
+    
+    try {
+      const [result] = await db.execute(
+        `DELETE FROM ${tableName} WHERE email = ?`,
+        [email]
+      );
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Account not found." });
+      }
+  
+      res.status(200).json({ message: "Account deleted successfully." });
+    } catch (err) {
+      console.error("Delete error:", err);
+      res.status(500).json({ message: "Server error. Could not delete account." });
+    }
+  });
+  
+
 export default router;

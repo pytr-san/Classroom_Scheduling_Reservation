@@ -48,13 +48,13 @@
   
   /* Role-specific styling (optional) */
   .settings-container div.admin {
-    border-left-color: #111111; /* Red for admin */
+    border-left-color: #111111; 
   }
   .settings-container div.faculty {
-    border-left-color: #002d8d; /* Blue for faculty */
+    border-left-color: #002d8d; 
   }
   .settings-container div.student {
-    border-left-color: #16a34a; /* Green for student */
+    border-left-color: #16a34a; 
   }
   
 
@@ -108,3 +108,19 @@
     color: #ef1b1b;
     background-color: #ececec;
   }
+
+  .btndelete {
+    background-color: #dc3545;
+    color: white;
+    display: block;
+    margin-bottom: 50px; 
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btndelete:hover {
+    background-color: #c82333;
+  }
+  

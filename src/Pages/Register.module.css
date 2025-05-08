@@ -322,3 +322,21 @@
     color: #ffffff;
     font-size: 20px; 
 }
+
+.termsText {
+    font-size: 0.7rem;
+    color: white;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .link {
+    color: #0367d2;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .link:hover {
+    color: #0056b3; 
+    text-decoration: none; 
+  }

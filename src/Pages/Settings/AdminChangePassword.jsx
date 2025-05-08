@@ -45,7 +45,7 @@ const AdminChangePassword = () => {
             return;
         }
 
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{16,}$/;
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_])[A-Za-z\d!@#$%^&*(),.?":{}|<>_]{16,}$/;
 
         if (!passwordRegex.test(formData.newPassword)) {
             setError("Password must contain at least one uppercase letter, one number, and one special character.");
@@ -65,6 +65,12 @@ const AdminChangePassword = () => {
                 }
             );
             toast.success("Password changed successfully!");
+            setFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmNewPassword: ''
+              });
+              
             setSuccess(true);
 
         } catch (err) {

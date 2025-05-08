@@ -113,6 +113,26 @@ router.get('/users/:role',authMiddleware , async (req, res) => {
         }
       });
 
-
+      router.post('/reset-attempts', async (req, res) => {
+        const { email, role } = req.body;
+        const table = role;
+        const db = await connectToDatabase();
+        try {
+          const [result] = await db.query(
+            `UPDATE ${table} SET failed_attempts = 0, last_failed_login = NULL WHERE email = ?`,
+            [email]
+          );
+      
+          if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found" });
+          }
+      
+          res.json({ message: "Login attempts reset successfully." });
+        } catch (err) {
+          console.error("❌ Reset error:", err);
+          res.status(500).json({ message: "Internal server error." });
+        }
+      });
+      
 
 export default router;

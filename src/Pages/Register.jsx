@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import  axiosInstance  from './../axios.jsx';
 import styles from "./Register.module.css";
 import useAuth from "../Hooks/useAuth";
@@ -312,7 +312,10 @@ export default function Register() {
                             </span>
                         </div>
                     </div>
-                    
+                    <p className={styles.termsText}>
+                        By signing up, you agree to our <Link to="/terms-of-service" className={styles.link}>Terms of Service</Link> and 
+                        <Link to="/privacy-policy" className={styles.link}>Privacy Policy</Link>.
+                    </p>
 
                     {data.role === "Faculty" && (
                         <div className={styles.inputGroup}>
@@ -340,13 +343,6 @@ export default function Register() {
                     <p className={styles.loginText}>Already have an account?<a 
                     className={styles.loginLink}
                     onClick={() => navigate("/login")}> Login?</a></p>
-                    {/* <button 
-                        type="button" 
-                        className={styles.loginButton}
-                        onClick={() => navigate("/login")}
-                    >
-                        Login?
-                    </button> */}
                 </form>
             </div>
         </div>

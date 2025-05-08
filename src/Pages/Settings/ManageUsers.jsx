@@ -4,7 +4,8 @@ import styles from "./ManageUsers.module.css";
 import { format } from 'date-fns';
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
+import { Button } from "react-bootstrap";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -52,17 +53,42 @@ const ManageUsers = () => {
     }
   };
 
+  const handleResetAttempts = async (email,failedAttempts) => {
+    if (failedAttempts === 0) {
+      toast.error("No failed attempts to reset.");
+      return;  // Exit the function if failed_attempts is 0
+    }
+
+    try {
+      await axiosInstance.post("/api/reset-attempts", { email, role });
+      toast.success("Login attempts reset successfully.");
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.email === email ? { ...user, failed_attempts: 0 } : user
+        )
+      );
+    } catch (error) {
+      console.error("Reset attempts error:", error);
+      toast.error("Failed to reset login attempts.");
+    }
+  };
+ 
   const filteredUsers = users.filter(
     (user) => 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      
   );
 
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate(-1)}>
-        <FaArrowLeft size={20} className="me-1" /> Back
-      </button>
+
+      <Button variant="outline-secondary" 
+        className="px-4"
+       style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }} 
+        onClick={() => navigate(-1)}>
+          <i className="bi bi-arrow-left fs-5"></i>
+      </Button>
 
       <h2 className={styles.title}>Manage Users</h2>
 
@@ -72,7 +98,8 @@ const ManageUsers = () => {
           <option value="faculty">Faculty</option>
           <option value="admin">Admins</option>
         </select>
-
+        
+        <FaSearch className={styles.searchIcon} />
         <input
           type="text"
           className={styles.searchInput}
@@ -89,7 +116,9 @@ const ManageUsers = () => {
             <th>Email</th>
             <th>Status</th>
             <th>Last Active</th>
+            <th>Login Failed Attempts</th>
             <th>Toggle</th>
+            <th>Reset</th>
           </tr>
         </thead>
         <tbody>
@@ -111,14 +140,23 @@ const ManageUsers = () => {
                     hour12: true,
                   }).format(new Date(user.last_active))}
                 </td>
+                <td>{user.failed_attempts}</td>
                 <td>
                   <button
-                    className={styles.toggleBtn}
+                    className={`${styles.toggleBtn} ${user.status === "active" ? styles.deactivateBtn : styles.activateBtn}`}
                     onClick={() => handleToggleStatus(user.id, user.status)}
                   >
                     {user.status === "active" ? "Deactivate" : "Activate"}
                   </button>
                 </td>
+                <td>
+                <button
+                  className={styles.resetBtn}
+                  onClick={() => handleResetAttempts(user.email, user.failed_attempts)}
+                >
+                  Reset
+                </button>
+              </td>
               </tr>
             ))
           ) : (

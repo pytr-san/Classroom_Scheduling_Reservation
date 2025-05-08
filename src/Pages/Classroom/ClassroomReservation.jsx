@@ -70,7 +70,7 @@ const ClassroomReservation = () => {
     <div className="container mt-4">
       <header className="header" >
         <div className="d-flex align-items-center">
-          <Button variant="outline-secondary" onClick={() => navigate(-1)} className="back-btn me-2" >
+          <Button variant="outline-secondary" onClick={() => navigate(-1)} className="px-4" >
             <i className="bi bi-arrow-left fs-5"></i>
           </Button>
           <h1 className="mb-0 d-flex align-items-center">

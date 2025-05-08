@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axiosInstance from './../axios.jsx';  // Your axios instance
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast'; // For showing toast notifications
 import './forgotpass.css';
+import { FaEnvelope,FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ForgotPass = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const ForgotPass = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const { token } = useParams();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleForgotPassword = async (e) => {
@@ -18,12 +20,13 @@ const ForgotPass = () => {
       const response = await axiosInstance.post('/auth/forgot-password', { email });
       setMessage(response.data.message);
       setError('');
-      toast.success(response.data.message);  // Show success toast
+      toast.success(response.data.message); 
+      setEmail('');
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'An error occurred while sending the reset email';
       setError(errorMessage);
       setMessage('');
-      toast.error(errorMessage);  // Show error toast
+      toast.error(errorMessage); 
       console.error('Forgot password request failed:', err.response?.data || err.message);
     }
   };
@@ -34,13 +37,14 @@ const ForgotPass = () => {
       const response = await axiosInstance.post(`/auth/reset-password/${token}`, { password });
       setMessage(response.data.message);
       setError('');
-      toast.success(response.data.message);  // Show success toast
-      setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
+      toast.success(response.data.message); 
+      setPassword('');
+      setTimeout(() => navigate('/login'), 3000); 
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'An error occurred while resetting the password';
       setError(errorMessage);
       setMessage('');
-      toast.error(errorMessage);  // Show error toast
+      toast.error(errorMessage); 
       console.error('Reset password request failed:', err.response?.data || err.message);
     }
   };
@@ -53,27 +57,43 @@ const ForgotPass = () => {
         <div className="inputGroupFp">
           <label>New Password</label>
           <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+              type={showPassword ? "text" : "password"}
+              autoComplete="off"
+              name="password"
+              placeholder="Enter New password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
           />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="eyeToggle"
+          >
+              {showPassword ?  <FaEye /> : <FaEyeSlash />}
+          </span>
         </div>
-        <button type="submit">Reset Password</button>
+        <button type="submit">Confirm New Password</button>
       </form>
     ) : (
       <form onSubmit={handleForgotPassword} className="forgotForm">
         <h2>Forgot Password</h2>
         <div className="inputGroupFp">
+        
           <label>Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder='Enter email'
             required
           />
         </div>
-        <button type="submit">Send Reset Email</button>
+        <button type="submit" className="d-flex align-items-center justify-content-center">
+          <FaEnvelope className="email-icon me-3" />Send Reset Email</button>
+
+        <p className="navigate-login">
+          Remembered your password?{" "}
+          <Link to="/login">Go back to Login</Link>
+        </p>
       </form>
     )}
     {message && <p className="successMessage">{message}</p>}

@@ -13,6 +13,7 @@ export default function Login() {
     const { setAuth } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+
     const [data, setData] = useState({
         email: "",
         password: "",
@@ -49,6 +50,7 @@ export default function Login() {
             
             toast.success('Login successful.')
             setTimeout(() => {
+                setData({ email: "", password: "" });
                 navigate("/");
             }, 1000);
         } catch (err) {

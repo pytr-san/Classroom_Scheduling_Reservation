@@ -174,14 +174,14 @@
     text-align: center;
     margin-bottom: 15px;
     color: #ccc;
-    text-decoration: none;
+    text-decoration: underline;
     font-size: 14px;
     transition: color 0.3s ease;
 }
 
 .forgotPasswordLink:hover {
-    color: #4CAF50;
-    text-decoration: underline;
+    color: #0000e4;
+    
 }
 .login{
     color: #66BB6A;

@@ -7,9 +7,10 @@ import { jsPDF } from "jspdf";
 import "./schedule.css";
 import "./table.css";
 import  axiosInstance  from '../../axios.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const ClassSchedule = () => {
-   
+    const navigate = useNavigate();
     const [selectedSection, setSelectedSection] = useState("Select Section");
     const [selectedCells, setSelectedCells] = useState(new Set());
     const [mergedCells, setMergedCells] = useState({});
@@ -456,6 +457,7 @@ const ClassSchedule = () => {
     return (
         <Container className="main mt-4">
             <Header
+                navigate={navigate}
                 setShowCreateModal={setShowCreateModal}
                 selectedSemester={selectedSemester}
                 setSelectedSemester={setSelectedSemester}
@@ -702,22 +704,31 @@ const SectionNavigation = ({ savedSchedules, setSavedSchedules, setSelectedSecti
     );
 };
 
-const Header = ({
-    setShowCreateModal,
-    selectedSemester,
-    setSelectedSemester,
-    selectedSchoolYear,
-    setSelectedSchoolYear,
-    semesters,
-    schoolYears,
-    setShowFilterModal,
-    courseName
-}) => (
-    <Row className="mb-3 d-flex justify-content-between align-items-center">
-        <Col className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
-            <h4>Class Schedule</h4>
-        </Col>
+    const Header = ({
+        navigate,
+        setShowCreateModal,
+        selectedSemester,
+        setSelectedSemester,
+        selectedSchoolYear,
+        setSelectedSchoolYear,
+        semesters,
+        schoolYears,
+        setShowFilterModal,
+        courseName
+    }) => (
+        <Row className="mb-3 d-flex justify-content-between align-items-center">
+            
+            <Col className="d-flex align-items-center">
+            <Button variant="outline-secondary" 
+            className="px-4"
+        style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }} 
+            onClick={() => navigate(-1)}>
+            <i className="bi bi-arrow-left fs-5 "></i>
+            </Button>
+                <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
+                <h4 className="mb-0 align-self-center">Class Schedule</h4>
+            </Col>
+
         <Col className="d-flex justify-content-end">
             <DropdownButton
                 title={selectedSemester}
