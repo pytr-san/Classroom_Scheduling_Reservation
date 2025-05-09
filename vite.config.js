@@ -11,14 +11,14 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://spistaccess.site',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
       '/auth': {
-        target: 'http://localhost:3000',
+        target: 'https://spistaccess.site',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   },

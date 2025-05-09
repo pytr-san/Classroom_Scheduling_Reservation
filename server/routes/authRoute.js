@@ -105,7 +105,7 @@ router.post( '/login',
 
   body('password')
     .trim()
-    .isLength({ min: 16 }).withMessage('Password must be at least 16 characters.')
+    .isLength({ min: 6 }).withMessage('Password must be at least 16 characters.')
 ],
 async (req, res) => {
  
