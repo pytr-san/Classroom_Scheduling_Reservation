@@ -40,17 +40,7 @@ app.use("/classrooms", classRoute);
 app.use('/api', uploadRoute);
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '/uploads/pdfs')));
 
-if (isProduction) {
-  const clientBuildPath = path.join(__dirname, 'public');
-  app.use(express.static(clientBuildPath));
 
-  // For React Router
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
-}
-
-const PORT = process.env.PORT || 8000;
 app.listen(process.env.PORT, () => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(`Server Started on Port ${process.env.PORT}`);

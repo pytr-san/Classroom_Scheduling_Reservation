@@ -20,10 +20,15 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
       },
+      '/classrooms': {
+        target: 'https://spistaccess.site',
+        changeOrigin: true,
+        secure: true,
+      }
     },
   },
   build: {
-    outDir: path.resolve(__dirname, 'server/public'),
+    outDir: 'dist',
     emptyOutDir: true,
   }
 });
