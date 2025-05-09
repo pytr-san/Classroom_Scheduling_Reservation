@@ -4,6 +4,7 @@ import styles from './FacultyDashboard.module.css';
 import { formatDistanceToNow, format, isToday, isYesterday, parseISO } from 'date-fns';
 
 const groupFilesByDate = (files) => {
+  
   return files.reduce((groups, file) => {
     const date = parseISO(file.created_at);
     let dateLabel = format(date, 'MMMM dd, yyyy');
@@ -24,12 +25,14 @@ const FacultyFiles = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [fileType, setFileType] = useState('Class Schedule');
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         const response = await axiosInstance.get('/api/view-files');
-        setFiles(response.data);
+        const filtered = response.data.filter(file => file.file_type === fileType);
+        setFiles(filtered);
       } catch (err) {
         setError('Error fetching files.');
       } finally {
@@ -38,10 +41,11 @@ const FacultyFiles = () => {
     };
 
     fetchFiles();
-  }, []);
+  }, [fileType]);
   
-
-  
+  const handleFileTypeChange = (e) => {
+    setFileType(e.target.value);
+  };
   
   const groupedFiles = groupFilesByDate(files);
 
@@ -51,7 +55,13 @@ const FacultyFiles = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Access Course Schedules</h2>
+      <h2 className={styles.title}>Access Course Class Schedules</h2>
+      <label>Select Schedule type</label>
+      <select onChange={handleFileTypeChange} value={fileType} className={styles.fileTypeSelectFaculty}>
+        <option value="Examination Schedule">Examination Schedule</option>
+        <option value="Class Schedule">Class Schedule</option>
+      </select>
+
       {files.length === 0 ? (
         <p>No uploaded files are available at the moment.</p>
       ) : (

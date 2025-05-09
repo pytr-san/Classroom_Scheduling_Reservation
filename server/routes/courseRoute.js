@@ -1,6 +1,6 @@
 import express from "express";
 import {connectToDatabase} from '../db.js'
-//import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -61,7 +61,7 @@ router.post('/add/course', async (req, res) => {
 // PUT update subject names
 router.put("/course/:id/subjects/update-names", async (req, res) => {
     const courseId = req.params.id;
-    const updates = req.body; // Expecting: [{ subject_id, subject_name }, ...]
+    const updates = req.body; 
 
     if (!Array.isArray(updates)) {
         return res.status(400).json({ error: "Invalid data format. Expected an array of subject updates." });
@@ -88,12 +88,11 @@ router.put("/course/:id/subjects/update-names", async (req, res) => {
 
 // DELETE a subject
 router.delete("/course/:id/:subject_id", async (req, res) => {
-    const { subject_id } = req.params; // Extract subject_id from URL params
+    const { subject_id } = req.params; 
 
     try {
         const db = await connectToDatabase();
 
-        // Query to delete the subject from the database
         const [results] = await db.execute(
             "DELETE FROM subjects WHERE subject_id = ?",
             [subject_id]
@@ -154,7 +153,7 @@ router.post('/add', async (req, res) => {
 
 
 // ✅ GET subjects & instructors for a course
-router.get("/course/:id/manage", async (req, res) => {
+router.get("/course/:id/manage", authMiddleware, async (req, res) => {
     const courseId = req.params.id;
 
     try {
@@ -241,7 +240,6 @@ router.post("/faculty/add", async (req, res) => {
             name,
         };
 
-        // ✅ Add instructor to the subject by inserting into the subjects table
         const [subjectResult] = await db.execute(
             "UPDATE subjects SET instructor_id = ? WHERE subject_id = ?",
             [newFaculty.faculty_id, subject_id]

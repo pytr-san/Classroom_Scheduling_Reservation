@@ -2,6 +2,16 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import { connectToDatabase } from '../db.js';
+import { validationResult, param, body } from 'express-validator';
+
+export const validateResetPassword = [
+  param('token')
+    .notEmpty().withMessage('Token is required')
+    .isLength({ min: 10 }).withMessage('Token is too short'),
+  body('password')
+    .notEmpty().withMessage('Password is required')
+    .isLength({ min: 8 }).withMessage('Password must be at least 16 characters long'),
+];
 
 export async function forgotPassword(req, res) {
   const { email } = req.body;
@@ -51,6 +61,13 @@ export async function forgotPassword(req, res) {
 
 
 export async function resetPassword(req, res) {
+
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ error: errors.array() });
+  }
+
     const { token } = req.params;
     const { password } = req.body;
     const db = await connectToDatabase();

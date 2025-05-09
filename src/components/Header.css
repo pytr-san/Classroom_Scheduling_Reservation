@@ -110,4 +110,32 @@
     color: red;
   }
 
+  .delete-img-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.2s;
+    line-height: 1;
+  }
+  
+  .position-relative:hover .delete-img-btn {
+    display: flex;
+  }
+  
+  .delete-img-btn:hover {
+    background-color: rgba(255, 0, 0, 0.8);
+  }
   

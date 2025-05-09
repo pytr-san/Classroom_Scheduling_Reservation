@@ -1,26 +1,21 @@
 import jwt from 'jsonwebtoken';
 
 const authMiddleware = (req, res, next) => {
-    // Get the token from the cookies
-    const token = req.cookies.token;
-    //console.log("Cookies token",token);
-    // const authHeader = req.headers.authorization;
-    // const token = authHeader && authHeader.split(" ")[1];
-    if (!token) {
-        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
-    }
+  const authHeader = req.headers.authorization;
 
-    try {
-       
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ valid: false, message: "Unauthorized: No access token provided" });
+  }
 
-        next();  
-    } catch (error) {
+  const token = authHeader.split(" ")[1];
 
-        res.clearCookie("token");
-        return res.status(403).json({ valid: false, message: "Invalid token" });
-    }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ valid: false, message: "Invalid or expired access token" });
+  }
 };
 
 export default authMiddleware;

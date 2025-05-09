@@ -28,14 +28,16 @@ const StudentFiles = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  const [fileType, setFileType] = useState('Class Schedule');
+  
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         const response = await axiosInstance.get('/api/view-files', {
           params: { courseId },
         });
-        setFiles(response.data);
+        const filtered = response.data.filter(file => file.file_type === fileType);
+        setFiles(filtered);
       } catch (err) {
         setError('Error fetching files.');
       } finally {
@@ -46,8 +48,12 @@ const StudentFiles = () => {
     if (courseId) {
       fetchFiles();
     }
-  }, [courseId]);
+  }, [courseId,fileType]);
 
+  const handleFileTypeChange = (e) => {
+    setFileType(e.target.value);
+  };
+  
   const groupedFiles = groupFilesByDate(files);
 
   if (loading) return <div className={styles.container}>Loading files...</div>;
@@ -56,6 +62,13 @@ const StudentFiles = () => {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>BSIT Schedules</h2>
+      
+      <label>Select Schedule type</label>
+      <select onChange={handleFileTypeChange} value={fileType} className={styles.fileTypeSelect}>
+        <option value="Examination Schedule">Examination Schedule</option>
+        <option value="Class Schedule">Class Schedule</option>
+      </select>
+
       {files.length === 0 ? (
         <p className={styles.noFilesMessage}>No uploaded files are available for this course at the moment.</p>
       ) : (

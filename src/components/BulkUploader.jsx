@@ -16,10 +16,10 @@ const BulkUploader = ({ courseId }) => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
+  const [fileType, setFileType] = useState("Class Schedule");
 
   const fetchFiles = async () => {
     try {
-console.log("USer token:", token);
       const res = await axiosInstance.get(`/api/view-files?courseId=${courseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,6 +64,7 @@ console.log("USer token:", token);
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
     formData.append('courseId', courseId);
+    formData.append('fileType', fileType); 
 
     try {
       setUploading(true);
@@ -82,7 +83,6 @@ console.log("USer token:", token);
       setFiles([]); 
       setProgress(0); 
     } catch (err) {
-      console.error('Upload Error:', err);
 
       if (err.response) {
         const errorMessage = err.response.data?.message || 'Something went wrong on the server.';
@@ -157,6 +157,17 @@ console.log("USer token:", token);
             </ul>
           </div>
         )}
+      <label className="mt-3">
+        Selected Schedule type: 
+        <select
+          value={fileType}
+          onChange={(e) => setFileType(e.target.value)}
+          className="form-select mt-1"
+        >
+          <option value="Class Schedule">Class Schedule</option>        
+          <option value="Examination Schedule">Examination Schedule</option>
+        </select>
+      </label>
 
         {uploading && (
           <div className="progress-container">
@@ -190,6 +201,7 @@ console.log("USer token:", token);
                 <th>File Name</th>
                 <th>Course</th>
                 <th>Uploaded</th>
+                <th>File Type</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -199,6 +211,7 @@ console.log("USer token:", token);
                   <td>{file.filename}</td>
                   <td>{file.course_name}</td>
                   <td>{new Date(file.created_at).toLocaleString()}</td>
+                  <td>{file.file_type}</td>
                   <td>
                     <Button variant="danger" size="sm" onClick={() => handleDeleteClick(file.id)}>
                       Delete

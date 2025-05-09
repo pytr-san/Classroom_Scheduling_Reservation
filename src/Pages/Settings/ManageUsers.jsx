@@ -34,7 +34,6 @@ const ManageUsers = () => {
 
   const handleToggleStatus = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
-    console.log("Toggling user ID:", userId, "to", newStatus);
 
     try {
       await axiosInstance.patch(`/api/users/${role}/${userId}/status`, {

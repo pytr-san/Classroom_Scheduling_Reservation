@@ -15,8 +15,8 @@ const Settings = () => {
     );
 
     const onAccessGranted = () => {
-        sessionStorage.setItem("adminAccess", "granted"); // ✅ Store in session
-        setHasAdminAccess(true); // ✅ Update state
+        sessionStorage.setItem("adminAccess", "granted"); 
+        setHasAdminAccess(true); 
     };
 
     useEffect(() => {
@@ -44,15 +44,12 @@ const Settings = () => {
         try {
             await axiosInstance.post("/auth/logout");
             sessionStorage.removeItem("adminAccess"); 
-            setAuth(null);  // ✅ Clear auth state
-            navigate("/login");  // Redirect to login page
+            setAuth(null);  
+            navigate("/login"); 
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
-    // const toggleSidebar = () => {
-    //     setIsSidebarOpen((prev) => !prev);
-    // };
 
     if (!auth.user) {
         return <div>Loading user data...</div>;

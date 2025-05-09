@@ -3,10 +3,14 @@ import { connectToDatabase } from '../db.js';
 import path from 'path';
 
 export const handleBulkUpload = async (req, res) => {
-  const { courseId } = req.body;
+  const { courseId, fileType } = req.body;
 
   if (!courseId) {
     return res.status(400).json({ message: 'Course ID is required' });
+  }
+
+  if (!fileType || !["Class Schedule", "Examination Schedule"].includes(fileType)) {
+    return res.status(400).json({ message: 'Invalid or missing file type' });
   }
 
   if (!req.files || req.files.length === 0) {
@@ -18,10 +22,10 @@ export const handleBulkUpload = async (req, res) => {
 
     const uploadPromises = req.files.map(file => {
       const query = `
-        INSERT INTO uploaded_files (filename, file_path, course_id) 
-        VALUES (?, ?, ?)
+        INSERT INTO uploaded_files (filename, file_path, course_id, file_type) 
+        VALUES (?, ?, ?, ?)
       `;
-      return db.query(query, [file.originalname, path.relative('uploads/pdfs', file.path), courseId]);
+      return db.query(query, [file.originalname, path.relative('uploads/pdfs', file.path), courseId,fileType]);
       
     });
 
@@ -47,6 +51,7 @@ export const viewAllFiles = async (req, res) => {
       uf.file_path,
       uf.course_id,
       uf.created_at,
+      uf.file_type,
       c.course_name,
       c.description
     FROM uploaded_files uf
@@ -86,6 +91,7 @@ export const viewFilesByCourse = async (req, res) => {
               u.file_path,
               u.course_id,
               u.created_at, 
+              u.file_type, 
               c.course_name,
               c.description 
        FROM uploaded_files u

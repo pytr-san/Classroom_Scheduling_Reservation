@@ -1,4 +1,4 @@
-/* Container for the whole files section */
+
 .container {
   padding: 20px;
   max-width: 900px;
@@ -8,7 +8,6 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Title of the page */
 .title {
   font-size: 24px;
   font-weight: 600;
@@ -16,7 +15,6 @@
   color: #333;
 }
 
-/* Message when no files are available */
 .noFilesMessage {
   font-size: 18px;
   color: #777;
@@ -24,7 +22,6 @@
   margin-top: 40px;
 }
 
-/* Loading message */
 .loading {
   font-size: 18px;
   color: #007bff;
@@ -32,7 +29,6 @@
   margin-top: 40px;
 }
 
-/* Error message */
 .error {
   font-size: 18px;
   color: red;
@@ -40,14 +36,12 @@
   margin-top: 40px;
 }
 
-/* The file list container */
 .fileList {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
-/* Each file item in the list */
 .fileItem {
   background-color: #fff;
   padding: 15px;
@@ -57,12 +51,10 @@
   transition: background-color 0.3s ease;
 }
 
-/* Hover effect for each file item */
 .fileItem:hover {
   background-color: #f1f1f1;
 }
 
-/* The file link */
 .fileLink {
   font-size: 18px;
   font-weight: 600;
@@ -72,12 +64,10 @@
   margin-bottom: 10px;
 }
 
-/* The file link hover effect */
 .fileLink:hover {
   color: #0056b3;
 }
 
-/* Course label (description and course name) */
 .courseLabel {
   font-size: 14px;
   color: #555;
@@ -85,18 +75,42 @@
   margin-top: 8px;
 }
 
-/* Add some spacing between date and course details */
 .courseLabel strong {
   color: #333;
 }
 
-/* Formatting the date when the file was uploaded */
 .courseLabel span {
   font-size: 14px;
   color: #888;
 }
 
-/* Responsive styling for smaller screens */
+.fileTypeSelect {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  width: 200px;
+}
+
+.fileTypeSelect:focus {
+  outline: none;
+  border-color: #007bff; 
+  background-color: #f0f8ff; 
+}
+
+.fileTypeSelect option {
+  font-size: 16px;
+  padding: 8px;
+}
+
+.fileTypeSelect:hover {
+  border-color: #007bff; 
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 15px;

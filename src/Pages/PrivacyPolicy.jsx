@@ -66,20 +66,15 @@ const PrivacyPolicy = () => {
 
                 <h2 className={styles.heading}>7. Account Deletion</h2>
                 <p>
-                    You can request to delete your account at any time. Upon deletion, your data will be removed from our systems, except where legally required to retain it.
+                    You can delete your account at any time. Upon deletion, your data will be removed from our systems.
                 </p>
 
-                <h2 className={styles.heading}>8. Your Rights</h2>
-                <p>
-                    You have the right to access, correct, or delete your personal information as detailed in the policy.
-                </p>
-
-                <h2 className={styles.heading}>9. Changes to This Policy</h2>
+                <h2 className={styles.heading}>8. Changes to This Policy</h2>
                 <p>
                     We may update this Privacy Policy from time to time. Changes will be communicated, and the updated policy will be effective as indicated.
                 </p>
 
-                <h2 className={styles.heading}>10. Contact Us</h2>
+                <h2 className={styles.heading}>9. Contact Us</h2>
                 <p>
                     If you have any questions, feel free to contact us at <strong>your-email@example.com</strong>.
                 </p>

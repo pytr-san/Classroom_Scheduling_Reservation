@@ -17,18 +17,10 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-// app.use(cors({
-//     origin: "http://localhost:5173", // Allow requests from your frontend
-//     credentials: true,  // Allow cookies, authentication headers, etc.
-//     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-//     allowedHeaders: ["Content-Type", "Authorization"] // Allowed headers
-// }
-// ));
 const isProduction = process.env.NODE_ENV === "production";
 
 const corsOptions = {
-  origin: isProduction ? "https://your-frontend-domain.com" : "http://localhost:5173",
+  origin: isProduction ? "https://spistaccess.site" : "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", 'PATCH', "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization",'no-refresh']
@@ -53,7 +45,6 @@ if (isProduction) {
   const distPath = path.join(__dirname, '../dist');
   app.use(express.static(distPath));
 
-  // Fallback to index.html for client-side routing
   app.get('*', (req, res) => {
     res.sendFile(path.join(distPath, '../dist/index.html'));
   });
@@ -61,6 +52,8 @@ if (isProduction) {
 
 const PORT = process.env.PORT || 8000;
 app.listen(process.env.PORT, () => {
+  if (process.env.NODE_ENV !== 'production') {
     console.log(`Server Started on Port ${process.env.PORT}`);
+  }
   });
   

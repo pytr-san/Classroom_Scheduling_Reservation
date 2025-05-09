@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import "./AccessClassroom.css";
 import { useNavigate } from "react-router-dom";
 import  axiosInstance  from '../../axios.jsx';
-import RoomSelectionModal from "../../components/Modal/RoomSelectionModal.jsx";
 import toast from "react-hot-toast";
 
 const AccessClassroom = () => {
@@ -14,15 +13,13 @@ const AccessClassroom = () => {
     const [sortByCapacity, setSortByCapacity] = useState(false);
     const navigate = useNavigate();
 
-    // Check if a floor is saved in localStorage
     const savedFloor = localStorage.getItem("currentFloor");
     const initialFloor = savedFloor ? parseInt(savedFloor, 10) : 1;
 
     const [classrooms, setClassrooms] = useState([]);
     const [currentFloor, setCurrentFloor] = useState(initialFloor);
     const [searchQuery, setSearchQuery] = useState("");
-    
-// Fetch classrooms when component mounts
+      
     useEffect(() => {
         const fetchClassrooms = async () => {
             try {
@@ -38,9 +35,8 @@ const AccessClassroom = () => {
         fetchClassrooms();
     }, []);
 
-    // Save the current floor in localStorage whenever it changes
     useEffect(() => {
-        localStorage.setItem("currentFloor", currentFloor); // Store the current floor in localStorage
+        localStorage.setItem("currentFloor", currentFloor); 
     }, [currentFloor]);
 
     const handlePrevFloor = () => {
@@ -59,22 +55,18 @@ const AccessClassroom = () => {
     const getFloorLabel = (floor) => `${floor}${getOrdinalSuffix(floor)} Floor`;
 
     const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value); // Update search query as user types
+        setSearchQuery(event.target.value); 
       };
    
-    
-        // 🔽 Apply search first
     const searchedRooms = classrooms.filter((room) =>
         room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // 🔽 Then sort if needed
     const sortedRooms = [...searchedRooms].sort((a, b) => {
         if (!sortByCapacity) return 0;
         return a.capacity - b.capacity; 
     });
 
-    // 🔽 Then filter by floor
     const filteredRooms = sortedRooms.filter(
         (room) =>
             room.floor_building === `${currentFloor}${getOrdinalSuffix(currentFloor)} Floor`
@@ -91,7 +83,7 @@ const AccessClassroom = () => {
 
     const handleCreatebtn = (e) => {
         e.preventDefault();
-        //setShowModal(true);
+        
         navigate("/create-room-schedule")
     }
     const handleReservationPage = (e) => {
@@ -103,7 +95,7 @@ const AccessClassroom = () => {
     return ( 
     
         <div className="container mt-4">
-        {/* Header */}
+
         <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center gap-2">
                 <i className="bi bi-building fs-2"></i>
@@ -115,7 +107,6 @@ const AccessClassroom = () => {
             </div>
         </div>
 
-        {/* Navigation */}
         <div className="d-flex align-items-center gap-3 mt-3">
             <Form.Select 
                 style={{ width: "150px" }} 
@@ -160,7 +151,6 @@ const AccessClassroom = () => {
             </div>
         </div>
 
-        {/* Main Content */}
         <div className="card text-white bg-dark mt-4 p-4">
             <section className="classroom-info1">
                 <h2 className="fw-bold">Tia Maria Building, {getFloorLabel(currentFloor)}.</h2>
@@ -169,7 +159,6 @@ const AccessClassroom = () => {
                     {loading ? (
                         <li>Loading classrooms...</li>
                     ) : searchQuery.trim() !== "" ? (
-                        // Group search results by floor
                         (() => {
                             const searchedRooms = classrooms.filter((room) =>
                                 room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -179,7 +168,6 @@ const AccessClassroom = () => {
                                 return <li>No classrooms match your search.</li>;
                             }
 
-                            // Group by floor
                             const groupedByFloor = searchedRooms.reduce((groups, room) => {
                                 const floor = room.floor_building;
                                 if (!groups[floor]) groups[floor] = [];
@@ -202,7 +190,6 @@ const AccessClassroom = () => {
                             ));
                         })()
                     ) : (
-                        // No search — show rooms on the current floor only
                         filteredRooms.length > 0 ? (
                             filteredRooms.map((room, index) => (
                                 <li key={index}>
@@ -223,28 +210,15 @@ const AccessClassroom = () => {
                     <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleReserve}>
                         Room Preview
                     </Button>
-                    {/* <Button className="btn btn-dark w-100 d-flex align-items-center justify-content-center" onClick={handleReservationPage}>
-                    <i className="fa-solid fa-list me-2"></i> Reservations
-                    </Button> */}
 
                 </div>
             </section>
 
-            {/* Right Section - Image */}
             <section className="floor-container">
                 <img src={Spist} alt="Spist Building" className="floor-image" />
             </section>
         </div>
 
-        {/* Modal */}
-        <RoomSelectionModal 
-            show={showModal} 
-            handleClose={() => setShowModal(false)} 
-            onConfirm={(selectedRooms) => console.log("Selected Rooms:", selectedRooms)} 
-            classrooms={classrooms} // 🔽 Pass the classrooms here
-            size="lg" 
-            centered
-        />
 
     </div>
     )

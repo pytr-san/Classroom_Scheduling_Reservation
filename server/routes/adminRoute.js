@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 
 const router = express.Router();
 
-router.post("/verify-pin", verifyAdminPin);
+router.post("/verify-pin", verifyAdminPin,authMiddleware);
 router.get("/faculty-passcode", getFacultyPasscode);
 
 

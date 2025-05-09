@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { connectToDatabase } from '../db.js';
 import authMiddleware from "../middleware/authMiddleware.js";
-import refreshTokenMiddleware from '../middleware/refreshTokenMiddleware.js';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
 import { forgotPassword, resetPassword } from '../controllers/forgotPassController.js';
@@ -55,7 +54,6 @@ cron.schedule('0 0 * * *', async () => {
 router.post('/register', async (req, res) => {
     try {
         const db = await connectToDatabase();
-        console.log("📩 Register endpoint hit! Request body:", req.body);
         
         const { name, email, password, role } = req.body;
 
@@ -63,7 +61,6 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        // ✅ Allowed email domain
         const allowedDomain = "@spist.edu.ph";
         if (!email.endsWith(allowedDomain)) {
             return res.status(403).json({ error: "Unauthorized email. Please use your organization email." });
@@ -71,7 +68,6 @@ router.post('/register', async (req, res) => {
 
         let tableName = role.toLowerCase()=== "faculty" ? "faculty" : "student";
 
-        // ✅ Check if user already exists in the respective table
         const [rows] = await db.execute(
             `SELECT * FROM ${tableName} WHERE email = ? OR name = ?`,
             [email, name]
@@ -81,10 +77,8 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: "email or name already exists" });
         }
 
-        // ✅ Hash the password before storing
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // ✅ Insert into respective table
         await db.execute(
             `INSERT INTO ${tableName} (name, email, password, role) VALUES (?, ?, ?, ?)`,
             [name, email, hashedPassword, role.toLowerCase()]
@@ -97,7 +91,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
+const isProduction = process.env.NODE_ENV === "production";
 const MAX_ATTEMPTS = 5;
 const COOLDOWN_MINUTES = 120;
 router.post(  '/login',
@@ -111,7 +105,7 @@ router.post(  '/login',
 
   body('password')
     .trim()
-    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters.')
+    .isLength({ min: 16 }).withMessage('Password must be at least 16 characters.')
 ],
 async (req, res) => {
  
@@ -160,7 +154,7 @@ async (req, res) => {
                 const minutesSinceLastFail = (now - lastFailed) / 60000;
                 
                 if (minutesSinceLastFail >= COOLDOWN_MINUTES) {
-                    // Reset failed attempts
+                  
                     await db.query(
                     `UPDATE ${table} SET failed_attempts = 0, last_failed_login = NULL WHERE ${table}_id = ?`,
                     [user.id]
@@ -187,7 +181,7 @@ async (req, res) => {
             return res.status(401).json({ message: "Incorrect password" });
         }
 
-        // ✅ On successful login, reset attempts
+
         await db.query(
             `UPDATE ${table} SET failed_attempts = 0, last_failed_login = NULL, last_active = NOW() WHERE ${table}_id = ?`,
             [user.id]
@@ -202,30 +196,20 @@ async (req, res) => {
         if (!user.is_active) {
             return res.status(403).json({ message: 'Your account is deactivated. Please contact admin.' });
           }
-            // if (user.failed_attempts >= MAX_ATTEMPTS) {
-            //     return res.status(403).json({ message: 'Account locked. Too many failed login attempts.' });
-            //   }
-            
 
-        // ✅ Generate JWT Access Token (valid for 1 hour)
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id },
                                     process.env.JWT_SECRET, 
-                                    { expiresIn: '1h' });       
+                                    { expiresIn: '10s' });       
 
-        //✅ Generate JWT Refresh Token (valid for 1 day)
-        // const refreshToken = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, 
-        //                                 process.env.JWT_REFRESH, 
-        //                                 { expiresIn: '1d' });
+        const refreshToken = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id  }, 
+                                        process.env.JWT_REFRESH, 
+                                        { expiresIn: '1d' });
 
-       // const table = user.role;
         await db.query(`UPDATE ${table} SET last_active = NOW() WHERE ${table}_id = ?`, [user.id]);
 
-        // ✅ Store token in HTTP-only cookie
-        const isProduction = process.env.NODE_ENV === "production";
-
-        res.cookie("token", token, {
+        res.cookie("token", refreshToken, {
           httpOnly: true,
-          secure: isProduction, // true in production (requires HTTPS)
+          secure: isProduction, 
           sameSite: isProduction ? "none" : "lax",
           maxAge: 24 * 60 * 60 * 1000,
           path: "/"
@@ -241,38 +225,39 @@ async (req, res) => {
 });
 
 
-router.get('/refresh', refreshTokenMiddleware, (req, res) => {
-    const user = req.user;
+// Route: POST /api/auth/refresh
+router.post("/refresh", (req, res) => {
+  const refreshToken = req.cookies.token;
 
-    try {
-        const newToken = jwt.sign(
-            { id: user.id, name: user.name, email: user.email, role: user.role },
-            process.env.JWT_SECRET, 
-            { expiresIn: '1h' }
-        );
-        console.log("Generated new access token:", newToken); 
-        res.json({ newToken, user }); // Send new token and user details
-    } catch (err) {
-        console.log("Error generating access token:", err); // Log any token generation errors
-        res.status(500).json({ message: "Error generating access token" });
-    }
+  if (!refreshToken) return res.status(401).json({ message: "Unauthorized" });
+
+  jwt.verify(refreshToken, process.env.JWT_REFRESH, (err, user) => {
+    if (err) return res.status(403).json({ message: "Forbidden" });
+
+    const newAccessToken = jwt.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        courseId: user.courseId
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ token: newAccessToken });
+  });
 });
 
-    // // ✅ Add this route to verify token
-    // router.get("/verify-token", authMiddleware, (req, res) => {
-    //     console.log("Token verified successfully:", req.user);
-    //     res.json({ user: req.user });
-    // });
     
-    // ✅ Logout User - Clears the Token Cookie
-    router.post("/logout", (req, res) => {
+
+  router.post("/logout", (req, res) => {
         res.clearCookie("token", {
-            httpOnly: true,
-            secure: false,  // Set `true` in production with HTTPS
-            sameSite: "Lax",
-            // secure: false,//process.env.NODE_ENV === "production", // Secure in production
-            // sameSite: 'none',//"Lax",
-             path: "/" // Ensures it clears properly
+          httpOnly: true,
+          secure: isProduction,  
+          sameSite: isProduction ? "none" : "lax",  
+          path: "/"
         });
 
     return res.status(200).json({ message: "Logged out successfully" });
@@ -289,7 +274,6 @@ router.put('/change-password', authMiddleware, async (req, res) => {
         }
 
         const user = req.user;
-        console.log(user);
         if (!user) {
             return res.status(401).json({ error: "Unauthorized" });
         }
