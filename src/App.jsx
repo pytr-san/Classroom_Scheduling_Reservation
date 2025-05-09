@@ -61,7 +61,7 @@ const ROLES = {
                             
                             <Route path="/course" element={<Course />} />
                             <Route path="/add/course" element={<CourseForm />} />
-                            <Route path="/course/:id/manage" element={<ManageCourse />} />
+                            <Route path="/course/id/manage" element={<ManageCourse />} />
                             <Route path="/course/upload" element={<FileUploadPage />} />      
                             
                             <Route path="/admin/manage-user" element={<ManageUsers />} />      

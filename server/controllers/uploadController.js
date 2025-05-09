@@ -62,8 +62,6 @@ export const viewAllFiles = async (req, res) => {
     }
     const fileData = files.map(file => ({
       ...file,
-      // Ensure you use the correct file path
-      // fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
       fileUrl: `${req.protocol}://${req.get('host')}/uploads/pdfs/${path.basename(file.file_path)}`
 
     }));
@@ -74,6 +72,8 @@ export const viewAllFiles = async (req, res) => {
     res.status(500).json({ message: 'Error retrieving all files' });
   }
 };
+
+
 
 // Students: View files by course ID
 export const viewFilesByCourse = async (req, res) => {
@@ -102,7 +102,6 @@ export const viewFilesByCourse = async (req, res) => {
 
     const fileData = files.map(file => ({
       ...file,
-      // fileUrl: `${req.protocol}://${req.get('host')}/${file.file_path.replace(/\\/g, '/')}`
       fileUrl: `${req.protocol}://${req.get('host')}/uploads/pdfs/${path.basename(file.file_path)}`
 
 

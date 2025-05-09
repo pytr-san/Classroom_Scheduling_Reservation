@@ -43,20 +43,18 @@ router.post('/register-admin',authMiddleware, async (req, res) => {
         res.status(201).json({ message: "Admin registered successfully." });
 
     } catch (err) {
-        console.error("❌ Registration error:", err);
         res.status(500).json({ message: "Internal server error. Please try again later." });
     }
 });
 
-// Example for Express.js
 router.get('/users/:role',authMiddleware , async (req, res) => {
     const { role } = req.params;
-    
-    // Make sure the role is valid
+    if (!role) {
+      return res.status(400).json({ message: 'Role is required.' });
+  }
     if (!['student', 'faculty', 'admin'].includes(role)) {
       return res.status(400).json({ message: 'Invalid role' });
     }
-    // Query based on the role
     let query = '';
     if (role === 'student') {
       query = 'SELECT * FROM student';
@@ -71,19 +69,21 @@ router.get('/users/:role',authMiddleware , async (req, res) => {
     try {
         
       const [rows] = await db.execute(query);
-      res.status(200).json(rows);  // Sending users for the given role
+      res.status(200).json(rows);
     } catch (error) {
       console.error('Error fetching users:', error);
       res.status(500).json({ message: 'Error fetching users' });
     }
   });
   
-
-
     router.patch('/users/:role/:id/status',authMiddleware, async (req, res) => {
         const { role, id } = req.params;
         const { is_active } = req.body;
-      
+
+        if (!role || !id) {
+          return res.status(400).json({ message: 'Both role and id are required.' });
+        }
+
         const tableMap = {
           student: 'student',
           faculty: 'faculty',

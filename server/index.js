@@ -19,6 +19,7 @@ const __dirname = path.dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === "production";
 
+
 const corsOptions = {
   origin: isProduction ? "https://spistaccess.site" : "http://localhost:5173",
   credentials: true,
@@ -31,22 +32,21 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
-app.use('/auth', authRouter) 
+app.use('/auth', authRouter); 
 app.use('/api', courseRouter);
 app.use("/", homeRouter);
 app.use("/api", adminRouter);
 app.use("/classrooms", classRoute);  
-
+app.use('/api', uploadRoute);
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '/uploads/pdfs')));
 
-app.use('/api', uploadRoute);
-
 if (isProduction) {
-  const distPath = path.join(__dirname, '../dist');
-  app.use(express.static(distPath));
+  const clientBuildPath = path.join(__dirname, 'public');
+  app.use(express.static(clientBuildPath));
 
+  // For React Router
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, '../dist/index.html'));
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 }
 

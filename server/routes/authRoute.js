@@ -23,7 +23,7 @@ cron.schedule('0 0 * * *', async () => {
   try {
     const db = await connectToDatabase();
     const currentDate = new Date();
-    const inactivityThresholdDate = new Date(currentDate - INACTIVITY_PERIOD * 24 * 60 * 60 * 1000);
+    const inactivityThresholdDate = new Date(currentDate.getTime() - INACTIVITY_PERIOD * 24 * 60 * 60 * 1000);
 
     const [studentsToDeactivate] = await db.execute(
       'SELECT * FROM student WHERE last_active < ? AND status = "active"',
@@ -94,7 +94,7 @@ router.post('/register', async (req, res) => {
 const isProduction = process.env.NODE_ENV === "production";
 const MAX_ATTEMPTS = 5;
 const COOLDOWN_MINUTES = 120;
-router.post(  '/login',
+router.post( '/login',
 [
 
   body('email')
@@ -199,7 +199,7 @@ async (req, res) => {
 
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id },
                                     process.env.JWT_SECRET, 
-                                    { expiresIn: '10s' });       
+                                    { expiresIn: '1h' });       
 
         const refreshToken = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role, courseId: user.course_id  }, 
                                         process.env.JWT_REFRESH, 

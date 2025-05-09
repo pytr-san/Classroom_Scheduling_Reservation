@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import  axiosInstance  from '../../axios.jsx';
 import CreatableSelect from "react-select/creatable";
 import styles from "./ManageCourse.module.css";
@@ -12,7 +12,9 @@ import toast from 'react-hot-toast';
 const ManageCourse = () => {
 
   const navigate = useNavigate();
-  const { id } = useParams();
+  const location = useLocation();
+  const id = location.state?.course_id;
+
   const [subjects, setSubjects] = useState([]);
   const [courseName, setCourseName] = useState("");
   const [faculty, setFaculty] = useState([]);
