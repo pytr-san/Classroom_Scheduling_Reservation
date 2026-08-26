@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axiosInstance from './../axios.jsx';  // Your axios instance
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast'; // For showing toast notifications
-import './forgotpass.css';
+import './forgotPass.css';
 import { FaEnvelope,FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ForgotPass = () => {

@@ -10,6 +10,7 @@ export const connectToDatabase = async () => {
     try {
       pool = mysql.createPool({
         host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT) || 3307, 
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
@@ -18,13 +19,12 @@ export const connectToDatabase = async () => {
         queueLimit: 0,
       });
 
-      if (process.env.NODE_ENV !== 'production') {
+ 
         console.log("Database Connected Successfully");
-      }
+
     } catch (error) {
-      if (process.env.NODE_ENV !== 'production') {
+
         console.error("Database Connection Failed:", error);
-      }
       throw error;
     }
   }

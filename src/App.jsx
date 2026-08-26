@@ -18,8 +18,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import FileUploadPage from './Pages/Course/FileUploadPage.jsx';
 import ManageUsers from "./Pages/Settings/ManageUsers.jsx";
 import ForgotPassword from "./Pages/forgotPass.jsx";
-import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
-import TermsOfService from './pages/TermsOfService.jsx';
+import PrivacyPolicy from './Pages/PrivacyPolicy.jsx';
+import TermsOfService from './Pages/TermsOfService.jsx';
 
 const ROLES = {
   student: "student",

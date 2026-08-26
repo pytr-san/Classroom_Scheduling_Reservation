@@ -24,17 +24,20 @@ const AccessClassroom = () => {
         const fetchClassrooms = async () => {
             try {
                 const response = await axiosInstance.get("/classrooms/list");
-                setClassrooms(response.data);                 
-            } catch (error) {
-                console.error("Error fetching classrooms:", error);
+                const data = response.data;
+                setClassrooms(Array.isArray(data) ? data : []);                 
+            } catch (error) {;
                 toast.error('Failed to load classrooms.');
+                setClassrooms([]);
             }finally {
                 setLoading(false);
             }
         };
         fetchClassrooms();
     }, []);
-
+    if (!Array.isArray(classrooms)) {
+        console.warn("Expected classrooms to be an array but got:", classrooms);
+    }
     useEffect(() => {
         localStorage.setItem("currentFloor", currentFloor); 
     }, [currentFloor]);
@@ -58,21 +61,28 @@ const AccessClassroom = () => {
         setSearchQuery(event.target.value); 
       };
    
-    const searchedRooms = classrooms.filter((room) =>
-        room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+      const searchedRooms = Array.isArray(classrooms)
+      ? classrooms.filter((room) =>
+          room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      : [];
 
     const sortedRooms = [...searchedRooms].sort((a, b) => {
         if (!sortByCapacity) return 0;
         return a.capacity - b.capacity; 
     });
+    console.log("Searched Rooms:", searchedRooms);
 
-    const filteredRooms = sortedRooms.filter(
-        (room) =>
-            room.floor_building === `${currentFloor}${getOrdinalSuffix(currentFloor)} Floor`
-    );
-
-
+    console.log("Sorted Rooms:", sortedRooms);
+    
+    const filteredRooms = Array.isArray(sortedRooms)
+        ? sortedRooms.filter(
+            (room) =>
+                room.floor_building === `${currentFloor}${getOrdinalSuffix(currentFloor)} Floor`
+        )
+        : [];
+        
+console.log("filtered",filteredRooms );
     const handleReserve = (e) =>{
         navigate("/classroom/reservation", { state: { 
                 classrooms: filteredRooms,
@@ -126,7 +136,6 @@ const AccessClassroom = () => {
             </Button>
             <span><i className="bi bi-calendar"></i></span>
 
-            {/* Right: Search + Filter */}
             <div className="d-flex align-items-center gap-2 ms-auto">
                 <InputGroup style={{ maxWidth: "300px" }}>
                     <InputGroup.Text className="bg-light border-0">
@@ -158,7 +167,7 @@ const AccessClassroom = () => {
                 <ul className="list-unstyled">
                     {loading ? (
                         <li>Loading classrooms...</li>
-                    ) : searchQuery.trim() !== "" ? (
+                    ) :  searchQuery.trim() !== "" ? (
                         (() => {
                             const searchedRooms = classrooms.filter((room) =>
                                 room.room_name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -167,14 +176,15 @@ const AccessClassroom = () => {
                             if (searchedRooms.length === 0) {
                                 return <li>No classrooms match your search.</li>;
                             }
-
-                            const groupedByFloor = searchedRooms.reduce((groups, room) => {
+                            const groupedByFloor = Array.isArray(searchedRooms)
+                            ? searchedRooms.reduce((groups, room) => {
                                 const floor = room.floor_building;
                                 if (!groups[floor]) groups[floor] = [];
                                 groups[floor].push(room);
                                 return groups;
-                            }, {});
-
+                            }, {})
+                            : {};
+                        
                             return Object.entries(groupedByFloor).map(([floor, rooms]) => (
                                 
                                 <li key={floor}>

@@ -15,7 +15,8 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
     const fetchCourses = async () => {
       try {
         const response = await axiosInstance.get("/api/course");
-        setCourses(response.data); // Assuming API returns an array of course names
+        const data = Array.isArray(response.data) ? response.data : response.data.data || [];
+        setCourses(data);
       } catch (error) {
         console.error("Error fetching courses:", error);
       }
@@ -25,12 +26,15 @@ const RoomSelectionModal = ({ show, handleClose,onConfirm, classrooms }) => {
   }, []);
     
 
-  const groupedByFloor = (classrooms || []).reduce((acc, room) => {
-    const floor = room.floor_building || "Unknown Floor";
-    if (!acc[floor]) acc[floor] = [];
-    acc[floor].push(room);
-    return acc;
-  }, {});
+  const groupedByFloor = Array.isArray(classrooms)
+  ? classrooms.reduce((acc, room) => {
+      const floor = room.floor_building || "Unknown Floor";
+      if (!acc[floor]) acc[floor] = [];
+      acc[floor].push(room);
+      return acc;
+    }, {})
+  : {};
+
 
   const [selectedRooms, setSelectedRooms] = useState([]);
 

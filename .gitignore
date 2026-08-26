@@ -8,12 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-/server/.env
+server/.env
+server/uploads/*
 *.pdf binary
 dist
 dist-ssr
 *.local
-
+scheduling_db.sql
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -93,7 +93,7 @@ const Settings = () => {
                     <AdminAccess onAccessGranted={onAccessGranted} />
                 ) : (
                 <div className="admin">
-                    <h2>🔑 Admin Settings</h2>
+                    <h2> Admin Settings</h2>
                     <p>Manage system settings, user accounts, and security policies.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
                     <button onClick={handleManageUser}>Manage Users</button>
@@ -109,7 +109,7 @@ const Settings = () => {
 
             {auth?.role === "faculty" && (
                 <div className="faculty">
-                    <h2>📚 Faculty Settings</h2>
+                    <h2> Faculty Settings</h2>
                     <p>Update course materials, modify profile, and change password.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
                 </div>
@@ -117,7 +117,7 @@ const Settings = () => {
 
             {auth?.role === "student" && (
                 <div className="student">
-                    <h2>🎓 Student Settings</h2>
+                    <h2> Student Settings</h2>
                     <p>Update personal information and change password.</p>
                     <button onClick={handlePasswordChange}>Change Password</button>
 

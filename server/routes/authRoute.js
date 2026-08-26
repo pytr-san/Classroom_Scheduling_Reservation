@@ -91,7 +91,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "Production";
 const MAX_ATTEMPTS = 5;
 const COOLDOWN_MINUTES = 120;
 router.post( '/login',
@@ -108,7 +108,7 @@ router.post( '/login',
     .isLength({ min: 6 }).withMessage('Password must be at least 16 characters.')
 ],
 async (req, res) => {
- 
+  console.log("new:", isProduction);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -210,7 +210,7 @@ async (req, res) => {
         res.cookie("token", refreshToken, {
           httpOnly: true,
           secure: isProduction, 
-          sameSite: isProduction ? "none" : "lax",
+          sameSite: "lax",
           maxAge: 24 * 60 * 60 * 1000,
           path: "/"
         });
@@ -255,8 +255,8 @@ router.post("/refresh", (req, res) => {
   router.post("/logout", (req, res) => {
         res.clearCookie("token", {
           httpOnly: true,
-          secure: isProduction,  
-          sameSite: isProduction ? "none" : "lax",  
+          secure: true,  
+          sameSite: "lax",  
           path: "/"
         });
 

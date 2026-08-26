@@ -17,8 +17,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isProduction = process.env.NODE_ENV === "production";
-
+const isProduction = process.env.NODE_ENV === "Production";
 
 const corsOptions = {
   origin: isProduction ? "https://spistaccess.site" : "http://localhost:5173",
@@ -36,13 +35,14 @@ app.use('/auth', authRouter);
 app.use('/api', courseRouter);
 app.use("/", homeRouter);
 app.use("/api", adminRouter);
-app.use("/classrooms", classRoute);  
+app.use("/classrooms", classRoute);   
 app.use('/api', uploadRoute);
 app.use('/uploads/pdfs', express.static(path.join(__dirname, '/uploads/pdfs')));
 
 
-app.listen(process.env.PORT, () => {
-  if (process.env.NODE_ENV !== 'production') {
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+  if (isProduction !== 'production') {
     console.log(`Server Started on Port ${process.env.PORT}`);
   }
   });

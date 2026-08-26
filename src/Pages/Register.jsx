@@ -111,7 +111,7 @@ export default function Register() {
             const { user } = response.data;
 
             if (data.role === "Student") {
-
+                console.log("year:", data.year_level);
                 await axiosInstance.post(`/api/student/details?email=${user.email}`, {
                     course_id: data.course,  // Pass course_id
                     year_level: data.year_level,  // Pass year level
